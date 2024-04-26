@@ -84,11 +84,7 @@ extension ELFFile {
             return nil
         }
         let section = sections[header.sectionNameStringTableIndex]
-        return .init(
-            elf: self,
-            offset: section.offset,
-            size: section.size
-        )
+        return section._strings(in: self)
     }
 }
 

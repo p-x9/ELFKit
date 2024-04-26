@@ -27,3 +27,14 @@ extension ELFSectionHeaderProtocol {
         )
     }
 }
+
+extension ELFSectionHeaderProtocol {
+    public func _strings(in elf: ELFFile) -> ELFFile.Strings? {
+        guard type == .strtab else { return nil }
+        return .init(
+            elf: elf,
+            offset: offset,
+            size: size
+        )
+    }
+}
