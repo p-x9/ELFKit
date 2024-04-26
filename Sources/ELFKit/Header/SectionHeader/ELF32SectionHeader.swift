@@ -16,6 +16,8 @@ public struct ELF32SectionHeader: LayoutWrapper {
 }
 
 extension ELF32SectionHeader: ELFSectionHeaderProtocol {
+    public var nameOffset: Int { numericCast(layout.sh_name) }
+
     public var type: SectionType! {
         .init(rawValue: numericCast(layout.sh_type))
     }
