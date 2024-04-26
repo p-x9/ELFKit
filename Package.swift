@@ -12,7 +12,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "ELFKit"
+            name: "ELFKit",
+            dependencies: [
+                "ELFKitC"
+            ]
+        ),
+        .target(
+            name: "ELFKitC"
         ),
         .testTarget(
             name: "ELFKitTests",
