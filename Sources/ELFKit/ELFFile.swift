@@ -52,3 +52,43 @@ public class ELFFile {
         fileHandle.closeFile()
     }
 }
+
+extension ELFFile {
+    public var sections32: DataSequence<ELF32SectionHeader>? {
+        guard !is64Bit else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(header.sectionTableOffset),
+            numberOfElements: header.numberOfSections
+        )
+    }
+
+    public var sections64: DataSequence<ELF64SectionHeader>? {
+        guard is64Bit else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(header.sectionTableOffset),
+            numberOfElements: header.numberOfSections
+        )
+    }
+
+    public var sections: [ELFSectionHeaderProtocol] {
+        if let sections64 {
+            return Array(sections64)
+        } else if let sections32 {
+            return Array(sections32)
+        }
+        return []
+    }
+
+    public var sectionHeaderStrings: Strings? {
+        guard sections.indices.contains(header.sectionNameStringTableIndex) else {
+            return nil
+        }
+        let section = sections[header.sectionNameStringTableIndex]
+        return .init(
+            elf: self,
+            offset: section.offset,
+            size: section.size
+        )
+    }
+}
+
