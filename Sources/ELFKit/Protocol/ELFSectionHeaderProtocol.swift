@@ -101,7 +101,7 @@ extension ELFSectionHeaderProtocol {
 
 extension ELFSectionHeaderProtocol {
     public func _note32(in elf: ELFFile) -> ELF32Note? {
-        guard type == .note else { return nil }
+        guard type == .note, !elf.is64Bit else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: size
@@ -110,7 +110,7 @@ extension ELFSectionHeaderProtocol {
     }
 
     public func _note64(in elf: ELFFile) -> ELF64Note? {
-        guard type == .note else { return nil }
+        guard type == .note, elf.is64Bit else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: size
@@ -123,6 +123,34 @@ extension ELFSectionHeaderProtocol {
             return _note64(in: elf)
         } else {
             return _note32(in: elf)
+        }
+    }
+}
+
+extension ELFSectionHeaderProtocol {
+    public func _dynamic32(in elf: ELFFile) -> DataSequence<ELF32Dynamic>? {
+        guard type == .dynamic, !elf.is64Bit else { return nil }
+        let count = size / ELF32Dynamic.layoutSize
+        return elf.fileHandle.readDataSequence(
+            offset: UInt64(offset),
+            numberOfElements: count
+        )
+    }
+
+    public func _dynamic64(in elf: ELFFile) -> DataSequence<ELF64Dynamic>? {
+        guard type == .dynamic, elf.is64Bit else { return nil }
+        let count = size / ELF64Dynamic.layoutSize
+        return elf.fileHandle.readDataSequence(
+            offset: UInt64(offset),
+            numberOfElements: count
+        )
+    }
+
+    public func _dynamic(in elf: ELFFile) -> [ELFDynamicProtocol]? {
+        if elf.is64Bit {
+            return _dynamic64(in: elf)?.map { $0 }
+        } else {
+            return _dynamic32(in: elf)?.map { $0 }
         }
     }
 }

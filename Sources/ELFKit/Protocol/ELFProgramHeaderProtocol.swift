@@ -21,7 +21,7 @@ public protocol ELFProgramHeaderProtocol {
 
 extension ELFProgramHeaderProtocol {
     public func _notes32(in elf: ELFFile) -> ELFNotes<ELF32Note>? {
-        guard type == .note else { return nil }
+        guard type == .note, !elf.is64Bit else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: fileSize
@@ -30,7 +30,7 @@ extension ELFProgramHeaderProtocol {
     }
 
     public func _notes64(in elf: ELFFile) -> ELFNotes<ELF64Note>? {
-        guard type == .note else { return nil }
+        guard type == .note, elf.is64Bit else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: fileSize
@@ -40,9 +40,37 @@ extension ELFProgramHeaderProtocol {
 
     public func _notes(in elf: ELFFile) -> [any ELFNoteProtocol]? {
         if elf.is64Bit {
-            return _notes64(in: elf)?.map { $0}
+            return _notes64(in: elf)?.map { $0 }
         } else {
             return _notes32(in: elf)?.map { $0 }
+        }
+    }
+}
+
+extension ELFProgramHeaderProtocol {
+    public func _dynamic32(in elf: ELFFile) -> DataSequence<ELF32Dynamic>? {
+        guard type == .dynamic, !elf.is64Bit else { return nil }
+        let count = fileSize / ELF32Dynamic.layoutSize
+        return elf.fileHandle.readDataSequence(
+            offset: UInt64(offset),
+            numberOfElements: count
+        )
+    }
+
+    public func _dynamic64(in elf: ELFFile) -> DataSequence<ELF64Dynamic>? {
+        guard type == .dynamic, elf.is64Bit else { return nil }
+        let count = fileSize / ELF64Dynamic.layoutSize
+        return elf.fileHandle.readDataSequence(
+            offset: UInt64(offset),
+            numberOfElements: count
+        )
+    }
+
+    public func _dynamic(in elf: ELFFile) -> [ELFDynamicProtocol]? {
+        if elf.is64Bit {
+            return _dynamic64(in: elf)?.map { $0 } ?? []
+        } else {
+            return _dynamic32(in: elf)?.map { $0 } ?? []
         }
     }
 }
