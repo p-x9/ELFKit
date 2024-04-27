@@ -115,3 +115,30 @@ extension ELFFile {
         }
     }
 }
+
+extension ELFFile {
+    public var programs32: DataSequence<ELF32ProgramHeader>? {
+        guard !is64Bit else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(header.programTableOffset),
+            numberOfElements: header.numberOfPrograms
+        )
+    }
+
+    public var programs64: DataSequence<ELF64ProgramHeader>? {
+        guard is64Bit else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(header.programTableOffset),
+            numberOfElements: header.numberOfPrograms
+        )
+    }
+
+    public var programs: [ELFProgramHeaderProtocol] {
+        if let programs64 {
+            return Array(programs64)
+        } else if let programs32 {
+            return Array(programs32)
+        }
+        return []
+    }
+}

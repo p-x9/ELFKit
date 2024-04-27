@@ -65,3 +65,26 @@ extension ELFHeader {
         }
     }
 }
+
+extension ELFHeader {
+    public var programTableOffset: Int {
+        switch self {
+        case ._32(let v): numericCast(v.e_phoff)
+        case ._64(let v): numericCast(v.e_phoff)
+        }
+    }
+
+    public var programTableEntrySize: Int {
+        switch self {
+        case ._32(let v): numericCast(v.e_phentsize)
+        case ._64(let v): numericCast(v.e_phentsize)
+        }
+    }
+
+    public var numberOfPrograms: Int {
+        switch self {
+        case ._32(let v): numericCast(v.e_phnum)
+        case ._64(let v): numericCast(v.e_phnum)
+        }
+    }
+}
