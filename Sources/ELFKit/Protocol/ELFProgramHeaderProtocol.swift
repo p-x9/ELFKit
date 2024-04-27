@@ -20,7 +20,7 @@ public protocol ELFProgramHeaderProtocol {
 }
 
 extension ELFProgramHeaderProtocol {
-    public func _note32(in elf: ELFFile) -> ELF32Note? {
+    public func _notes32(in elf: ELFFile) -> ELFNotes<ELF32Note>? {
         guard type == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
@@ -29,7 +29,7 @@ extension ELFProgramHeaderProtocol {
         return .init(data: data)
     }
 
-    public func _note64(in elf: ELFFile) -> ELF64Note? {
+    public func _notes64(in elf: ELFFile) -> ELFNotes<ELF64Note>? {
         guard type == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
@@ -38,11 +38,11 @@ extension ELFProgramHeaderProtocol {
         return .init(data: data)
     }
 
-    public func _note(in elf: ELFFile) -> (any ELFNoteProtocol)? {
+    public func _notes(in elf: ELFFile) -> [any ELFNoteProtocol]? {
         if elf.is64Bit {
-            return _note64(in: elf)
+            return _notes64(in: elf)?.map { $0}
         } else {
-            return _note32(in: elf)
+            return _notes32(in: elf)?.map { $0 }
         }
     }
 }

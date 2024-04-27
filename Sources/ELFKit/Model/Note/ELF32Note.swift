@@ -13,7 +13,7 @@ public struct ELF32Note {
     public let data: Data
     public let header: ELF32NoteHeader
 
-    init?(data: Data) {
+    public init?(data: Data) {
         guard data.count >= ELF32NoteHeader.layoutSize else {
             return nil
         }
