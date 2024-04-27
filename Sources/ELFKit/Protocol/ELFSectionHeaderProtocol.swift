@@ -98,3 +98,31 @@ extension ELFSectionHeaderProtocol {
         }
     }
 }
+
+extension ELFSectionHeaderProtocol {
+    public func _note32(in elf: ELFFile) -> ELF32Note? {
+        guard type == .note else { return nil }
+        let data = elf.fileHandle.readData(
+            offset: numericCast(offset),
+            size: size
+        )
+        return .init(data: data)
+    }
+
+    public func _note64(in elf: ELFFile) -> ELF64Note? {
+        guard type == .note else { return nil }
+        let data = elf.fileHandle.readData(
+            offset: numericCast(offset),
+            size: size
+        )
+        return .init(data: data)
+    }
+
+    public func _note(in elf: ELFFile) -> (any ELFNoteProtocol)? {
+        if elf.is64Bit {
+            return _note64(in: elf)
+        } else {
+            return _note32(in: elf)
+        }
+    }
+}
