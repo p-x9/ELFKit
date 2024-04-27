@@ -88,3 +88,30 @@ extension ELFFile {
     }
 }
 
+extension ELFFile {
+    public var symbols32: DataSequence<ELF32Symbol>? {
+        guard !is64Bit, let _symtab else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(_symtab.offset),
+            numberOfElements: _symtab.size / ELF32Symbol.layoutSize
+        )
+    }
+
+    public var symbols64: DataSequence<ELF64Symbol>? {
+        guard is64Bit, let _symtab else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(_symtab.offset),
+            numberOfElements: _symtab.size / ELF64Symbol.layoutSize
+        )
+    }
+
+    public var symbols: [ELFSymbolProtocol] {
+        if is64Bit, let symbols64 {
+            return Array(symbols64)
+        } else if let symbols32 {
+            return Array(symbols32)
+        } else {
+            return []
+        }
+    }
+}
