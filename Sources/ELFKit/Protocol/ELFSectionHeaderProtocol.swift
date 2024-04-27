@@ -38,3 +38,63 @@ extension ELFSectionHeaderProtocol {
         )
     }
 }
+
+extension ELFSectionHeaderProtocol {
+    public func _relocations32(in elf: ELFFile) -> AnyRandomAccessCollection<ELF32Relocation>? {
+        guard !elf.is64Bit else { return nil }
+        switch type {
+        case .rel:
+            let count = size / ELF32RelocationInfo.layoutSize
+            let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence
+                    .map {
+                        .general($0)
+                    }
+            )
+        case .rela:
+            let count = size / ELF32RelocationAddendInfo.layoutSize
+            let sequence: DataSequence<ELF32RelocationAddendInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence
+                    .map {
+                        .addend($0)
+                    }
+            )
+        default:
+            return nil
+        }
+    }
+
+    public func _relocations64(in elf: ELFFile) -> AnyRandomAccessCollection<ELF64Relocation>? {
+        guard elf.is64Bit else { return nil }
+        switch type {
+        case .rel:
+            let count = size / ELF64RelocationInfo.layoutSize
+            let sequence: DataSequence<ELF64RelocationInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        case .rela:
+            let count = size / ELF64RelocationAddendInfo.layoutSize
+            let sequence: DataSequence<ELF64RelocationAddendInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        default:
+            return nil
+        }
+    }
+}
