@@ -68,9 +68,9 @@ extension ELFProgramHeaderProtocol {
 
     public func _dynamic(in elf: ELFFile) -> [ELFDynamicProtocol]? {
         if elf.is64Bit {
-            return _dynamic64(in: elf)?.map { $0 } ?? []
+            return _dynamic64(in: elf)?.map { $0 }
         } else {
-            return _dynamic32(in: elf)?.map { $0 } ?? []
+            return _dynamic32(in: elf)?.map { $0 }
         }
     }
 }

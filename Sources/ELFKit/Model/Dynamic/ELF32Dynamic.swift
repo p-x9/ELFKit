@@ -19,4 +19,12 @@ extension ELF32Dynamic: ELFDynamicProtocol {
     public var tag: DynamicTag! {
         .init(rawValue: numericCast(layout.d_tag))
     }
+
+    public var value: Int {
+        numericCast(layout.d_un.d_val)
+    }
+    
+    public var pointer: Int {
+        numericCast(layout.d_un.d_ptr)
+    }
 }

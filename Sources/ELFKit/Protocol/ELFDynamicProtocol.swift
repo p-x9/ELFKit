@@ -10,4 +10,6 @@ import Foundation
 
 public protocol ELFDynamicProtocol {
     var tag: DynamicTag! { get }
+    var value: Int { get }
+    var pointer: Int { get }
 }
