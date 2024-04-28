@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SectionType {
+public enum SectionType: CaseIterable {
     /// SHT_NULL
     case null
     /// SHT_PROGBITS
@@ -34,16 +34,16 @@ public enum SectionType {
     case shlib
     /// SHT_DYNSYM
     case dynsym
-    /// SHT_NUM
-    case num
-    /// SHT_LOPROC
-    case loproc
-    /// SHT_HIPROC
-    case hiproc
-    /// SHT_LOUSER
-    case louser
-    /// SHT_HIUSER
-    case hiuser
+    /// SHT_INIT_ARRAY
+    case init_array
+    /// SHT_FINI_ARRAY
+    case fini_array
+    /// SHT_PREINIT_ARRAY
+    case preinit_array
+    /// SHT_GROUP
+    case group
+    /// SHT_SYMTAB_SHNDX
+    case symtab_shndx
 }
 
 extension SectionType: RawRepresentable {
@@ -63,11 +63,11 @@ extension SectionType: RawRepresentable {
         case RawValue(SHT_REL): self = .rel
         case RawValue(SHT_SHLIB): self = .shlib
         case RawValue(SHT_DYNSYM): self = .dynsym
-        case RawValue(SHT_NUM): self = .num
-        case RawValue(SHT_LOPROC): self = .loproc
-        case RawValue(SHT_HIPROC): self = .hiproc
-        case RawValue(SHT_LOUSER): self = .louser
-        case RawValue(SHT_HIUSER): self = .hiuser
+        case RawValue(SHT_INIT_ARRAY): self = .init_array
+        case RawValue(SHT_FINI_ARRAY): self = .fini_array
+        case RawValue(SHT_PREINIT_ARRAY): self = .preinit_array
+        case RawValue(SHT_GROUP): self = .group
+        case RawValue(SHT_SYMTAB_SHNDX): self = .symtab_shndx
         default: return nil
         }
     }
@@ -86,11 +86,11 @@ extension SectionType: RawRepresentable {
         case .rel: RawValue(SHT_REL)
         case .shlib: RawValue(SHT_SHLIB)
         case .dynsym: RawValue(SHT_DYNSYM)
-        case .num: RawValue(SHT_NUM)
-        case .loproc: RawValue(SHT_LOPROC)
-        case .hiproc: RawValue(SHT_HIPROC)
-        case .louser: RawValue(SHT_LOUSER)
-        case .hiuser: RawValue(SHT_HIUSER)
+        case .init_array: RawValue(SHT_INIT_ARRAY)
+        case .fini_array: RawValue(SHT_FINI_ARRAY)
+        case .preinit_array: RawValue(SHT_PREINIT_ARRAY)
+        case .group: RawValue(SHT_GROUP)
+        case .symtab_shndx: RawValue(SHT_SYMTAB_SHNDX)
         }
     }
 }
@@ -110,11 +110,11 @@ extension SectionType: CustomStringConvertible {
         case .rel: "SHT_REL"
         case .shlib: "SHT_SHLIB"
         case .dynsym: "SHT_DYNSYM"
-        case .num: "SHT_NUM"
-        case .loproc: "SHT_LOPROC"
-        case .hiproc: "SHT_HIPROC"
-        case .louser: "SHT_LOUSER"
-        case .hiuser: "SHT_HIUSER"
+        case .init_array: "SHT_INIT_ARRAY"
+        case .fini_array: "SHT_FINI_ARRAY"
+        case .preinit_array: "SHT_PREINIT_ARRAY"
+        case .group: "SHT_GROUP"
+        case .symtab_shndx: "SHT_SYMTAB_SHNDX"
         }
     }
 }

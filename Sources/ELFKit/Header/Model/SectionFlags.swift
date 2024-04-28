@@ -32,17 +32,37 @@ extension SectionFlags {
     public static let execinstr = SectionFlags(
         rawValue: Bit.execinstr.rawValue
     )
-    /// SHF_RELA_LIVEPATCH
-    public static let rela_livepatch = SectionFlags(
-        rawValue: Bit.rela_livepatch.rawValue
+    /// SHF_MERGE
+    public static let merge = SectionFlags(
+        rawValue: Bit.merge.rawValue
     )
-    /// SHF_RO_AFTER_INIT
-    public static let ro_after_init = SectionFlags(
-        rawValue: Bit.ro_after_init.rawValue
+    /// SHF_STRINGS
+    public static let strings = SectionFlags(
+        rawValue: Bit.strings.rawValue
     )
-    /// SHF_MASKPROC
-    public static let maskproc = SectionFlags(
-        rawValue: Bit.maskproc.rawValue
+    /// SHF_INFO_LINK
+    public static let info_link = SectionFlags(
+        rawValue: Bit.info_link.rawValue
+    )
+    /// SHF_LINK_ORDER
+    public static let link_order = SectionFlags(
+        rawValue: Bit.link_order.rawValue
+    )
+    /// SHF_OS_NONCONFORMING
+    public static let os_nonconforming = SectionFlags(
+        rawValue: Bit.os_nonconforming.rawValue
+    )
+    /// SHF_GROUP
+    public static let group = SectionFlags(
+        rawValue: Bit.group.rawValue
+    )
+    /// SHF_TLS
+    public static let tls = SectionFlags(
+        rawValue: Bit.tls.rawValue
+    )
+    /// SHF_COMPRESSED
+    public static let compressed = SectionFlags(
+        rawValue: Bit.compressed.rawValue
     )
 }
 
@@ -54,12 +74,22 @@ extension SectionFlags {
         case alloc
         /// SHF_EXECINSTR
         case execinstr
-        /// SHF_RELA_LIVEPATCH
-        case rela_livepatch
-        /// SHF_RO_AFTER_INIT
-        case ro_after_init
-        /// SHF_MASKPROC
-        case maskproc
+        /// SHF_MERGE
+        case merge
+        /// SHF_STRINGS
+        case strings
+        /// SHF_INFO_LINK
+        case info_link
+        /// SHF_LINK_ORDER
+        case link_order
+        /// SHF_OS_NONCONFORMING
+        case os_nonconforming
+        /// SHF_GROUP
+        case group
+        /// SHF_TLS
+        case tls
+        /// SHF_COMPRESSED
+        case compressed
     }
 }
 
@@ -71,9 +101,14 @@ extension SectionFlags.Bit: RawRepresentable {
         case RawValue(SHF_WRITE): self = .write
         case RawValue(SHF_ALLOC): self = .alloc
         case RawValue(SHF_EXECINSTR): self = .execinstr
-        case RawValue(SHF_RELA_LIVEPATCH): self = .rela_livepatch
-        case RawValue(SHF_RO_AFTER_INIT): self = .ro_after_init
-        case RawValue(SHF_MASKPROC): self = .maskproc
+        case RawValue(SHF_MERGE): self = .merge
+        case RawValue(SHF_STRINGS): self = .strings
+        case RawValue(SHF_INFO_LINK): self = .info_link
+        case RawValue(SHF_LINK_ORDER): self = .link_order
+        case RawValue(SHF_OS_NONCONFORMING): self = .os_nonconforming
+        case RawValue(SHF_GROUP): self = .group
+        case RawValue(SHF_TLS): self = .tls
+        case RawValue(SHF_COMPRESSED): self = .compressed
         default: return nil
         }
     }
@@ -83,9 +118,14 @@ extension SectionFlags.Bit: RawRepresentable {
         case .write: RawValue(SHF_WRITE)
         case .alloc: RawValue(SHF_ALLOC)
         case .execinstr: RawValue(SHF_EXECINSTR)
-        case .rela_livepatch: RawValue(SHF_RELA_LIVEPATCH)
-        case .ro_after_init: RawValue(SHF_RO_AFTER_INIT)
-        case .maskproc: RawValue(SHF_MASKPROC)
+        case .merge: RawValue(SHF_MERGE)
+        case .strings: RawValue(SHF_STRINGS)
+        case .info_link: RawValue(SHF_INFO_LINK)
+        case .link_order: RawValue(SHF_LINK_ORDER)
+        case .os_nonconforming: RawValue(SHF_OS_NONCONFORMING)
+        case .group: RawValue(SHF_GROUP)
+        case .tls: RawValue(SHF_TLS)
+        case .compressed: RawValue(SHF_COMPRESSED)
         }
     }
 }
@@ -96,9 +136,14 @@ extension SectionFlags.Bit: CustomStringConvertible {
         case .write: "SHF_WRITE"
         case .alloc: "SHF_ALLOC"
         case .execinstr: "SHF_EXECINSTR"
-        case .rela_livepatch: "SHF_RELA_LIVEPATCH"
-        case .ro_after_init: "SHF_RO_AFTER_INIT"
-        case .maskproc: "SHF_MASKPROC"
+        case .merge: "SHF_MERGE"
+        case .strings: "SHF_STRINGS"
+        case .info_link: "SHF_INFO_LINK"
+        case .link_order: "SHF_LINK_ORDER"
+        case .os_nonconforming: "SHF_OS_NONCONFORMING"
+        case .group: "SHF_GROUP"
+        case .tls: "SHF_TLS"
+        case .compressed: "SHF_COMPRESSED"
         }
     }
 }

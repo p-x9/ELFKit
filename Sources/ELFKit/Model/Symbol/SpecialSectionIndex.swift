@@ -14,16 +14,12 @@ public enum SpecialSectionIndex: CaseIterable {
     case undef
     /// SHN_LORESERVE
     case loreserve
-    /// SHN_LOPROC
-    case loproc
-    /// SHN_HIPROC
-    case hiproc
-    /// SHN_LIVEPATCH
-    case livepatch
     /// SHN_ABS
     case abs
     /// SHN_COMMON
     case common
+    /// SHN_XINDEX
+    case xindex
     /// SHN_HIRESERVE
     case hireserve
 }
@@ -35,11 +31,9 @@ extension SpecialSectionIndex: RawRepresentable {
         switch rawValue {
         case RawValue(SHN_UNDEF): self = .undef
         case RawValue(SHN_LORESERVE): self = .loreserve
-        case RawValue(SHN_LOPROC): self = .loproc
-        case RawValue(SHN_HIPROC): self = .hiproc
-        case RawValue(SHN_LIVEPATCH): self = .livepatch
         case RawValue(SHN_ABS): self = .abs
         case RawValue(SHN_COMMON): self = .common
+        case RawValue(SHN_XINDEX): self = .xindex
         case RawValue(SHN_HIRESERVE): self = .hireserve
         default: return nil
         }
@@ -49,26 +43,23 @@ extension SpecialSectionIndex: RawRepresentable {
         switch self {
         case .undef: RawValue(SHN_UNDEF)
         case .loreserve: RawValue(SHN_LORESERVE)
-        case .loproc: RawValue(SHN_LOPROC)
-        case .hiproc: RawValue(SHN_HIPROC)
-        case .livepatch: RawValue(SHN_LIVEPATCH)
         case .abs: RawValue(SHN_ABS)
         case .common: RawValue(SHN_COMMON)
+        case .xindex: RawValue(SHN_XINDEX)
         case .hireserve: RawValue(SHN_HIRESERVE)
         }
     }
 }
+
 
 extension SpecialSectionIndex: CustomStringConvertible {
     public var description: String {
         switch self {
         case .undef: "SHN_UNDEF"
         case .loreserve: "SHN_LORESERVE"
-        case .loproc: "SHN_LOPROC"
-        case .hiproc: "SHN_HIPROC"
-        case .livepatch: "SHN_LIVEPATCH"
         case .abs: "SHN_ABS"
         case .common: "SHN_COMMON"
+        case .xindex: "SHN_XINDEX"
         case .hireserve: "SHN_HIRESERVE"
         }
     }

@@ -20,10 +20,6 @@ public enum ELFType {
     case dyn
     /// ET_CORE
     case core
-    /// ET_CORE
-    case loproc
-    /// ET_HIPROC
-    case hiproc
 }
 
 extension ELFType: RawRepresentable {
@@ -36,8 +32,6 @@ extension ELFType: RawRepresentable {
         case RawValue(ET_EXEC): self = .exec
         case RawValue(ET_DYN): self = .dyn
         case RawValue(ET_CORE): self = .core
-        case RawValue(ET_LOPROC): self = .loproc
-        case RawValue(ET_HIPROC): self = .hiproc
         default: return nil
         }
     }
@@ -49,8 +43,6 @@ extension ELFType: RawRepresentable {
         case .exec: RawValue(ET_EXEC)
         case .dyn: RawValue(ET_DYN)
         case .core: RawValue(ET_CORE)
-        case .loproc: RawValue(ET_LOPROC)
-        case .hiproc: RawValue(ET_HIPROC)
         }
     }
 }
@@ -63,8 +55,6 @@ extension ELFType: CustomStringConvertible {
         case .exec: "ET_EXEC"
         case .dyn: "ET_DYN"
         case .core: "ET_CORE"
-        case .loproc: "ET_LOPROC"
-        case .hiproc: "ET_HIPROC"
         }
     }
 }

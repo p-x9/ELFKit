@@ -26,24 +26,6 @@ public enum SegmentType: CaseIterable {
     case phdr
     /// PT_TLS
     case tls
-    /// PT_LOOS
-    case loos
-    /// PT_HIOS
-    case hios
-    /// PT_LOPROC
-    case loproc
-    /// PT_HIPROC
-    case hiproc
-    /// PT_GNU_EH_FRAME
-    case gnu_eh_frame
-    /// PT_GNU_STACK
-    case gnu_stack
-    /// PT_GNU_RELRO
-    case gnu_relro
-    /// PT_GNU_PROPERTY
-    case gnu_property
-    /// PT_AARCH64_MEMTAG_MTE
-    case aarch64_memtag_mte
 }
 
 extension SegmentType: RawRepresentable {
@@ -59,15 +41,6 @@ extension SegmentType: RawRepresentable {
         case RawValue(PT_SHLIB): self = .shlib
         case RawValue(PT_PHDR): self = .phdr
         case RawValue(PT_TLS): self = .tls
-        case RawValue(PT_LOOS): self = .loos
-        case RawValue(PT_HIOS): self = .hios
-        case RawValue(PT_LOPROC): self = .loproc
-        case RawValue(PT_HIPROC): self = .hiproc
-        case RawValue(PT_GNU_EH_FRAME): self = .gnu_eh_frame
-        case RawValue(PT_GNU_STACK): self = .gnu_stack
-        case RawValue(PT_GNU_RELRO): self = .gnu_relro
-        case RawValue(PT_GNU_PROPERTY): self = .gnu_property
-        case RawValue(PT_AARCH64_MEMTAG_MTE): self = .aarch64_memtag_mte
         default: return nil
         }
     }
@@ -82,15 +55,6 @@ extension SegmentType: RawRepresentable {
         case .shlib: RawValue(PT_SHLIB)
         case .phdr: RawValue(PT_PHDR)
         case .tls: RawValue(PT_TLS)
-        case .loos: RawValue(PT_LOOS)
-        case .hios: RawValue(PT_HIOS)
-        case .loproc: RawValue(PT_LOPROC)
-        case .hiproc: RawValue(PT_HIPROC)
-        case .gnu_eh_frame: RawValue(PT_GNU_EH_FRAME)
-        case .gnu_stack: RawValue(PT_GNU_STACK)
-        case .gnu_relro: RawValue(PT_GNU_RELRO)
-        case .gnu_property: RawValue(PT_GNU_PROPERTY)
-        case .aarch64_memtag_mte: RawValue(PT_AARCH64_MEMTAG_MTE)
         }
     }
 }
@@ -106,15 +70,6 @@ extension SegmentType: CustomStringConvertible {
         case .shlib: "PT_SHLIB"
         case .phdr: "PT_PHDR"
         case .tls: "PT_TLS"
-        case .loos: "PT_LOOS"
-        case .hios: "PT_HIOS"
-        case .loproc: "PT_LOPROC"
-        case .hiproc: "PT_HIPROC"
-        case .gnu_eh_frame: "PT_GNU_EH_FRAME"
-        case .gnu_stack: "PT_GNU_STACK"
-        case .gnu_relro: "PT_GNU_RELRO"
-        case .gnu_property: "PT_GNU_PROPERTY"
-        case .aarch64_memtag_mte: "PT_AARCH64_MEMTAG_MTE"
         }
     }
 }
