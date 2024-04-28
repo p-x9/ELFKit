@@ -24,10 +24,8 @@ public enum SymbolType: CaseIterable {
     case common
     /// STT_TLS
     case tls
-    /// STT_LOPROC
-    case loproc
-    /// STT_HIPROC
-    case hiproc
+    /// STT_NUM
+    case num
 }
 
 extension SymbolType: RawRepresentable {
@@ -42,8 +40,7 @@ extension SymbolType: RawRepresentable {
         case RawValue(STT_FILE): self = .file
         case RawValue(STT_COMMON): self = .common
         case RawValue(STT_TLS): self = .tls
-        case RawValue(13): self = .loproc
-        case RawValue(15): self = .hiproc
+        case RawValue(STT_NUM): self = .num
         default: return nil
         }
     }
@@ -57,8 +54,7 @@ extension SymbolType: RawRepresentable {
         case .file: RawValue(STT_FILE)
         case .common: RawValue(STT_COMMON)
         case .tls: RawValue(STT_TLS)
-        case .loproc: RawValue(13)
-        case .hiproc: RawValue(15)
+        case .num: RawValue(STT_NUM)
         }
     }
 }
@@ -73,8 +69,7 @@ extension SymbolType: CustomStringConvertible {
         case .file: "STT_FILE"
         case .common: "STT_COMMON"
         case .tls: "STT_TLS"
-        case .loproc: "STT_LOPROC"
-        case .hiproc: "STT_HIPROC"
+        case .num: "STT_NUM"
         }
     }
 }

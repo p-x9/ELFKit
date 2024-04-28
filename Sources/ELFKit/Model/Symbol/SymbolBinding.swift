@@ -16,10 +16,6 @@ public enum SymbolBinding: CaseIterable {
     case global
     /// STB_WEAK
     case weak
-    /// STB_LOPROC
-    case loproc
-    /// STB_HIPROC
-    case hiproc
 }
 
 extension SymbolBinding: RawRepresentable {
@@ -30,8 +26,6 @@ extension SymbolBinding: RawRepresentable {
         case RawValue(STB_LOCAL): self = .local
         case RawValue(STB_GLOBAL): self = .global
         case RawValue(STB_WEAK): self = .weak
-        case RawValue(13): self = .loproc
-        case RawValue(15): self = .hiproc
         default: return nil
         }
     }
@@ -41,8 +35,6 @@ extension SymbolBinding: RawRepresentable {
         case .local: RawValue(STB_LOCAL)
         case .global: RawValue(STB_GLOBAL)
         case .weak: RawValue(STB_WEAK)
-        case .loproc: RawValue(13)
-        case .hiproc: RawValue(15)
         }
     }
 }
@@ -53,8 +45,6 @@ extension SymbolBinding: CustomStringConvertible {
         case .local: "STB_LOCAL"
         case .global: "STB_GLOBAL"
         case .weak: "STB_WEAK"
-        case .loproc: "STB_LOPROC"
-        case .hiproc: "STB_HIPROC"
         }
     }
 }
