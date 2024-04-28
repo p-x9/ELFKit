@@ -170,3 +170,35 @@ extension ELFFile {
         return []
     }
 }
+
+extension ELFFile {
+    public var dynamics64: DataSequence<ELF64Dynamic>? {
+        guard is64Bit else { return nil }
+        if let dynamic = sections64?._dynamic {
+            return dynamic._dynamic64(in: self)
+        }
+        if let dynamic = programs64?._dynamic {
+            return dynamic._dynamic64(in: self)
+        }
+        return nil
+    }
+
+    public var dynamics32: DataSequence<ELF32Dynamic>? {
+        guard !is64Bit else { return nil }
+        if let dynamic = sections32?._dynamic {
+            return dynamic._dynamic32(in: self)
+        }
+        if let dynamic = programs32?._dynamic {
+            return dynamic._dynamic32(in: self)
+        }
+        return nil
+    }
+
+    public var dynamics: [any ELFDynamicProtocol]? {
+        if is64Bit {
+            dynamics64?.map { $0 }
+        } else {
+            dynamics32?.map { $0 }
+        }
+    }
+}

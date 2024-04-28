@@ -9,6 +9,10 @@
 import Foundation
 
 extension Sequence where Element: ELFSectionHeaderProtocol {
+    var _dynamic: Element? {
+        first(where: { $0.type == .dynamic })
+    }
+
     var _dynsym: Element? {
         first(where: { $0.type == .dynsym })
     }
