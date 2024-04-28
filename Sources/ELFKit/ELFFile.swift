@@ -117,6 +117,34 @@ extension ELFFile {
 }
 
 extension ELFFile {
+    public var dynamicSymbols32: DataSequence<ELF32Symbol>? {
+        guard !is64Bit, let _dysym else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(_dysym.offset),
+            numberOfElements: _dysym.size / ELF32Symbol.layoutSize
+        )
+    }
+
+    public var dynamicSymbols64: DataSequence<ELF64Symbol>? {
+        guard is64Bit, let _dysym else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(_dysym.offset),
+            numberOfElements: _dysym.size / ELF64Symbol.layoutSize
+        )
+    }
+
+    public var dynamicSymbols: [ELFSymbolProtocol] {
+        if is64Bit, let dynamicSymbols64 {
+            return Array(dynamicSymbols64)
+        } else if let dynamicSymbols32 {
+            return Array(dynamicSymbols32)
+        } else {
+            return []
+        }
+    }
+}
+
+extension ELFFile {
     public var programs32: DataSequence<ELF32ProgramHeader>? {
         guard !is64Bit else { return nil }
         return fileHandle.readDataSequence(

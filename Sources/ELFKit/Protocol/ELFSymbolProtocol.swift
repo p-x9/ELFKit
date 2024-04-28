@@ -18,11 +18,18 @@ public protocol ELFSymbolProtocol {
 }
 
 extension ELFSymbolProtocol {
-    public func name(in elf: ELFFile) -> String? {
-        guard let strtab = elf._strtab,
-              let data = strtab._strings(in: elf)?.data else {
+    public func name(in elf: ELFFile, isDynamic: Bool) -> String? {
+        var stringTable: ELFSectionHeaderProtocol?
+        if isDynamic {
+            stringTable = elf._dynstr
+        } else {
+            stringTable = elf._strtab
+        }
+
+        guard let stringTable,
+              let strings = stringTable._strings(in: elf) else {
             return nil
         }
-        return String(cString: data.advanced(by: nameOffset))
+        return strings.string(at: nameOffset)?.string
     }
 }

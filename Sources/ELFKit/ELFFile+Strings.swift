@@ -75,3 +75,15 @@ extension ELFFile.Strings {
         }
     }
 }
+
+extension ELFFile.Strings {
+    func string(at offset: Int) -> Element? {
+        guard data.count >= offset else { return nil }
+        guard let string = String(
+            cString: data.advanced(by: offset)
+        ) else {
+            return nil
+        }
+        return .init(string: string, offset: offset)
+    }
+}
