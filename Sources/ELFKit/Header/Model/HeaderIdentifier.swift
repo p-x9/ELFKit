@@ -37,4 +37,12 @@ extension HeaderIdentifier {
     public var version: UInt8 {
         layout.6 /* EI_VERSION */
     }
+
+    public var osABI: EFIOSABI! {
+        .init(rawValue: layout.7) // EI_OSABI
+    }
+
+    public var abiVersion: UInt8 {
+        layout.8 // EI_ABIVERSION
+    }
 }
