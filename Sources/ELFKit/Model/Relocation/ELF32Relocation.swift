@@ -14,11 +14,11 @@ public enum ELF32Relocation {
     case addend(ELF32RelocationAddendInfo)
 }
 
-extension ELF32Relocation {
-    public var offset: UInt32 {
+extension ELF32Relocation: ELFRelocationProtocol {
+    public var offset: Int {
         switch self {
-        case let .general(v): v.r_offset
-        case let .addend(v): v.r_offset
+        case let .general(v): numericCast(v.r_offset)
+        case let .addend(v): numericCast(v.r_offset)
         }
     }
 
@@ -29,16 +29,16 @@ extension ELF32Relocation {
         }
     }
 
-    public var type: UInt32 {
+    public var _type: Int {
         switch self {
-        case let .general(v): v.type
-        case let .addend(v): v.type
+        case let .general(v): numericCast(v._type)
+        case let .addend(v): numericCast(v._type)
         }
     }
 
-    public var addend: Int32 {
+    public var addend: Int {
         switch self {
-        case let .addend(v): v.r_addend
+        case let .addend(v): numericCast(v.r_addend)
         default: 0
         }
     }

@@ -26,7 +26,7 @@ extension ELF64RelocationInfo {
         numericCast(layout.r_info >> 32) // ELF64_R_SYM
     }
 
-    public var type: UInt64 {
+    public var _type: UInt64 {
         layout.r_info & 0xffffffff// ELF64_R_TYPE
     }
 }
@@ -36,7 +36,7 @@ extension ELF64RelocationAddendInfo {
         numericCast(layout.r_info >> 32) // ELF64_R_SYM
     }
 
-    public var type: UInt64 {
+    public var _type: UInt64 {
         layout.r_info & 0xffffffff// ELF64_R_TYPE
     }
 }

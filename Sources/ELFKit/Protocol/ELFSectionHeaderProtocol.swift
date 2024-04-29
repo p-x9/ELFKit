@@ -97,6 +97,14 @@ extension ELFSectionHeaderProtocol {
             return nil
         }
     }
+
+    public func _relocations(in elf: ELFFile) -> [any ELFRelocationProtocol]? {
+        if elf.is64Bit {
+            return _relocations64(in: elf)?.map { $0 }
+        } else {
+            return _relocations32(in: elf)?.map { $0 }
+        }
+    }
 }
 
 extension ELFSectionHeaderProtocol {

@@ -26,7 +26,7 @@ extension ELF32RelocationInfo {
         numericCast(layout.r_info >> 8) // ELF32_R_SYM
     }
 
-    public var type: UInt32 {
+    public var _type: UInt32 {
         layout.r_info & 0xff// ELF32_R_TYPE
     }
 }
@@ -36,7 +36,7 @@ extension ELF32RelocationAddendInfo {
         numericCast(layout.r_info >> 8) // ELF32_R_SYM
     }
 
-    public var type: UInt32 {
+    public var _type: UInt32 {
         layout.r_info & 0xff// ELF32_R_TYPE
     }
 }

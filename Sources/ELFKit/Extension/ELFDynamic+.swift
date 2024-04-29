@@ -321,4 +321,12 @@ extension Sequence where Element: ELFDynamicProtocol {
         }
         return nil
     }
+
+    public func relocations(in elf: ELFFile) -> [any ELFRelocationProtocol]? {
+        if elf.is64Bit {
+            return relocations64(in: elf)?.map { $0 }
+        } else {
+            return relocations32(in: elf)?.map { $0 }
+        }
+    }
 }
