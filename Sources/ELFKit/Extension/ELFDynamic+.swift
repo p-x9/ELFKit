@@ -268,3 +268,57 @@ extension Sequence where Element: ELFDynamicProtocol {
         }
     }
 }
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func relocations32(in elf: ELFFile) -> AnyRandomAccessCollection<ELF32Relocation>? {
+        guard !elf.is64Bit else { return nil }
+        if let _rel, let _relsz {
+            let count = _relsz.value / ELF32RelocationInfo.layoutSize
+            let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(_rel.pointer),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        }
+
+        if let _rela, let _relasz {
+            let count = _relasz.value / ELF32RelocationAddendInfo.layoutSize
+            let sequence: DataSequence<ELF32RelocationAddendInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(_rela.pointer),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        }
+        return nil
+    }
+
+    public func relocations64(in elf: ELFFile) -> AnyRandomAccessCollection<ELF64Relocation>? {
+        guard elf.is64Bit else { return nil }
+        if let _rel, let _relsz {
+            let count = _relsz.value / ELF64RelocationInfo.layoutSize
+            let sequence: DataSequence<ELF64RelocationInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(_rel.pointer),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        }
+
+        if let _rela, let _relasz {
+            let count = _relasz.value / ELF64RelocationAddendInfo.layoutSize
+            let sequence: DataSequence<ELF64RelocationAddendInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(_rela.pointer),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        }
+        return nil
+    }
+}
