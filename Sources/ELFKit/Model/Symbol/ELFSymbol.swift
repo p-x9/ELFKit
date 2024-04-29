@@ -27,13 +27,18 @@ extension ELF32Symbol: ELFSymbolProtocol {
     }
 
     public var binding: SymbolBinding! {
-        // ELF_ST_BIND
+        // ELF32_ST_BIND
         .init(rawValue: numericCast(layout.st_info >> 4))
     }
 
     public var type: SymbolType! {
-        // ELF_ST_TYPE
+        // ELF32_ST_TYPE
         .init(rawValue: numericCast(layout.st_info & 0xf))
+    }
+
+    public var visibility: SymbolVisibility! {
+        // ELF32_ST_VISIBILITY
+        .init(rawValue: layout.st_other & 0x3)
     }
 
     public var sectionIndex: Int? {
@@ -51,13 +56,18 @@ extension ELF64Symbol: ELFSymbolProtocol {
     }
 
     public var binding: SymbolBinding! {
-        // ELF_ST_BIND
+        // ELF64_ST_BIND
         .init(rawValue: numericCast(layout.st_info >> 4))
     }
 
     public var type: SymbolType! {
-        // ELF_ST_TYPE
+        // ELF64_ST_TYPE
         .init(rawValue: numericCast(layout.st_info & 0xf))
+    }
+
+    public var visibility: SymbolVisibility! {
+        // ELF64_ST_VISIBILITY
+        .init(rawValue: layout.st_other & 0x3)
     }
 
     public var sectionIndex: Int? {

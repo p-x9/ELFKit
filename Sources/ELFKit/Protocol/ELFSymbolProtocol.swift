@@ -13,6 +13,7 @@ public protocol ELFSymbolProtocol {
     var nameOffset: Int { get }
     var binding: SymbolBinding! { get }
     var type: SymbolType! { get }
+    var visibility: SymbolVisibility! { get }
     var sectionIndex: Int? { get }
     var specialSection: SpecialSectionIndex? { get }
 }
