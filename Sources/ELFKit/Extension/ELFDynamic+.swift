@@ -40,3 +40,11 @@ extension Sequence where Element: ELFDynamicProtocol {
     }
 }
 
+extension Sequence where Element: ELFDynamicProtocol {
+    public func neededs(in elf: ELFFile) -> [String] {
+        guard let strings = strings(in: elf) else { return [] }
+        return _neededs.compactMap {
+            strings.string(at: numericCast($0.value))?.string
+        }
+    }
+}
