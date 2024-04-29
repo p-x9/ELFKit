@@ -48,3 +48,19 @@ extension Sequence where Element: ELFDynamicProtocol {
         }
     }
 }
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func rpaths(in elf: ELFFile) -> [String] {
+        guard let strings = strings(in: elf) else { return [] }
+        return _rpath.compactMap {
+            strings.string(at: numericCast($0.value))?.string
+        }
+    }
+
+    public func runpaths(in elf: ELFFile) -> [String] {
+        guard let strings = strings(in: elf) else { return [] }
+        return _runpath.compactMap {
+            strings.string(at: numericCast($0.value))?.string
+        }
+    }
+}
