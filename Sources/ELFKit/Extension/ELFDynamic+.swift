@@ -219,3 +219,43 @@ extension Sequence where Element: ELFDynamicProtocol {
         }
     }
 }
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func symbols32(in elf: ELFFile) -> DataSequence<ELF32Symbol>? {
+        guard !elf.is64Bit, let _symtab else { return nil }
+        var numberOfSymbols: Int?
+        if let hashHeader = hashTableHeader(in: elf) {
+            numberOfSymbols = hashHeader.numberOfChains
+        } else if let gnuHashTable = gnuHashTable(in: elf) {
+            numberOfSymbols = gnuHashTable.numberOfSymbols(in: elf)
+        }
+        guard let numberOfSymbols else { return nil }
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(_symtab.pointer),
+            numberOfElements: numberOfSymbols
+        )
+    }
+
+    public func symbols64(in elf: ELFFile) -> DataSequence<ELF64Symbol>? {
+        guard elf.is64Bit, let _symtab else { return nil }
+        var numberOfSymbols: Int?
+        if let hashHeader = hashTableHeader(in: elf) {
+            numberOfSymbols = hashHeader.numberOfChains
+        } else if let gnuHashTable = gnuHashTable(in: elf) {
+            numberOfSymbols = gnuHashTable.numberOfSymbols(in: elf)
+        }
+        guard let numberOfSymbols else { return nil }
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(_symtab.pointer),
+            numberOfElements: numberOfSymbols
+        )
+    }
+
+    public func symbols(in elf: ELFFile) -> [ELFSymbolProtocol]? {
+        if elf.is64Bit {
+            return symbols64(in: elf)?.map { $0 }
+        } else {
+            return symbols32(in: elf)?.map { $0 }
+        }
+    }
+}
