@@ -10,6 +10,7 @@ import Foundation
 
 extension Sequence where Element: ELFDynamicProtocol {
     var _neededs: [Element] { filter { $0.tag == .needed } }
+    var _soname: Element? { first(where: { $0.tag == .soname }) }
 
     var _strtab: Element? { first(where: { $0.tag == .strtab }) }
     var _strsiz: Element? { first(where: { $0.tag == .strsz }) }
@@ -62,6 +63,14 @@ extension Sequence where Element: ELFDynamicProtocol {
         return _runpath.compactMap {
             strings.string(at: numericCast($0.value))?.string
         }
+    }
+}
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func sharedObjectName(in elf: ELFFile) -> String? {
+        guard let _soname else { return nil }
+        guard let strings = strings(in: elf) else { return nil }
+        return strings.string(at: _soname.value)?.string
     }
 }
 
