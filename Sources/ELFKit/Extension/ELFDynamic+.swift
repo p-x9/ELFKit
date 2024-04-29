@@ -20,6 +20,9 @@ extension Sequence where Element: ELFDynamicProtocol {
     var _symtab: Element? { first(where: { $0.tag == .symtab }) }
     var _syment: Element? { first(where: { $0.tag == .syment }) }
 
+    var _syminfo: Element? { first(where: { $0.tag == .syminfo }) }
+    var _syminsz: Element? { first(where: { $0.tag == .syminsz }) }
+
     var _rela: Element? { first(where: { $0.tag == .rela }) }
     var _relasz: Element? { first(where: { $0.tag == .relasz }) }
     var _rel: Element? { first(where: { $0.tag == .rel }) }
@@ -347,5 +350,33 @@ extension Sequence where Element: ELFDynamicProtocol {
             return .init(rawValue: 0)
         }
         return .init(rawValue: numericCast(_flags_1.value))
+    }
+}
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func symbolInfos32(in elf: ELFFile) -> DataSequence<ELF32SymbolInfo>? {
+        guard !elf.is64Bit else { return nil }
+        guard let _syminfo, let _syminsz else { return nil }
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(_syminfo.pointer),
+            numberOfElements: numericCast(_syminsz.value) / ELF32SymbolInfo.layoutSize
+        )
+    }
+
+    public func symbolInfos64(in elf: ELFFile) -> DataSequence<ELF64SymbolInfo>? {
+        guard elf.is64Bit else { return nil }
+        guard let _syminfo, let _syminsz else { return nil }
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(_syminfo.pointer),
+            numberOfElements: numericCast(_syminsz.value) / ELF64SymbolInfo.layoutSize
+        )
+    }
+
+    public func symbolInfos(in elf: ELFFile) -> [any ELFSymbolInfoProtocol]? {
+        if elf.is64Bit {
+            return symbolInfos64(in: elf)?.map { $0 }
+        } else {
+            return symbolInfos32(in: elf)?.map { $0 }
+        }
     }
 }
