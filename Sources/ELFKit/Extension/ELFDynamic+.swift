@@ -64,3 +64,86 @@ extension Sequence where Element: ELFDynamicProtocol {
         }
     }
 }
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func hashTableHeader32(in elf: ELFFile) -> ELF32HashTableHeader? {
+        guard let _hash else { return nil }
+        guard !elf.is64Bit else { return nil }
+        return elf.fileHandle.read(
+            offset: numericCast(_hash.pointer)
+        )
+    }
+
+    public func hashTableHeader64(in elf: ELFFile) -> ELF64HashTableHeader? {
+        guard let _hash else { return nil }
+        guard elf.is64Bit else { return nil }
+        return elf.fileHandle.read(
+            offset: numericCast(_hash.pointer)
+        )
+    }
+
+    public func hashTableHeader(in elf: ELFFile) -> (any ELFHashTableHeaderProtocol)? {
+        if elf.is64Bit {
+            return hashTableHeader64(in: elf)
+        } else {
+            return hashTableHeader32(in: elf)
+        }
+    }
+
+    public func hashTable32(in elf: ELFFile) -> ELF32HashTable? {
+        guard let _hash else { return nil }
+        guard let header = hashTableHeader32(in: elf) else {
+            return nil
+        }
+
+        let bucketStart: Int = numericCast(_hash.pointer) + numericCast(header.layoutSize)
+        let buckets: DataSequence<Elf32_Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bucketStart),
+            numberOfElements: numericCast(header.nbuckets)
+        )
+
+        let chainStart: Int = bucketStart + buckets.data.count
+        let chains: DataSequence<Elf32_Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(chainStart),
+            numberOfElements: numericCast(header.nchain)
+        )
+        return .init(
+            header: header,
+            buckets: Array(buckets),
+            chains: Array(chains)
+        )
+    }
+
+    public func hashTable64(in elf: ELFFile) -> ELF64HashTable? {
+        guard let _hash else { return nil }
+        guard let header = hashTableHeader64(in: elf) else {
+            return nil
+        }
+
+        let bucketStart: Int = numericCast(_hash.pointer) + numericCast(header.layoutSize)
+        let buckets: DataSequence<Elf64_Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bucketStart),
+            numberOfElements: numericCast(header.nbuckets)
+        )
+
+        let chainStart: Int = bucketStart + buckets.data.count
+        let chains: DataSequence<Elf64_Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(chainStart),
+            numberOfElements: numericCast(header.nchain)
+        )
+        return .init(
+            header: header,
+            buckets: Array(buckets),
+            chains: Array(chains)
+        )
+    }
+
+    public func hashTable(in elf: ELFFile) -> (any ELFHashTableProtocol)? {
+        if elf.is64Bit {
+            return hashTable64(in: elf)
+        } else {
+            return hashTable32(in: elf)
+        }
+    }
+}
+
