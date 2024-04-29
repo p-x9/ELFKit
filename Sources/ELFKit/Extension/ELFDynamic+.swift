@@ -27,6 +27,9 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     var _rpath: [Element] { filter { $0.tag == .rpath } }
     var _runpath: [Element] { filter { $0.tag == .runpath } }
+
+    var _flags: Element? { first(where: { $0.tag == .flags }) }
+    var _flags_1: Element? { first(where: { $0.tag == .flags_1 }) }
 }
 
 extension Sequence where Element: ELFDynamicProtocol {
@@ -328,5 +331,21 @@ extension Sequence where Element: ELFDynamicProtocol {
         } else {
             return relocations32(in: elf)?.map { $0 }
         }
+    }
+}
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public var flags: DynamicFlags {
+        guard let _flags else {
+            return .init(rawValue: 0)
+        }
+        return .init(rawValue: numericCast(_flags.value))
+    }
+
+    public var flags1: DynamicFlags1 {
+        guard let _flags_1 else {
+            return .init(rawValue: 0)
+        }
+        return .init(rawValue: numericCast(_flags_1.value))
     }
 }
