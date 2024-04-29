@@ -20,9 +20,6 @@ extension Sequence where Element: ELFDynamicProtocol {
     var _symtab: Element? { first(where: { $0.tag == .symtab }) }
     var _syment: Element? { first(where: { $0.tag == .syment }) }
 
-    var _syminfo: Element? { first(where: { $0.tag == .syminfo }) }
-    var _syminsz: Element? { first(where: { $0.tag == .syminsz }) }
-
     var _rela: Element? { first(where: { $0.tag == .rela }) }
     var _relasz: Element? { first(where: { $0.tag == .relasz }) }
     var _rel: Element? { first(where: { $0.tag == .rel }) }
@@ -33,6 +30,12 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     var _flags: Element? { first(where: { $0.tag == .flags }) }
     var _flags_1: Element? { first(where: { $0.tag == .flags_1 }) }
+
+    var _syminfo: Element? { first(where: { $0.tag == .syminfo }) }
+    var _syminsz: Element? { first(where: { $0.tag == .syminsz }) }
+
+    var _verdef: Element? { first(where: { $0.tag == .verdef }) }
+    var _verdefnum: Element? { first(where: { $0.tag == .verdefnum }) }
 }
 
 extension Sequence where Element: ELFDynamicProtocol {
@@ -377,6 +380,51 @@ extension Sequence where Element: ELFDynamicProtocol {
             return symbolInfos64(in: elf)?.map { $0 }
         } else {
             return symbolInfos32(in: elf)?.map { $0 }
+        }
+    }
+}
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public var numberOfVersionDefs: Int? {
+        guard let _verdefnum else { return nil }
+        return numericCast(_verdefnum.value)
+    }
+
+    public func versionDef64(in elf: ELFFile) -> ELF64VersionDef? {
+        guard elf.is64Bit,
+              let _verdef else {
+            return nil
+        }
+        let layout: ELF64VersionDef.Layout = elf.fileHandle.read(
+            offset: numericCast(_verdef.pointer)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: numericCast(_verdef.pointer)
+        )
+    }
+
+    public func versionDef32(in elf: ELFFile) -> ELF32VersionDef? {
+        guard !elf.is64Bit,
+              let _verdef else {
+            return nil
+        }
+        let layout: ELF32VersionDef.Layout = elf.fileHandle.read(
+            offset: numericCast(_verdef.pointer)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: numericCast(_verdef.pointer)
+        )
+    }
+
+    public func versionDef(in elf: ELFFile) -> (any ELFVersionDefProtocol)? {
+        if elf.is64Bit {
+            return versionDef64(in: elf)
+        } else {
+            return versionDef32(in: elf)
         }
     }
 }
