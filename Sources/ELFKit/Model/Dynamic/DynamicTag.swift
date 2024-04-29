@@ -72,8 +72,8 @@ public enum DynamicTag: CaseIterable {
     case runpath
     /// DT_FLAGS
     case flags
-    /// DT_ENCODING
-    case encoding
+//    /// DT_ENCODING
+//    case encoding
     /// DT_PREINIT_ARRAY
     case preinit_array
     /// DT_PREINIT_ARRAYSZ
@@ -86,8 +86,8 @@ public enum DynamicTag: CaseIterable {
     case relr
     /// DT_RELRENT
     case relrent
-    /// DT_VALRNGLO
-    case valrnglo
+//    /// DT_VALRNGLO
+//    case valrnglo
     /// DT_GNU_PRELINKED
     case gnu_prelinked
     /// DT_GNU_CONFLICTSZ
@@ -112,10 +112,10 @@ public enum DynamicTag: CaseIterable {
     case syminsz
     /// DT_SYMINENT
     case syminent
-    /// DT_VALRNGHI
-    case valrnghi
-    /// DT_ADDRRNGLO
-    case addrrnglo
+//    /// DT_VALRNGHI
+//    case valrnghi
+//    /// DT_ADDRRNGLO
+//    case addrrnglo
     /// DT_GNU_HASH
     case gnu_hash
     /// DT_TLSDESC_PLT
@@ -138,8 +138,8 @@ public enum DynamicTag: CaseIterable {
     case movetab
     /// DT_SYMINFO
     case syminfo
-    /// DT_ADDRRNGHI
-    case addrrnghi
+//    /// DT_ADDRRNGHI
+//    case addrrnghi
     /// DT_VERSYM
     case versym
     /// DT_RELACOUNT
@@ -194,14 +194,14 @@ extension DynamicTag: RawRepresentable {
         case RawValue(DT_FINI_ARRAYSZ): self = .fini_arraysz
         case RawValue(DT_RUNPATH): self = .runpath
         case RawValue(DT_FLAGS): self = .flags
-        case RawValue(DT_ENCODING): self = .encoding
+//        case RawValue(DT_ENCODING): self = .encoding
         case RawValue(DT_PREINIT_ARRAY): self = .preinit_array
         case RawValue(DT_PREINIT_ARRAYSZ): self = .preinit_arraysz
         case RawValue(DT_MAXPOSTAGS): self = .maxpostags
         case RawValue(DT_RELRSZ): self = .relrsz
         case RawValue(DT_RELR): self = .relr
         case RawValue(DT_RELRENT): self = .relrent
-        case RawValue(DT_VALRNGLO): self = .valrnglo
+//        case RawValue(DT_VALRNGLO): self = .valrnglo
         case RawValue(DT_GNU_PRELINKED): self = .gnu_prelinked
         case RawValue(DT_GNU_CONFLICTSZ): self = .gnu_conflictsz
         case RawValue(DT_GNU_LIBLISTSZ): self = .gnu_liblistsz
@@ -214,8 +214,8 @@ extension DynamicTag: RawRepresentable {
         case RawValue(DT_POSFLAG_1): self = .posflag_1
         case RawValue(DT_SYMINSZ): self = .syminsz
         case RawValue(DT_SYMINENT): self = .syminent
-        case RawValue(DT_VALRNGHI): self = .valrnghi
-        case RawValue(DT_ADDRRNGLO): self = .addrrnglo
+//        case RawValue(DT_VALRNGHI): self = .valrnghi
+//        case RawValue(DT_ADDRRNGLO): self = .addrrnglo
         case RawValue(DT_GNU_HASH): self = .gnu_hash
         case RawValue(DT_TLSDESC_PLT): self = .tlsdesc_plt
         case RawValue(DT_TLSDESC_GOT): self = .tlsdesc_got
@@ -227,7 +227,7 @@ extension DynamicTag: RawRepresentable {
         case RawValue(DT_PLTPAD): self = .pltpad
         case RawValue(DT_MOVETAB): self = .movetab
         case RawValue(DT_SYMINFO): self = .syminfo
-        case RawValue(DT_ADDRRNGHI): self = .addrrnghi
+//        case RawValue(DT_ADDRRNGHI): self = .addrrnghi
         case RawValue(DT_VERSYM): self = .versym
         case RawValue(DT_RELACOUNT): self = .relacount
         case RawValue(DT_RELCOUNT): self = .relcount
@@ -273,14 +273,14 @@ extension DynamicTag: RawRepresentable {
         case .fini_arraysz: RawValue(DT_FINI_ARRAYSZ)
         case .runpath: RawValue(DT_RUNPATH)
         case .flags: RawValue(DT_FLAGS)
-        case .encoding: RawValue(DT_ENCODING)
+//        case .encoding: RawValue(DT_ENCODING)
         case .preinit_array: RawValue(DT_PREINIT_ARRAY)
         case .preinit_arraysz: RawValue(DT_PREINIT_ARRAYSZ)
         case .maxpostags: RawValue(DT_MAXPOSTAGS)
         case .relrsz: RawValue(DT_RELRSZ)
         case .relr: RawValue(DT_RELR)
         case .relrent: RawValue(DT_RELRENT)
-        case .valrnglo: RawValue(DT_VALRNGLO)
+//        case .valrnglo: RawValue(DT_VALRNGLO)
         case .gnu_prelinked: RawValue(DT_GNU_PRELINKED)
         case .gnu_conflictsz: RawValue(DT_GNU_CONFLICTSZ)
         case .gnu_liblistsz: RawValue(DT_GNU_LIBLISTSZ)
@@ -293,8 +293,8 @@ extension DynamicTag: RawRepresentable {
         case .posflag_1: RawValue(DT_POSFLAG_1)
         case .syminsz: RawValue(DT_SYMINSZ)
         case .syminent: RawValue(DT_SYMINENT)
-        case .valrnghi: RawValue(DT_VALRNGHI)
-        case .addrrnglo: RawValue(DT_ADDRRNGLO)
+//        case .valrnghi: RawValue(DT_VALRNGHI)
+//        case .addrrnglo: RawValue(DT_ADDRRNGLO)
         case .gnu_hash: RawValue(DT_GNU_HASH)
         case .tlsdesc_plt: RawValue(DT_TLSDESC_PLT)
         case .tlsdesc_got: RawValue(DT_TLSDESC_GOT)
@@ -306,7 +306,7 @@ extension DynamicTag: RawRepresentable {
         case .pltpad: RawValue(DT_PLTPAD)
         case .movetab: RawValue(DT_MOVETAB)
         case .syminfo: RawValue(DT_SYMINFO)
-        case .addrrnghi: RawValue(DT_ADDRRNGHI)
+//        case .addrrnghi: RawValue(DT_ADDRRNGHI)
         case .versym: RawValue(DT_VERSYM)
         case .relacount: RawValue(DT_RELACOUNT)
         case .relcount: RawValue(DT_RELCOUNT)
@@ -353,14 +353,14 @@ extension DynamicTag: CustomStringConvertible {
         case .fini_arraysz: "DT_FINI_ARRAYSZ"
         case .runpath: "DT_RUNPATH"
         case .flags: "DT_FLAGS"
-        case .encoding: "DT_ENCODING"
+//        case .encoding: "DT_ENCODING"
         case .preinit_array: "DT_PREINIT_ARRAY"
         case .preinit_arraysz: "DT_PREINIT_ARRAYSZ"
         case .maxpostags: "DT_MAXPOSTAGS"
         case .relrsz: "DT_RELRSZ"
         case .relr: "DT_RELR"
         case .relrent: "DT_RELRENT"
-        case .valrnglo: "DT_VALRNGLO"
+//        case .valrnglo: "DT_VALRNGLO"
         case .gnu_prelinked: "DT_GNU_PRELINKED"
         case .gnu_conflictsz: "DT_GNU_CONFLICTSZ"
         case .gnu_liblistsz: "DT_GNU_LIBLISTSZ"
@@ -373,8 +373,8 @@ extension DynamicTag: CustomStringConvertible {
         case .posflag_1: "DT_POSFLAG_1"
         case .syminsz: "DT_SYMINSZ"
         case .syminent: "DT_SYMINENT"
-        case .valrnghi: "DT_VALRNGHI"
-        case .addrrnglo: "DT_ADDRRNGLO"
+//        case .valrnghi: "DT_VALRNGHI"
+//        case .addrrnglo: "DT_ADDRRNGLO"
         case .gnu_hash: "DT_GNU_HASH"
         case .tlsdesc_plt: "DT_TLSDESC_PLT"
         case .tlsdesc_got: "DT_TLSDESC_GOT"
@@ -386,7 +386,7 @@ extension DynamicTag: CustomStringConvertible {
         case .pltpad: "DT_PLTPAD"
         case .movetab: "DT_MOVETAB"
         case .syminfo: "DT_SYMINFO"
-        case .addrrnghi: "DT_ADDRRNGHI"
+//        case .addrrnghi: "DT_ADDRRNGHI"
         case .versym: "DT_VERSYM"
         case .relacount: "DT_RELACOUNT"
         case .relcount: "DT_RELCOUNT"
