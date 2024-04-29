@@ -11,8 +11,8 @@ import Foundation
 public struct DataSequence<T>: Sequence {
     public typealias Element = T
 
-    private let data: Data
-    private let numberOfElements: Int
+    let data: Data
+    let numberOfElements: Int
 
     init(
         data: Data,
