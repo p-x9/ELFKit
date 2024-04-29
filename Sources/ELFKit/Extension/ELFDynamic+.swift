@@ -36,6 +36,9 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     var _verdef: Element? { first(where: { $0.tag == .verdef }) }
     var _verdefnum: Element? { first(where: { $0.tag == .verdefnum }) }
+
+    var _verneed: Element? { first(where: { $0.tag == .verneed }) }
+    var _verneednum: Element? { first(where: { $0.tag == .verneednum }) }
 }
 
 extension Sequence where Element: ELFDynamicProtocol {
@@ -425,6 +428,51 @@ extension Sequence where Element: ELFDynamicProtocol {
             return versionDef64(in: elf)
         } else {
             return versionDef32(in: elf)
+        }
+    }
+}
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public var numberOfVersionNeeds: Int? {
+        guard let _verneednum else { return nil }
+        return numericCast(_verneednum.value)
+    }
+
+    public func versionNeed64(in elf: ELFFile) -> ELF64VersionNeed? {
+        guard elf.is64Bit,
+              let _verneed else {
+            return nil
+        }
+        let layout: ELF64VersionNeed.Layout = elf.fileHandle.read(
+            offset: numericCast(_verneed.pointer)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: numericCast(_verneed.pointer)
+        )
+    }
+
+    public func versionNeed32(in elf: ELFFile) -> ELF32VersionNeed? {
+        guard !elf.is64Bit,
+              let _verneed else {
+            return nil
+        }
+        let layout: ELF32VersionNeed.Layout = elf.fileHandle.read(
+            offset: numericCast(_verneed.pointer)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: numericCast(_verneed.pointer)
+        )
+    }
+
+    public func versionNeed(in elf: ELFFile) -> (any ELFVersionNeedProtocol)? {
+        if elf.is64Bit {
+            return versionNeed64(in: elf)
+        } else {
+            return versionNeed32(in: elf)
         }
     }
 }
