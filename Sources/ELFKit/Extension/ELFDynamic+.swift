@@ -147,3 +147,75 @@ extension Sequence where Element: ELFDynamicProtocol {
     }
 }
 
+extension Sequence where Element: ELFDynamicProtocol {
+    public func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
+        guard let _gnu_hash else { return nil }
+        return elf.fileHandle.read(
+            offset: numericCast(_gnu_hash.pointer)
+        )
+    }
+
+    public func gnuHashTable32(in elf: ELFFile) -> ELF32GnuHashTable? {
+        guard !elf.is64Bit, let _gnu_hash else { return nil }
+        guard let header = gnuHashTableHeader(in: elf) else {
+            return nil
+        }
+
+        let bloomsStart: Int = numericCast(_gnu_hash.pointer) + numericCast(header.layoutSize)
+        let blooms: DataSequence<ELF32GnuHashTable.Bloom> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bloomsStart),
+            numberOfElements: numericCast(header.gh_maskwords)
+        )
+
+        let bucketsStart: Int = bloomsStart + blooms.data.count
+        let buckets: DataSequence<ELF32GnuHashTable.Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bucketsStart),
+            numberOfElements: numericCast(header.gh_nbuckets)
+        )
+
+        let chainsOffset = bucketsStart + buckets.data.count
+
+        return .init(
+            header: header,
+            bloom: Array(blooms),
+            buckets: Array(buckets),
+            chainsOffset: chainsOffset
+        )
+    }
+
+    public func gnuHashTable64(in elf: ELFFile) -> ELF64GnuHashTable? {
+        guard elf.is64Bit, let _gnu_hash else { return nil }
+        guard let header = gnuHashTableHeader(in: elf) else {
+            return nil
+        }
+
+        let bloomsStart: Int = numericCast(_gnu_hash.pointer) + numericCast(header.layoutSize)
+        let blooms: DataSequence<ELF64GnuHashTable.Bloom> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bloomsStart),
+            numberOfElements: numericCast(header.gh_maskwords)
+        )
+
+        let bucketsStart: Int = bloomsStart + blooms.data.count
+        let buckets: DataSequence<ELF64GnuHashTable.Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bucketsStart),
+            numberOfElements: numericCast(header.gh_nbuckets)
+        )
+
+        let chainsOffset = bucketsStart + buckets.data.count
+
+        return .init(
+            header: header,
+            bloom: Array(blooms),
+            buckets: Array(buckets),
+            chainsOffset: chainsOffset
+        )
+    }
+
+    public func gnuHashTable(in elf: ELFFile) -> (any ELFGnuHashTableProtocol)? {
+        if elf.is64Bit {
+            return gnuHashTable64(in: elf)
+        } else {
+            return gnuHashTable32(in: elf)
+        }
+    }
+}
