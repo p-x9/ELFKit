@@ -26,8 +26,12 @@ public struct ELF64VersionDefAux: LayoutWrapper {
 }
 
 extension ELF32VersionDefAux: ELFVersionDefAuxProtocol {
-    public var nextOffset: Int {
+    public var nameOffset: Int {
         numericCast(layout.vda_name)
+    }
+
+    public var nextOffset: Int {
+        numericCast(layout.vda_next)
     }
 
     public func next(in elf: ELFFile) -> Self? {
@@ -50,13 +54,17 @@ extension ELF32VersionDefAux: ELFVersionDefAuxProtocol {
               let strings = dynamics.strings(in: elf) else {
             return nil
         }
-        return strings.string(at: nextOffset)?.string
+        return strings.string(at: nameOffset)?.string
     }
 }
 
 extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
-    public var nextOffset: Int {
+    public var nameOffset: Int {
         numericCast(layout.vda_name)
+    }
+    
+    public var nextOffset: Int {
+        numericCast(layout.vda_next)
     }
 
     public func next(in elf: ELFFile) -> Self? {
@@ -79,6 +87,6 @@ extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
               let strings = dynamics.strings(in: elf) else {
             return nil
         }
-        return strings.string(at: nextOffset)?.string
+        return strings.string(at: nameOffset)?.string
     }
 }
