@@ -10,12 +10,14 @@ import Foundation
 
 public protocol ELFVersionDefProtocol {
     associatedtype Aux: ELFVersionDefAuxProtocol
-
+    
     var _offset: Int { get }
     var _index: Int { get }
-
+    
+    var flags: VersionFlags { get }
     var versionIndex: Int { get }
     var numberOfAux: Int { get }
+    var hash: Int { get }
     var auxOffset: Int { get }
     var nextOffset: Int { get }
 

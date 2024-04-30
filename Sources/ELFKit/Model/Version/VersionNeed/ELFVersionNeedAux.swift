@@ -26,16 +26,20 @@ public struct ELF64VersionNeedAux: LayoutWrapper {
 }
 
 extension ELF32VersionNeedAux: ELFVersionNeedAuxProtocol {
-    public var nextOffset: Int {
-        numericCast(layout.vna_next)
-    }
-
     public var hash: Int {
         numericCast(layout.vna_hash)
     }
 
+    public var flags: VersionFlags {
+        .init(rawValue: layout.vna_flags)
+    }
+
     public var version: Int {
         numericCast(layout.vna_other)
+    }
+
+    public var nextOffset: Int {
+        numericCast(layout.vna_next)
     }
 
     public func next(in elf: ELFFile) -> Self? {
@@ -63,16 +67,20 @@ extension ELF32VersionNeedAux: ELFVersionNeedAuxProtocol {
 }
 
 extension ELF64VersionNeedAux: ELFVersionNeedAuxProtocol {
-    public var nextOffset: Int {
-        numericCast(layout.vna_next)
-    }
-
     public var hash: Int {
         numericCast(layout.vna_hash)
     }
 
+    public var flags: VersionFlags {
+        .init(rawValue: layout.vna_flags)
+    }
+
     public var version: Int {
         numericCast(layout.vna_other)
+    }
+
+    public var nextOffset: Int {
+        numericCast(layout.vna_next)
     }
 
     public func next(in elf: ELFFile) -> Self? {

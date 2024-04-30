@@ -29,12 +29,20 @@ public struct ELF64VersionDef: LayoutWrapper {
 extension ELF32VersionDef: ELFVersionDefProtocol {
     public typealias Aux = ELF32VersionDefAux
 
+    public var flags: VersionFlags {
+        .init(rawValue: layout.vd_flags)
+    }
+
     public var versionIndex: Int {
         numericCast(layout.vd_ndx)
     }
 
     public var numberOfAux: Int {
         numericCast(layout.vd_cnt)
+    }
+
+    public var hash: Int {
+        numericCast(layout.vd_hash)
     }
 
     public var auxOffset: Int {
@@ -81,12 +89,20 @@ extension ELF32VersionDef: ELFVersionDefProtocol {
 extension ELF64VersionDef: ELFVersionDefProtocol {
     public typealias Aux = ELF64VersionDefAux
 
+    public var flags: VersionFlags {
+        .init(rawValue: layout.vd_flags)
+    }
+
     public var versionIndex: Int {
         numericCast(layout.vd_ndx)
     }
 
     public var numberOfAux: Int {
         numericCast(layout.vd_cnt)
+    }
+
+    public var hash: Int {
+        numericCast(layout.vd_hash)
     }
 
     public var auxOffset: Int {
