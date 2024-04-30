@@ -39,6 +39,8 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     var _verneed: Element? { first(where: { $0.tag == .verneed }) }
     var _verneednum: Element? { first(where: { $0.tag == .verneednum }) }
+
+    var _versym: Element? { first(where: { $0.tag == .versym }) }
 }
 
 extension Sequence where Element: ELFDynamicProtocol {
@@ -242,15 +244,20 @@ extension Sequence where Element: ELFDynamicProtocol {
 }
 
 extension Sequence where Element: ELFDynamicProtocol {
+    public func numberOfSymbols(in elf: ELFFile) -> Int? {
+        if let hashHeader = hashTableHeader(in: elf) {
+            return hashHeader.numberOfChains
+        } else if let gnuHashTable = gnuHashTable(in: elf) {
+            return gnuHashTable.numberOfSymbols(in: elf)
+        }
+        return nil
+    }
+
     public func symbols32(in elf: ELFFile) -> DataSequence<ELF32Symbol>? {
         guard !elf.is64Bit, let _symtab else { return nil }
-        var numberOfSymbols: Int?
-        if let hashHeader = hashTableHeader(in: elf) {
-            numberOfSymbols = hashHeader.numberOfChains
-        } else if let gnuHashTable = gnuHashTable(in: elf) {
-            numberOfSymbols = gnuHashTable.numberOfSymbols(in: elf)
+        guard let numberOfSymbols = numberOfSymbols(in: elf) else {
+            return nil
         }
-        guard let numberOfSymbols else { return nil }
         return elf.fileHandle.readDataSequence(
             offset: numericCast(_symtab.pointer),
             numberOfElements: numberOfSymbols
@@ -259,13 +266,9 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     public func symbols64(in elf: ELFFile) -> DataSequence<ELF64Symbol>? {
         guard elf.is64Bit, let _symtab else { return nil }
-        var numberOfSymbols: Int?
-        if let hashHeader = hashTableHeader(in: elf) {
-            numberOfSymbols = hashHeader.numberOfChains
-        } else if let gnuHashTable = gnuHashTable(in: elf) {
-            numberOfSymbols = gnuHashTable.numberOfSymbols(in: elf)
+        guard let numberOfSymbols = numberOfSymbols(in: elf) else {
+            return nil
         }
-        guard let numberOfSymbols else { return nil }
         return elf.fileHandle.readDataSequence(
             offset: numericCast(_symtab.pointer),
             numberOfElements: numberOfSymbols
@@ -473,6 +476,44 @@ extension Sequence where Element: ELFDynamicProtocol {
             return versionNeed64(in: elf)
         } else {
             return versionNeed32(in: elf)
+        }
+    }
+}
+
+extension Sequence where Element: ELFDynamicProtocol {
+    public func versionSyms64(in elf: ELFFile) -> DataSequence<ELF64VersionSym>? {
+        guard elf.is64Bit,
+              let _versym else {
+            return nil
+        }
+        guard let numberOfSymbols = numberOfSymbols(in: elf) else {
+            return nil
+        }
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(_versym.pointer),
+            numberOfElements: numberOfSymbols
+        )
+    }
+
+    public func versionSyms32(in elf: ELFFile) -> DataSequence<ELF32VersionSym>? {
+        guard !elf.is64Bit,
+              let _versym else {
+            return nil
+        }
+        guard let numberOfSymbols = numberOfSymbols(in: elf) else {
+            return nil
+        }
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(_versym.pointer),
+            numberOfElements: numberOfSymbols
+        )
+    }
+
+    public func versionSyms(in elf: ELFFile) -> [any ELFVersionSymProtocol]? {
+        if elf.is64Bit {
+            return versionSyms64(in: elf)?.map { $0 }
+        } else {
+            return versionSyms32(in: elf)?.map { $0 }
         }
     }
 }
