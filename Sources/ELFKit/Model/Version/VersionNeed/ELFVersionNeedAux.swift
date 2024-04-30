@@ -42,7 +42,15 @@ extension ELF32VersionNeedAux: ELFVersionNeedAuxProtocol {
         numericCast(layout.vna_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func name(in elf: ELFFile) -> String? {
+        guard let dynamics = elf.dynamics32,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: numericCast(layout.vna_name))?.string
+    }
+
+    public func _next(in elf: ELFFile) -> Self? {
         guard nextOffset != 0 else {
             return nil
         }
@@ -55,14 +63,6 @@ extension ELF32VersionNeedAux: ELFVersionNeedAuxProtocol {
             _index: _index + 1,
             _offset: offset
         )
-    }
-
-    public func name(in elf: ELFFile) -> String? {
-        guard let dynamics = elf.dynamics32,
-              let strings = dynamics.strings(in: elf) else {
-            return nil
-        }
-        return strings.string(at: numericCast(layout.vna_name))?.string
     }
 }
 
@@ -83,7 +83,15 @@ extension ELF64VersionNeedAux: ELFVersionNeedAuxProtocol {
         numericCast(layout.vna_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func name(in elf: ELFFile) -> String? {
+        guard let dynamics = elf.dynamics64,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: numericCast(layout.vna_name))?.string
+    }
+
+    public func _next(in elf: ELFFile) -> Self? {
         guard nextOffset != 0 else {
             return nil
         }
@@ -96,13 +104,5 @@ extension ELF64VersionNeedAux: ELFVersionNeedAuxProtocol {
             _index: _index + 1,
             _offset: offset
         )
-    }
-
-    public func name(in elf: ELFFile) -> String? {
-        guard let dynamics = elf.dynamics64,
-              let strings = dynamics.strings(in: elf) else {
-            return nil
-        }
-        return strings.string(at: numericCast(layout.vna_name))?.string
     }
 }

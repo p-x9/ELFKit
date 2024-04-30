@@ -53,7 +53,7 @@ extension ELF32VersionDef: ELFVersionDefProtocol {
         numericCast(layout.vd_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func _next(in elf: ELFFile) -> Self? {
         guard let dynamics = elf.dynamics32,
               let max = dynamics.numberOfVersionDefs,
               _index + 1 < max,
@@ -71,11 +71,11 @@ extension ELF32VersionDef: ELFVersionDefProtocol {
         )
     }
 
-    public func aux(in elf: ELFFile) -> ELF32VersionDefAux? {
+    public func _aux(in elf: ELFFile) -> Aux? {
         guard numberOfAux > 0 else { return nil }
 
         let offset = _offset + numericCast(layout.vd_aux)
-        let layout: ELF32VersionDefAux.Layout = elf.fileHandle.read(
+        let layout: Aux.Layout = elf.fileHandle.read(
             offset: numericCast(offset)
         )
         return .init(
@@ -113,7 +113,7 @@ extension ELF64VersionDef: ELFVersionDefProtocol {
         numericCast(layout.vd_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func _next(in elf: ELFFile) -> Self? {
         guard let dynamics = elf.dynamics64,
               let max = dynamics.numberOfVersionDefs,
               _index + 1 < max,
@@ -131,11 +131,11 @@ extension ELF64VersionDef: ELFVersionDefProtocol {
         )
     }
 
-    public func aux(in elf: ELFFile) -> ELF64VersionDefAux? {
+    public func _aux(in elf: ELFFile) -> Aux? {
         guard numberOfAux > 0 else { return nil }
 
         let offset = _offset + numericCast(layout.vd_aux)
-        let layout: ELF64VersionDefAux.Layout = elf.fileHandle.read(
+        let layout: Aux.Layout = elf.fileHandle.read(
             offset: numericCast(offset)
         )
         return .init(

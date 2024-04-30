@@ -19,7 +19,22 @@ public protocol ELFVersionNeedProtocol {
     var auxOffset: Int { get }
     var nextOffset: Int { get }
 
-    func next(in elf: ELFFile) -> Self?
     func fileName(in elf: ELFFile) -> String?
-    func aux(in elf: ELFFile) -> Aux?
+    func auxes(in elf: ELFFile) -> [Aux]
+
+    func _next(in elf: ELFFile) -> Self?
+    func _aux(in elf: ELFFile) -> Aux?
+}
+
+extension ELFVersionNeedProtocol {
+    public func auxes(in elf: ELFFile) -> [Aux] {
+        var aux = _aux(in: elf)
+        var auxes: [Aux] = []
+        while aux != nil {
+            guard let _aux = aux else { break }
+            auxes.append(_aux)
+            aux = _aux._next(in: elf)
+        }
+        return auxes
+    }
 }

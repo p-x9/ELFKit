@@ -34,7 +34,7 @@ extension ELF32VersionDefAux: ELFVersionDefAuxProtocol {
         numericCast(layout.vda_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func _next(in elf: ELFFile) -> Self? {
         guard nextOffset != 0 else {
             return nil
         }
@@ -67,7 +67,7 @@ extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
         numericCast(layout.vda_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func _next(in elf: ELFFile) -> Self? {
         guard nextOffset != 0 else {
             return nil
         }

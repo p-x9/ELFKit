@@ -44,7 +44,15 @@ extension ELF32VersionNeed: ELFVersionNeedProtocol {
         numericCast(layout.vn_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func fileName(in elf: ELFFile) -> String? {
+        guard let dynamics = elf.dynamics64,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: fileNameOffset)?.string
+    }
+
+    public func _next(in elf: ELFFile) -> Self? {
         guard let dynamics = elf.dynamics32,
               let max = dynamics.numberOfVersionNeeds,
               _index + 1 < max,
@@ -62,15 +70,7 @@ extension ELF32VersionNeed: ELFVersionNeedProtocol {
         )
     }
 
-    public func fileName(in elf: ELFFile) -> String? {
-        guard let dynamics = elf.dynamics64,
-              let strings = dynamics.strings(in: elf) else {
-            return nil
-        }
-        return strings.string(at: fileNameOffset)?.string
-    }
-
-    public func aux(in elf: ELFFile) -> Aux? {
+    public func _aux(in elf: ELFFile) -> Aux? {
         guard numberOfAux > 0 else { return nil }
 
         let offset = _offset + numericCast(layout.vn_aux)
@@ -104,7 +104,15 @@ extension ELF64VersionNeed: ELFVersionNeedProtocol {
         numericCast(layout.vn_next)
     }
 
-    public func next(in elf: ELFFile) -> Self? {
+    public func fileName(in elf: ELFFile) -> String? {
+        guard let dynamics = elf.dynamics64,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: fileNameOffset)?.string
+    }
+
+    public func _next(in elf: ELFFile) -> Self? {
         guard let dynamics = elf.dynamics64,
               let max = dynamics.numberOfVersionNeeds,
               _index + 1 < max,
@@ -122,15 +130,7 @@ extension ELF64VersionNeed: ELFVersionNeedProtocol {
         )
     }
 
-    public func fileName(in elf: ELFFile) -> String? {
-        guard let dynamics = elf.dynamics64,
-              let strings = dynamics.strings(in: elf) else {
-            return nil
-        }
-        return strings.string(at: fileNameOffset)?.string
-    }
-
-    public func aux(in elf: ELFFile) -> Aux? {
+    public func _aux(in elf: ELFFile) -> Aux? {
         guard numberOfAux > 0 else { return nil }
 
         let offset = _offset + numericCast(layout.vn_aux)

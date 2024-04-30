@@ -396,7 +396,7 @@ extension Sequence where Element: ELFDynamicProtocol {
         return numericCast(_verdefnum.value)
     }
 
-    public func versionDef64(in elf: ELFFile) -> ELF64VersionDef? {
+    public func _versionDef64(in elf: ELFFile) -> ELF64VersionDef? {
         guard elf.is64Bit,
               let _verdef else {
             return nil
@@ -411,7 +411,7 @@ extension Sequence where Element: ELFDynamicProtocol {
         )
     }
 
-    public func versionDef32(in elf: ELFFile) -> ELF32VersionDef? {
+    public func _versionDef32(in elf: ELFFile) -> ELF32VersionDef? {
         guard !elf.is64Bit,
               let _verdef else {
             return nil
@@ -426,11 +426,41 @@ extension Sequence where Element: ELFDynamicProtocol {
         )
     }
 
-    public func versionDef(in elf: ELFFile) -> (any ELFVersionDefProtocol)? {
+    public func _versionDef(in elf: ELFFile) -> (any ELFVersionDefProtocol)? {
         if elf.is64Bit {
-            return versionDef64(in: elf)
+            return _versionDef64(in: elf)
         } else {
-            return versionDef32(in: elf)
+            return _versionDef32(in: elf)
+        }
+    }
+
+    public func versionDefs64(in elf: ELFFile) -> [ELF64VersionDef] {
+        var def = _versionDef64(in: elf)
+        var defs: [ELF64VersionDef] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
+
+    public func versionDefs32(in elf: ELFFile) -> [ELF32VersionDef] {
+        var def = _versionDef32(in: elf)
+        var defs: [ELF32VersionDef] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
+
+    public func versionDefs(in elf: ELFFile) -> [any ELFVersionDefProtocol] {
+        if elf.is64Bit {
+            return versionDefs64(in: elf)
+        } else {
+            return versionDefs32(in: elf)
         }
     }
 }
@@ -441,7 +471,7 @@ extension Sequence where Element: ELFDynamicProtocol {
         return numericCast(_verneednum.value)
     }
 
-    public func versionNeed64(in elf: ELFFile) -> ELF64VersionNeed? {
+    public func _versionNeed64(in elf: ELFFile) -> ELF64VersionNeed? {
         guard elf.is64Bit,
               let _verneed else {
             return nil
@@ -456,7 +486,7 @@ extension Sequence where Element: ELFDynamicProtocol {
         )
     }
 
-    public func versionNeed32(in elf: ELFFile) -> ELF32VersionNeed? {
+    public func _versionNeed32(in elf: ELFFile) -> ELF32VersionNeed? {
         guard !elf.is64Bit,
               let _verneed else {
             return nil
@@ -471,11 +501,41 @@ extension Sequence where Element: ELFDynamicProtocol {
         )
     }
 
-    public func versionNeed(in elf: ELFFile) -> (any ELFVersionNeedProtocol)? {
+    public func _versionNeed(in elf: ELFFile) -> (any ELFVersionNeedProtocol)? {
         if elf.is64Bit {
-            return versionNeed64(in: elf)
+            return _versionNeed64(in: elf)
         } else {
-            return versionNeed32(in: elf)
+            return _versionNeed32(in: elf)
+        }
+    }
+
+    public func versionNeeds64(in elf: ELFFile) -> [ELF64VersionNeed] {
+        var def = _versionNeed64(in: elf)
+        var defs: [ELF64VersionNeed] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
+
+    public func versionNeeds32(in elf: ELFFile) -> [ELF32VersionNeed] {
+        var def = _versionNeed32(in: elf)
+        var defs: [ELF32VersionNeed] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
+
+    public func versionNeeds(in elf: ELFFile) -> [any ELFVersionNeedProtocol] {
+        if elf.is64Bit {
+            return versionNeeds64(in: elf)
+        } else {
+            return versionNeeds32(in: elf)
         }
     }
 }

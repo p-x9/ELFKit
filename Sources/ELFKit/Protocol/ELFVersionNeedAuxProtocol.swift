@@ -16,6 +16,6 @@ public protocol ELFVersionNeedAuxProtocol {
     var version: Int { get }
     var nextOffset: Int { get }
 
-    func next(in elf: ELFFile) -> Self?
     func name(in elf: ELFFile) -> String?
+    func _next(in elf: ELFFile) -> Self?
 }
