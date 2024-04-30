@@ -47,6 +47,34 @@ extension FileHandle {
     func read<Element>(
         offset: UInt64,
         swapHandler: ((inout Data) -> Void)? = nil
+    ) -> Optional<Element> where Element: LayoutWrapper {
+        seek(toFileOffset: offset)
+        var data = readData(
+            ofLength: Element.layoutSize
+        )
+        if let swapHandler { swapHandler(&data) }
+        return data.withUnsafeBytes {
+            $0.load(as: Element.self)
+        }
+    }
+
+    func read<Element>(
+        offset: UInt64,
+        swapHandler: ((inout Data) -> Void)? = nil
+    ) -> Optional<Element> {
+        seek(toFileOffset: offset)
+        var data = readData(
+            ofLength: MemoryLayout<Element>.size
+        )
+        if let swapHandler { swapHandler(&data) }
+        return data.withUnsafeBytes {
+            $0.load(as: Element.self)
+        }
+    }
+    
+    func read<Element>(
+        offset: UInt64,
+        swapHandler: ((inout Data) -> Void)? = nil
     ) -> Element where Element: LayoutWrapper {
         seek(toFileOffset: offset)
         var data = readData(
