@@ -10,11 +10,14 @@ import Foundation
 
 public protocol ELFSectionHeaderProtocol {
     var nameOffset: Int { get }
-    var type: SectionType! { get }
+    var type: SectionType? { get }
     var flags: SectionFlags { get }
     var address: Int { get }
     var offset: Int { get }
     var size: Int { get }
+
+    var osSpecificType: SectionType.OSSpecific { get }
+    var processorSpecificType: SectionType.ProcessorSpecific { get }
 }
 
 extension ELFSectionHeaderProtocol {
