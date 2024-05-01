@@ -20,6 +20,16 @@ public struct SectionFlags: BitFlags {
 }
 
 extension SectionFlags {
+    public var isOSSpecific: Bool {
+        (rawValue & numericCast(SHF_MASKOS)) > 0
+    }
+
+    public var isProcessorSpecific: Bool {
+        (rawValue & numericCast(SHF_MASKPROC)) > 0
+    }
+}
+
+extension SectionFlags {
     /// SHF_WRITE
     public static let write = SectionFlags(
         rawValue: Bit.write.rawValue
