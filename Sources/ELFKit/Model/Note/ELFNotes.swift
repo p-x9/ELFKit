@@ -8,7 +8,10 @@
 
 import Foundation
 
-public struct ELFNotes<Note: ELFNoteProtocol>: Sequence {
+public typealias ELF32Notes = _ELFNotes<ELF32Note>
+public typealias ELF64Notes = _ELFNotes<ELF64Note>
+
+public struct _ELFNotes<Note: ELFNoteProtocol>: Sequence {
     let data: Data
 
     public func makeIterator() -> Iterator {
@@ -16,7 +19,7 @@ public struct ELFNotes<Note: ELFNoteProtocol>: Sequence {
     }
 }
 
-extension ELFNotes {
+extension _ELFNotes {
     public struct Iterator: IteratorProtocol {
         public typealias Element = Note
 
