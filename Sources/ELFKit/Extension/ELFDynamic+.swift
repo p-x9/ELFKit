@@ -22,8 +22,12 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     var _rela: Element? { first(where: { $0.tag == .rela }) }
     var _relasz: Element? { first(where: { $0.tag == .relasz }) }
+    var _relacount: Element? { first(where: { $0.tag == .relacount }) }
+    var _relaent: Element? { first(where: { $0.tag == .relaent }) }
     var _rel: Element? { first(where: { $0.tag == .rel }) }
     var _relsz: Element? { first(where: { $0.tag == .relsz }) }
+    var _relcount: Element? { first(where: { $0.tag == .relcount }) }
+    var _relent: Element? { first(where: { $0.tag == .relent }) }
 
     var _rpath: [Element] { filter { $0.tag == .rpath } }
     var _runpath: [Element] { filter { $0.tag == .runpath } }
@@ -285,24 +289,42 @@ extension Sequence where Element: ELFDynamicProtocol {
 }
 
 extension Sequence where Element: ELFDynamicProtocol {
+    private var relcount: Int? {
+        if let _relcount {
+            return numericCast(_relcount.value)
+        }
+        if let _relsz, let _relent {
+            return numericCast(_relsz.value / _relent.value)
+        }
+        return nil
+    }
+
+    private var relacount: Int? {
+        if let _relacount {
+            return numericCast(_relacount.value)
+        }
+        if let _relasz, let _relaent {
+            return numericCast(_relasz.value / _relaent.value)
+        }
+        return nil
+    }
+
     public func relocations32(in elf: ELFFile) -> AnyRandomAccessCollection<ELF32Relocation>? {
         guard !elf.is64Bit else { return nil }
-        if let _rel, let _relsz {
-            let count = _relsz.value / ELF32RelocationInfo.layoutSize
+        if let _rel, let relcount {
             let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
                 offset: numericCast(_rel.pointer),
-                numberOfElements: count
+                numberOfElements: relcount
             )
             return AnyRandomAccessCollection(
                 sequence.map { .general($0) }
             )
         }
 
-        if let _rela, let _relasz {
-            let count = _relasz.value / ELF32RelocationAddendInfo.layoutSize
+        if let _rela, let relacount {
             let sequence: DataSequence<ELF32RelocationAddendInfo> = elf.fileHandle.readDataSequence(
                 offset: numericCast(_rela.pointer),
-                numberOfElements: count
+                numberOfElements: relacount
             )
             return AnyRandomAccessCollection(
                 sequence.map { .addend($0) }
@@ -313,22 +335,20 @@ extension Sequence where Element: ELFDynamicProtocol {
 
     public func relocations64(in elf: ELFFile) -> AnyRandomAccessCollection<ELF64Relocation>? {
         guard elf.is64Bit else { return nil }
-        if let _rel, let _relsz {
-            let count = _relsz.value / ELF64RelocationInfo.layoutSize
+        if let _rel, let relcount {
             let sequence: DataSequence<ELF64RelocationInfo> = elf.fileHandle.readDataSequence(
                 offset: numericCast(_rel.pointer),
-                numberOfElements: count
+                numberOfElements: relcount
             )
             return AnyRandomAccessCollection(
                 sequence.map { .general($0) }
             )
         }
 
-        if let _rela, let _relasz {
-            let count = _relasz.value / ELF64RelocationAddendInfo.layoutSize
+        if let _rela, let relacount {
             let sequence: DataSequence<ELF64RelocationAddendInfo> = elf.fileHandle.readDataSequence(
                 offset: numericCast(_rela.pointer),
-                numberOfElements: count
+                numberOfElements: relacount
             )
             return AnyRandomAccessCollection(
                 sequence.map { .addend($0) }
