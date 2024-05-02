@@ -20,6 +20,16 @@ public struct ProgramFlags: BitFlags {
 }
 
 extension ProgramFlags {
+    public var isOSSpecific: Bool {
+        (rawValue & numericCast(PF_MASKOS)) > 0
+    }
+
+    public var isProcessorSpecific: Bool {
+        (rawValue & numericCast(PF_MASKPROC)) > 0
+    }
+}
+
+extension ProgramFlags {
     public static let r = ProgramFlags(
         rawValue: Bit.r.rawValue
     )
@@ -30,7 +40,6 @@ extension ProgramFlags {
         rawValue: Bit.x.rawValue
     )
 }
-
 
 extension ProgramFlags {
     public enum Bit: CaseIterable {
