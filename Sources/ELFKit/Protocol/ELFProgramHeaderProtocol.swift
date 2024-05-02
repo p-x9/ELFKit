@@ -10,6 +10,8 @@ import Foundation
 
 public protocol ELFProgramHeaderProtocol {
     var type: SegmentType! { get }
+    var osSpecificType: SegmentType.OSSpecific { get }
+    var processorSpecificType: SegmentType.ProcessorSpecific { get }
     var flags: ProgramFlags { get }
     var offset: Int { get }
     var virtualAddress: Int { get }

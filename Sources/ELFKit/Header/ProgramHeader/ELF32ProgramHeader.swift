@@ -20,6 +20,14 @@ extension ELF32ProgramHeader: ELFProgramHeaderProtocol {
         .init(rawValue: layout.p_type)
     }
 
+    public var osSpecificType: SegmentType.OSSpecific {
+        .init(rawValue: numericCast(layout.p_type))
+    }
+
+    public var processorSpecificType: SegmentType.ProcessorSpecific {
+        .init(rawValue: numericCast(layout.p_type))
+    }
+
     public var flags: ProgramFlags {
         .init(rawValue: numericCast(layout.p_flags))
     }
