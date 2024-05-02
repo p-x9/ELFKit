@@ -19,6 +19,18 @@ public struct ELF32GnuHashTable: ELFGnuHashTableProtocol {
     public let buckets: [Hashelt]
 //    public let chains: [Hashelt]
     public let chainsOffset: Int
+
+    public init(
+        header: ELFGnuHashTableHeader,
+        bloom: [Bloom],
+        buckets: [Hashelt],
+        chainsOffset: Int
+    ) {
+        self.header = header
+        self.bloom = bloom
+        self.buckets = buckets
+        self.chainsOffset = chainsOffset
+    }
 }
 
 public struct ELF64GnuHashTable: ELFGnuHashTableProtocol {
@@ -31,4 +43,16 @@ public struct ELF64GnuHashTable: ELFGnuHashTableProtocol {
     public let buckets: [Hashelt]
 //    public let chains: [Hashelt]
     public let chainsOffset: Int
+
+    public init(
+        header: ELFGnuHashTableHeader,
+        bloom: [Bloom],
+        buckets: [Hashelt],
+        chainsOffset: Int
+    ) {
+        self.header = header
+        self.bloom = bloom
+        self.buckets = buckets
+        self.chainsOffset = chainsOffset
+    }
 }

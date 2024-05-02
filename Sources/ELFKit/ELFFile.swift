@@ -172,7 +172,7 @@ extension ELFFile {
 }
 
 extension ELFFile {
-    public var dynamics64: DataSequence<ELF64Dynamic>? {
+    public var dynamics64: Dynamics64? {
         guard is64Bit else { return nil }
         if let dynamic = sections64?._dynamic {
             return dynamic._dynamic64(in: self)
@@ -183,7 +183,7 @@ extension ELFFile {
         return nil
     }
 
-    public var dynamics32: DataSequence<ELF32Dynamic>? {
+    public var dynamics32: Dynamics32? {
         guard !is64Bit else { return nil }
         if let dynamic = sections32?._dynamic {
             return dynamic._dynamic32(in: self)

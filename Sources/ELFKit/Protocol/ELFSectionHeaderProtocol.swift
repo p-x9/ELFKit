@@ -3,7 +3,7 @@
 //
 //
 //  Created by p-x9 on 2024/04/27
-//  
+//
 //
 
 import Foundation
@@ -139,21 +139,25 @@ extension ELFSectionHeaderProtocol {
 }
 
 extension ELFSectionHeaderProtocol {
-    public func _dynamic32(in elf: ELFFile) -> DataSequence<ELF32Dynamic>? {
+    public func _dynamic32(in elf: ELFFile) -> ELFFile.Dynamics32? {
         guard type == .dynamic, !elf.is64Bit else { return nil }
         let count = size / ELF32Dynamic.layoutSize
-        return elf.fileHandle.readDataSequence(
-            offset: UInt64(offset),
-            numberOfElements: count
+        return .init(
+            elf.fileHandle.readDataSequence(
+                offset: UInt64(offset),
+                numberOfElements: count
+            )
         )
     }
 
-    public func _dynamic64(in elf: ELFFile) -> DataSequence<ELF64Dynamic>? {
+    public func _dynamic64(in elf: ELFFile) -> ELFFile.Dynamics64? {
         guard type == .dynamic, elf.is64Bit else { return nil }
         let count = size / ELF64Dynamic.layoutSize
-        return elf.fileHandle.readDataSequence(
-            offset: UInt64(offset),
-            numberOfElements: count
+        return .init(
+            elf.fileHandle.readDataSequence(
+                offset: UInt64(offset),
+                numberOfElements: count
+            )
         )
     }
 

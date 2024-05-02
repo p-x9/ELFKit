@@ -17,6 +17,16 @@ public struct ELF32HashTable: ELFHashTableProtocol {
 
     public let buckets: [Hashelt]
     public let chains: [Hashelt]
+
+    public init(
+        header: Header,
+        buckets: [Hashelt],
+        chains: [Hashelt]
+    ) {
+        self.header = header
+        self.buckets = buckets
+        self.chains = chains
+    }
 }
 
 public struct ELF64HashTable: ELFHashTableProtocol {
@@ -27,4 +37,14 @@ public struct ELF64HashTable: ELFHashTableProtocol {
 
     public let buckets: [Hashelt]
     public let chains: [Hashelt]
+
+    public init(
+        header: Header,
+        buckets: [Hashelt],
+        chains: [Hashelt]
+    ) {
+        self.header = header
+        self.buckets = buckets
+        self.chains = chains
+    }
 }

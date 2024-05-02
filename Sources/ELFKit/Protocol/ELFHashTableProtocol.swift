@@ -20,6 +20,8 @@ public protocol ELFHashTableProtocol {
     var header: Header { get }
     var buckets: [Hashelt] { get }
     var chains: [Hashelt] { get }
+
+    init(header: Header, buckets: [Hashelt], chains: [Hashelt])
 }
 
 public protocol ELFGnuHashTableProtocol {
@@ -32,6 +34,8 @@ public protocol ELFGnuHashTableProtocol {
     var buckets: [Hashelt] { get }
 
     var chainsOffset: Int { get }
+
+    init(header: ELFGnuHashTableHeader, bloom: [Bloom], buckets: [Hashelt], chainsOffset: Int)
 }
 
 extension ELFGnuHashTableProtocol {
