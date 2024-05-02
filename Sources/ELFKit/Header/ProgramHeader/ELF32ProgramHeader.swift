@@ -16,15 +16,15 @@ public struct ELF32ProgramHeader: LayoutWrapper {
 }
 
 extension ELF32ProgramHeader: ELFProgramHeaderProtocol {
-    public var type: SegmentType! {
+    public var type: ProgramType! {
         .init(rawValue: layout.p_type)
     }
 
-    public var osSpecificType: SegmentType.OSSpecific {
+    public var osSpecificType: ProgramType.OSSpecific {
         .init(rawValue: numericCast(layout.p_type))
     }
 
-    public var processorSpecificType: SegmentType.ProcessorSpecific {
+    public var processorSpecificType: ProgramType.ProcessorSpecific {
         .init(rawValue: numericCast(layout.p_type))
     }
 

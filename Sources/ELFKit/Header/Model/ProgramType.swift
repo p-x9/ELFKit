@@ -1,5 +1,5 @@
 //
-//  SegmentType.swift
+//  ProgramType.swift
 //
 //
 //  Created by p-x9 on 2024/04/27
@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SegmentType: CaseIterable {
+public enum ProgramType: CaseIterable {
     /// PT_NULL
     case null
     /// PT_LOAD
@@ -28,7 +28,7 @@ public enum SegmentType: CaseIterable {
     case tls
 }
 
-extension SegmentType: RawRepresentable {
+extension ProgramType: RawRepresentable {
     public typealias RawValue = UInt32
 
     public init?(rawValue: RawValue) {
@@ -59,7 +59,7 @@ extension SegmentType: RawRepresentable {
     }
 }
 
-extension SegmentType: CustomStringConvertible {
+extension ProgramType: CustomStringConvertible {
     public var description: String {
         switch self {
         case .null: "PT_NULL"

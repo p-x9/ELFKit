@@ -1,5 +1,5 @@
 //
-//  SegmentType+OSSpecific.swift
+//  ProgramType+OSSpecific.swift
 //
 //
 //  Created by p-x9 on 2024/05/03
@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-extension SegmentType {
+extension ProgramType {
     public struct OSSpecific: RawRepresentable {
         public typealias RawValue = UInt32
         public var rawValue: RawValue
@@ -32,7 +32,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.OSSpecific: CustomStringConvertible {
+extension ProgramType.OSSpecific: CustomStringConvertible {
     public var description: String {
         [
             gnu?.description,
@@ -45,7 +45,7 @@ extension SegmentType.OSSpecific: CustomStringConvertible {
 }
 
 // MARK: GNU
-extension SegmentType {
+extension ProgramType {
     public enum GNU: CaseIterable {
         /// PT_GNU_EH_FRAME
         case eh_frame
@@ -56,7 +56,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.GNU: RawRepresentable {
+extension ProgramType.GNU: RawRepresentable {
     public typealias RawValue = UInt32
 
     public init?(rawValue: RawValue) {
@@ -77,7 +77,7 @@ extension SegmentType.GNU: RawRepresentable {
     }
 }
 
-extension SegmentType.GNU: CustomStringConvertible {
+extension ProgramType.GNU: CustomStringConvertible {
     public var description: String {
         switch self {
         case .eh_frame: "PT_GNU_EH_FRAME"
@@ -88,7 +88,7 @@ extension SegmentType.GNU: CustomStringConvertible {
 }
 
 // MARK: - SUNW
-extension SegmentType {
+extension ProgramType {
     public enum SUNW: CaseIterable {
         /// PT_SUNW_UNWIND
         case unwind
@@ -103,7 +103,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.SUNW: RawRepresentable {
+extension ProgramType.SUNW: RawRepresentable {
     public typealias RawValue = UInt32
 
     public init?(rawValue: RawValue) {
@@ -128,7 +128,7 @@ extension SegmentType.SUNW: RawRepresentable {
     }
 }
 
-extension SegmentType.SUNW: CustomStringConvertible {
+extension ProgramType.SUNW: CustomStringConvertible {
     public var description: String {
         switch self {
         case .unwind: "PT_SUNW_UNWIND"
@@ -141,7 +141,7 @@ extension SegmentType.SUNW: CustomStringConvertible {
 }
 
 // MARK: - OpenBSD
-extension SegmentType {
+extension ProgramType {
     public enum OpenBSD: CaseIterable {
         /// PT_OPENBSD_RANDOMIZE
         case randomize
@@ -152,7 +152,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.OpenBSD: RawRepresentable {
+extension ProgramType.OpenBSD: RawRepresentable {
     public typealias RawValue = UInt32
 
     public init?(rawValue: RawValue) {
@@ -173,7 +173,7 @@ extension SegmentType.OpenBSD: RawRepresentable {
     }
 }
 
-extension SegmentType.OpenBSD: CustomStringConvertible {
+extension ProgramType.OpenBSD: CustomStringConvertible {
     public var description: String {
         switch self {
         case .randomize: "PT_OPENBSD_RANDOMIZE"

@@ -9,9 +9,9 @@
 import Foundation
 
 public protocol ELFProgramHeaderProtocol {
-    var type: SegmentType! { get }
-    var osSpecificType: SegmentType.OSSpecific { get }
-    var processorSpecificType: SegmentType.ProcessorSpecific { get }
+    var type: ProgramType! { get }
+    var osSpecificType: ProgramType.OSSpecific { get }
+    var processorSpecificType: ProgramType.ProcessorSpecific { get }
     var flags: ProgramFlags { get }
     var offset: Int { get }
     var virtualAddress: Int { get }

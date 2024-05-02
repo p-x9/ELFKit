@@ -1,5 +1,5 @@
 //
-//  SegmentType+ProcessorSpecific.swift
+//  ProgramType+ProcessorSpecific.swift
 //  
 //
 //  Created by p-x9 on 2024/05/03
@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-extension SegmentType {
+extension ProgramType {
     public struct ProcessorSpecific: RawRepresentable {
         public typealias RawValue = UInt32
         public var rawValue: RawValue
@@ -28,7 +28,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.ProcessorSpecific: CustomStringConvertible {
+extension ProgramType.ProcessorSpecific: CustomStringConvertible {
     public var description: String {
         [
             arm?.description,
@@ -41,7 +41,7 @@ extension SegmentType.ProcessorSpecific: CustomStringConvertible {
 
 
 // MARK: - ARM
-extension SegmentType {
+extension ProgramType {
     public enum ARM: CaseIterable {
         /// PT_ARM_ARCHEXT
         case archext
@@ -50,7 +50,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.ARM: RawRepresentable {
+extension ProgramType.ARM: RawRepresentable {
     public typealias RawValue = UInt32
 
     public init?(rawValue: RawValue) {
@@ -69,7 +69,7 @@ extension SegmentType.ARM: RawRepresentable {
     }
 }
 
-extension SegmentType.ARM: CustomStringConvertible {
+extension ProgramType.ARM: CustomStringConvertible {
     public var description: String {
         switch self {
         case .archext: "PT_ARM_ARCHEXT"
@@ -79,7 +79,7 @@ extension SegmentType.ARM: CustomStringConvertible {
 }
 
 // MARK: - MIPS
-extension SegmentType {
+extension ProgramType {
     public enum MIPS: CaseIterable {
         /// PT_MIPS_REGINFO
         case reginfo
@@ -92,7 +92,7 @@ extension SegmentType {
     }
 }
 
-extension SegmentType.MIPS: RawRepresentable {
+extension ProgramType.MIPS: RawRepresentable {
     public typealias RawValue = UInt32
 
     public init?(rawValue: RawValue) {
@@ -115,7 +115,7 @@ extension SegmentType.MIPS: RawRepresentable {
     }
 }
 
-extension SegmentType.MIPS: CustomStringConvertible {
+extension ProgramType.MIPS: CustomStringConvertible {
     public var description: String {
         switch self {
         case .reginfo: "PT_MIPS_REGINFO"
