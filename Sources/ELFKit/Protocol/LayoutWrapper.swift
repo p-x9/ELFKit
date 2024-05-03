@@ -9,7 +9,7 @@
 import Foundation
 
 @dynamicMemberLookup
-public protocol LayoutWrapper {
+public protocol LayoutWrapper<Layout> {
     associatedtype Layout
 
     var layout: Layout { get set }
