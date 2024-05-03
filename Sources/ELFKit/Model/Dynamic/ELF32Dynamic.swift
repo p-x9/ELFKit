@@ -16,7 +16,15 @@ public struct ELF32Dynamic: LayoutWrapper {
 }
 
 extension ELF32Dynamic: ELFDynamicProtocol {
-    public var tag: DynamicTag! {
+    public var tag: DynamicTag? {
+        .init(rawValue: numericCast(layout.d_tag))
+    }
+
+    public var osSpecificTag: DynamicTag.OSSpecific {
+        .init(rawValue: numericCast(layout.d_tag))
+    }
+
+    public var processorSpecificTag: DynamicTag.ProcessorSpecific {
         .init(rawValue: numericCast(layout.d_tag))
     }
 

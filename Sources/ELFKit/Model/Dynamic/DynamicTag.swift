@@ -156,6 +156,12 @@ public enum DynamicTag: CaseIterable {
     case verneed
     /// DT_VERNEEDNUM
     case verneednum
+    /// DT_AUXILIARY
+    case auxiliary
+    /// DT_USED
+    case used
+    /// DT_FILTER
+    case filter
 }
 
 extension DynamicTag: RawRepresentable {
@@ -236,6 +242,9 @@ extension DynamicTag: RawRepresentable {
         case RawValue(DT_VERDEFNUM): self = .verdefnum
         case RawValue(DT_VERNEED): self = .verneed
         case RawValue(DT_VERNEEDNUM): self = .verneednum
+        case RawValue(DT_AUXILIARY): self = .auxiliary
+        case RawValue(DT_USED): self = .used
+        case RawValue(DT_FILTER): self = .filter
         default: return nil
         }
     }
@@ -315,6 +324,9 @@ extension DynamicTag: RawRepresentable {
         case .verdefnum: RawValue(DT_VERDEFNUM)
         case .verneed: RawValue(DT_VERNEED)
         case .verneednum: RawValue(DT_VERNEEDNUM)
+        case .auxiliary: RawValue(DT_AUXILIARY)
+        case .used: RawValue(DT_USED)
+        case .filter: RawValue(DT_FILTER)
         }
     }
 }
@@ -395,6 +407,9 @@ extension DynamicTag: CustomStringConvertible {
         case .verdefnum: "DT_VERDEFNUM"
         case .verneed: "DT_VERNEED"
         case .verneednum: "DT_VERNEEDNUM"
+        case .auxiliary: "DT_AUXILIARY"
+        case .used: "DT_USED"
+        case .filter: "DT_FILTER"
         }
     }
 }
