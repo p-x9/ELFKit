@@ -28,7 +28,7 @@ public protocol ELFSectionHeaderProtocol {
     func _strings(in elf: ELFFile) -> ELFFile.Strings?
     func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
     func _note(in elf: ELFFile) -> Note?
-    func _dynamic(in elf: ELFFile) -> Dynamics?
+    func _dynamics(in elf: ELFFile) -> Dynamics?
 }
 
 extension ELFSectionHeaderProtocol {
@@ -68,7 +68,7 @@ extension ELFSectionHeaderProtocol {
 
 // MARK: - Dynamics
 extension ELFSectionHeaderProtocol {
-    public func _dynamic(in elf: ELFFile) -> Dynamics? {
+    public func _dynamics(in elf: ELFFile) -> Dynamics? {
         guard type == .dynamic else { return nil }
         let count = size / Dynamics.Dynamic.layoutSize
         return .init(

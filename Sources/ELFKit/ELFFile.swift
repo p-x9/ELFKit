@@ -161,7 +161,7 @@ extension ELFFile {
         )
     }
 
-    public var programs: [ELFProgramHeaderProtocol] {
+    public var programs: [any ELFProgramHeaderProtocol] {
         if let programs64 {
             return Array(programs64)
         } else if let programs32 {
@@ -175,10 +175,10 @@ extension ELFFile {
     public var dynamics64: Dynamics64? {
         guard is64Bit else { return nil }
         if let dynamic = sections64?._dynamic {
-            return dynamic._dynamic(in: self)
+            return dynamic._dynamics(in: self)
         }
         if let dynamic = programs64?._dynamic {
-            return dynamic._dynamic64(in: self)
+            return dynamic._dynamics(in: self)
         }
         return nil
     }
@@ -186,10 +186,10 @@ extension ELFFile {
     public var dynamics32: Dynamics32? {
         guard !is64Bit else { return nil }
         if let dynamic = sections32?._dynamic {
-            return dynamic._dynamic(in: self)
+            return dynamic._dynamics(in: self)
         }
         if let dynamic = programs32?._dynamic {
-            return dynamic._dynamic32(in: self)
+            return dynamic._dynamics(in: self)
         }
         return nil
     }

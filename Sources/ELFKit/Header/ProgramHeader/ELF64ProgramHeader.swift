@@ -16,6 +16,10 @@ public struct ELF64ProgramHeader: LayoutWrapper {
 }
 
 extension ELF64ProgramHeader: ELFProgramHeaderProtocol {
+    public typealias Relocation = ELF64Relocation
+    public typealias Note = ELF64Note
+    public typealias Dynamics = ELFFile.Dynamics64
+
     public var type: ProgramType! {
         .init(rawValue: layout.p_type)
     }
