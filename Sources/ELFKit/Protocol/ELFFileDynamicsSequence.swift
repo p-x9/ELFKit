@@ -10,6 +10,7 @@ import Foundation
 
 public protocol ELFFileDynamicsSequence<Dynamic>: RandomAccessCollection
 where Element == Dynamic,
+      Dynamic: LayoutWrapper,
       Iterator == WrappedSequence.Iterator,
       Index == Int,
       HashTable.Header == HashTableHeader
@@ -28,6 +29,8 @@ where Element == Dynamic,
     typealias WrappedSequence = DataSequence<Dynamic>
 
     var sequence: WrappedSequence { get }
+
+    init(_ sequence: WrappedSequence)
 
     func hashTableHeader(in elf: ELFFile) -> HashTableHeader?
     func hashTable(in elf: ELFFile) -> HashTable?

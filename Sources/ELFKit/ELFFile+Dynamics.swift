@@ -28,7 +28,7 @@ extension ELFFile {
 
         public let sequence: WrappedSequence
 
-        init(_ sequence: WrappedSequence) {
+        public init(_ sequence: WrappedSequence) {
             self.sequence = sequence
         }
     }
@@ -50,7 +50,7 @@ extension ELFFile {
 
         public let sequence: WrappedSequence
 
-        init(_ sequence: WrappedSequence) {
+        public init(_ sequence: WrappedSequence) {
             self.sequence = sequence
         }
     }

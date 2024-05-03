@@ -9,6 +9,10 @@
 import Foundation
 
 public protocol ELFSectionHeaderProtocol {
+    associatedtype Relocation: ELFRelocationProtocol
+    associatedtype Note: ELFNoteProtocol
+    associatedtype Dynamics: ELFFileDynamicsSequence
+
     var nameOffset: Int { get }
     var type: SectionType? { get }
     var flags: SectionFlags { get }
@@ -18,6 +22,13 @@ public protocol ELFSectionHeaderProtocol {
 
     var osSpecificType: SectionType.OSSpecific { get }
     var processorSpecificType: SectionType.ProcessorSpecific { get }
+
+    func name(in elf: ELFFile) -> String?
+
+    func _strings(in elf: ELFFile) -> ELFFile.Strings?
+    func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
+    func _note(in elf: ELFFile) -> Note?
+    func _dynamic(in elf: ELFFile) -> Dynamics?
 }
 
 extension ELFSectionHeaderProtocol {
@@ -31,6 +42,7 @@ extension ELFSectionHeaderProtocol {
     }
 }
 
+// MARK: - String Table
 extension ELFSectionHeaderProtocol {
     public func _strings(in elf: ELFFile) -> ELFFile.Strings? {
         guard type == .strtab else { return nil }
@@ -42,130 +54,28 @@ extension ELFSectionHeaderProtocol {
     }
 }
 
+// MARK: - Note
 extension ELFSectionHeaderProtocol {
-    public func _relocations32(in elf: ELFFile) -> AnyRandomAccessCollection<ELF32Relocation>? {
-        guard !elf.is64Bit else { return nil }
-        switch type {
-        case .rel:
-            let count = size / ELF32RelocationInfo.layoutSize
-            let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
-                numberOfElements: count
-            )
-            return AnyRandomAccessCollection(
-                sequence
-                    .map {
-                        .general($0)
-                    }
-            )
-        case .rela:
-            let count = size / ELF32RelocationAddendInfo.layoutSize
-            let sequence: DataSequence<ELF32RelocationAddendInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
-                numberOfElements: count
-            )
-            return AnyRandomAccessCollection(
-                sequence
-                    .map {
-                        .addend($0)
-                    }
-            )
-        default:
-            return nil
-        }
-    }
-
-    public func _relocations64(in elf: ELFFile) -> AnyRandomAccessCollection<ELF64Relocation>? {
-        guard elf.is64Bit else { return nil }
-        switch type {
-        case .rel:
-            let count = size / ELF64RelocationInfo.layoutSize
-            let sequence: DataSequence<ELF64RelocationInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
-                numberOfElements: count
-            )
-            return AnyRandomAccessCollection(
-                sequence.map { .general($0) }
-            )
-        case .rela:
-            let count = size / ELF64RelocationAddendInfo.layoutSize
-            let sequence: DataSequence<ELF64RelocationAddendInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
-                numberOfElements: count
-            )
-            return AnyRandomAccessCollection(
-                sequence.map { .addend($0) }
-            )
-        default:
-            return nil
-        }
-    }
-
-    public func _relocations(in elf: ELFFile) -> [any ELFRelocationProtocol]? {
-        if elf.is64Bit {
-            return _relocations64(in: elf)?.map { $0 }
-        } else {
-            return _relocations32(in: elf)?.map { $0 }
-        }
-    }
-}
-
-extension ELFSectionHeaderProtocol {
-    public func _note32(in elf: ELFFile) -> ELF32Note? {
-        guard type == .note, !elf.is64Bit else { return nil }
+    public func _note(in elf: ELFFile) -> Note? {
+        guard type == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: size
         )
         return .init(data: data)
     }
-
-    public func _note64(in elf: ELFFile) -> ELF64Note? {
-        guard type == .note, elf.is64Bit else { return nil }
-        let data = elf.fileHandle.readData(
-            offset: numericCast(offset),
-            size: size
-        )
-        return .init(data: data)
-    }
-
-    public func _note(in elf: ELFFile) -> (any ELFNoteProtocol)? {
-        if elf.is64Bit {
-            return _note64(in: elf)
-        } else {
-            return _note32(in: elf)
-        }
-    }
 }
 
+// MARK: - Dynamics
 extension ELFSectionHeaderProtocol {
-    public func _dynamic32(in elf: ELFFile) -> ELFFile.Dynamics32? {
-        guard type == .dynamic, !elf.is64Bit else { return nil }
-        let count = size / ELF32Dynamic.layoutSize
+    public func _dynamic(in elf: ELFFile) -> Dynamics? {
+        guard type == .dynamic else { return nil }
+        let count = size / Dynamics.Dynamic.layoutSize
         return .init(
             elf.fileHandle.readDataSequence(
                 offset: UInt64(offset),
                 numberOfElements: count
             )
         )
-    }
-
-    public func _dynamic64(in elf: ELFFile) -> ELFFile.Dynamics64? {
-        guard type == .dynamic, elf.is64Bit else { return nil }
-        let count = size / ELF64Dynamic.layoutSize
-        return .init(
-            elf.fileHandle.readDataSequence(
-                offset: UInt64(offset),
-                numberOfElements: count
-            )
-        )
-    }
-
-    public func _dynamic(in elf: ELFFile) -> [ELFDynamicProtocol]? {
-        if elf.is64Bit {
-            return _dynamic64(in: elf)?.map { $0 }
-        } else {
-            return _dynamic32(in: elf)?.map { $0 }
-        }
     }
 }

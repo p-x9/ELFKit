@@ -16,6 +16,10 @@ public struct ELF64SectionHeader: LayoutWrapper {
 }
 
 extension ELF64SectionHeader: ELFSectionHeaderProtocol {
+    public typealias Relocation = ELF64Relocation
+    public typealias Note = ELF64Note
+    public typealias Dynamics = ELFFile.Dynamics64
+
     public var nameOffset: Int { numericCast(layout.sh_name) }
 
     public var type: SectionType? {
@@ -37,4 +41,31 @@ extension ELF64SectionHeader: ELFSectionHeaderProtocol {
     public var address: Int { numericCast(layout.sh_addr) }
     public var offset: Int { numericCast(layout.sh_offset) }
     public var size: Int { numericCast(layout.sh_size) }
+}
+
+extension ELF64SectionHeader {
+    public func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>? {
+        switch type {
+        case .rel:
+            let count = size / ELF64RelocationInfo.layoutSize
+            let sequence: DataSequence<ELF64RelocationInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        case .rela:
+            let count = size / ELF64RelocationAddendInfo.layoutSize
+            let sequence: DataSequence<ELF64RelocationAddendInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        default:
+            return nil
+        }
+    }
 }

@@ -20,7 +20,7 @@ public protocol ELFSymbolProtocol {
 
 extension ELFSymbolProtocol {
     public func name(in elf: ELFFile, isDynamic: Bool) -> String? {
-        var stringTable: ELFSectionHeaderProtocol?
+        var stringTable: (any ELFSectionHeaderProtocol)?
         if isDynamic {
             stringTable = elf._dynstr
         } else {
