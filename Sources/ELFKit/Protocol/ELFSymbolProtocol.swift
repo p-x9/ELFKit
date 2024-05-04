@@ -34,3 +34,12 @@ extension ELFSymbolProtocol {
         return strings.string(at: nameOffset)?.string
     }
 }
+
+extension ELFSymbolProtocol {
+    public func demangledName(in elf: ELFFile, isDynamic: Bool) -> String? {
+        guard let name = name(in: elf, isDynamic: isDynamic) else {
+            return nil
+        }
+        return stdlib_demangleName(name)
+    }
+}
