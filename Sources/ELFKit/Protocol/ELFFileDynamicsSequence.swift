@@ -13,7 +13,8 @@ where Element == Dynamic,
       Dynamic: LayoutWrapper,
       Iterator == WrappedSequence.Iterator,
       Index == Int,
-      HashTable.Header == HashTableHeader
+      HashTable.Header == HashTableHeader,
+      HashTableHeader: LayoutWrapper
 {
     associatedtype Dynamic: ELFDynamicProtocol
     associatedtype HashTableHeader: ELFHashTableHeaderProtocol
@@ -122,7 +123,7 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: Hash Table
-extension ELFFileDynamicsSequence where HashTableHeader: LayoutWrapper {
+extension ELFFileDynamicsSequence {
     public func hashTableHeader(in elf: ELFFile) -> HashTableHeader? {
         guard let _hash else { return nil }
         return elf.fileHandle.read(
@@ -135,22 +136,9 @@ extension ELFFileDynamicsSequence where HashTableHeader: LayoutWrapper {
         guard let header = hashTableHeader(in: elf) else {
             return nil
         }
-
-        let bucketStart: Int = numericCast(_hash.pointer) + numericCast(header.layoutSize)
-        let buckets: DataSequence<HashTable.Hashelt> = elf.fileHandle.readDataSequence(
-            offset: numericCast(bucketStart),
-            numberOfElements: header.numberOfBuckets
-        )
-
-        let chainStart: Int = bucketStart + buckets.data.count
-        let chains: DataSequence<HashTable.Hashelt> = elf.fileHandle.readDataSequence(
-            offset: numericCast(chainStart),
-            numberOfElements: header.numberOfChains
-        )
-        return .init(
-            header: header,
-            buckets: Array(buckets),
-            chains: Array(chains)
+        return header._readContent(
+            in: elf,
+            at: numericCast(_hash.pointer)
         )
     }
 }
@@ -169,26 +157,9 @@ extension ELFFileDynamicsSequence {
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
         }
-
-        let bloomsStart: Int = numericCast(_gnu_hash.pointer) + numericCast(header.layoutSize)
-        let blooms: DataSequence<GnuHashTable.Bloom> = elf.fileHandle.readDataSequence(
-            offset: numericCast(bloomsStart),
-            numberOfElements: numericCast(header.gh_maskwords)
-        )
-
-        let bucketsStart: Int = bloomsStart + blooms.data.count
-        let buckets: DataSequence<GnuHashTable.Hashelt> = elf.fileHandle.readDataSequence(
-            offset: numericCast(bucketsStart),
-            numberOfElements: numericCast(header.gh_nbuckets)
-        )
-
-        let chainsOffset = bucketsStart + buckets.data.count
-
-        return .init(
-            header: header,
-            bloom: Array(blooms),
-            buckets: Array(buckets),
-            chainsOffset: chainsOffset
+        return header._readContent(
+            in: elf,
+            at: numericCast(_gnu_hash.pointer)
         )
     }
 }

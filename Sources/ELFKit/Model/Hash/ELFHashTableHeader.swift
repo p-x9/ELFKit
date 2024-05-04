@@ -44,3 +44,29 @@ extension ELF64HashTableHeader: ELFHashTableHeaderProtocol {
         numericCast(layout.nchain)
     }
 }
+
+extension ELFHashTableHeaderProtocol where Self: LayoutWrapper {
+    func _readContent<Table: ELFHashTableProtocol>(
+        in elf: ELFFile,
+        at offset: Int
+    ) -> Table where Table.Header == Self {
+        var header: Self { self }
+
+        let bucketStart: Int = numericCast(offset) + numericCast(header.layoutSize)
+        let buckets: DataSequence<Table.Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(bucketStart),
+            numberOfElements: header.numberOfBuckets
+        )
+
+        let chainStart: Int = bucketStart + buckets.data.count
+        let chains: DataSequence<Table.Hashelt> = elf.fileHandle.readDataSequence(
+            offset: numericCast(chainStart),
+            numberOfElements: header.numberOfChains
+        )
+        return .init(
+            header: header,
+            buckets: Array(buckets),
+            chains: Array(chains)
+        )
+    }
+}

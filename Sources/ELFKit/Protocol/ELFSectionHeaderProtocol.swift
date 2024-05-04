@@ -79,3 +79,45 @@ extension ELFSectionHeaderProtocol {
         )
     }
 }
+
+// MARK: - Hash Table
+extension ELFSectionHeaderProtocol {
+    public func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader? {
+        guard type == .hash else { return nil }
+        return elf.fileHandle.read(
+            offset: numericCast(offset)
+        )
+    }
+
+    public func _hashTable(in elf: ELFFile) -> Dynamics.HashTable? {
+        guard let header = _hashTableHeader(in: elf) else {
+            return nil
+        }
+        return header._readContent(
+            in: elf,
+            at: offset
+        )
+    }
+}
+
+// MARK: - GNU Hash Table
+extension ELFSectionHeaderProtocol {
+    public func _gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
+        guard let name = name(in: elf),
+              name.starts(with: ".gnu"),
+              osSpecificType.gnu == .hash else { return nil }
+        return elf.fileHandle.read(
+            offset: numericCast(offset)
+        )
+    }
+
+    public func gnuHashTable(in elf: ELFFile) -> Dynamics.GnuHashTable? {
+        guard let header = _gnuHashTableHeader(in: elf) else {
+            return nil
+        }
+        return header._readContent(
+            in: elf,
+            at: offset
+        )
+    }
+}
