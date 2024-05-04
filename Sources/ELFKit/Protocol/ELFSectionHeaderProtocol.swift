@@ -19,6 +19,9 @@ public protocol ELFSectionHeaderProtocol {
     var address: Int { get }
     var offset: Int { get }
     var size: Int { get }
+    var link: Int { get }
+    var addressAlignment: Int { get }
+    var entrySize: Int { get }
 
     var osSpecificType: SectionType.OSSpecific { get }
     var processorSpecificType: SectionType.ProcessorSpecific { get }
@@ -105,7 +108,9 @@ extension ELFSectionHeaderProtocol {
     public func _gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
         guard let name = name(in: elf),
               name.starts(with: ".gnu"),
-              osSpecificType.gnu == .hash else { return nil }
+              osSpecificType.gnu == .hash else {
+            return nil
+        }
         return elf.fileHandle.read(
             offset: numericCast(offset)
         )

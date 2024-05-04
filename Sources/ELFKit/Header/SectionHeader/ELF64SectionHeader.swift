@@ -41,6 +41,9 @@ extension ELF64SectionHeader: ELFSectionHeaderProtocol {
     public var address: Int { numericCast(layout.sh_addr) }
     public var offset: Int { numericCast(layout.sh_offset) }
     public var size: Int { numericCast(layout.sh_size) }
+    public var link: Int { numericCast(layout.sh_link) }
+    public var addressAlignment: Int { numericCast(layout.sh_addralign) }
+    public var entrySize: Int { numericCast(layout.sh_entsize) }
 }
 
 extension ELF64SectionHeader {
