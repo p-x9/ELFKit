@@ -72,3 +72,38 @@ extension ELF64SectionHeader {
         }
     }
 }
+
+// MARK: - Version Defs
+extension ELF64SectionHeader {
+    public func _versionDef(in elf: ELFFile) -> ELF64VersionDef? {
+        // name: .gnu.* or .SUNW_*
+        guard osSpecificType.gnu == .verdef || osSpecificType.solaris == .verdef else {
+            return nil
+        }
+        let layout: ELF64VersionDef.Layout = elf.fileHandle.read(
+            offset: numericCast(offset)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: offset
+        )
+    }
+}
+
+// MARK: - Verson Needs
+extension ELF64SectionHeader {
+    public func _versionNeed(in elf: ELFFile) -> ELF64VersionNeed? {
+        guard osSpecificType.gnu == .verneed || osSpecificType.solaris == .verneed else {
+            return nil
+        }
+        let layout: ELF64VersionNeed.Layout = elf.fileHandle.read(
+            offset: numericCast(offset)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: offset
+        )
+    }
+}

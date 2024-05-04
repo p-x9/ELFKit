@@ -78,3 +78,37 @@ extension ELF32SectionHeader {
         }
     }
 }
+
+// MARK: - Version Defs
+extension ELF32SectionHeader {
+    public func _versionDef(in elf: ELFFile) -> ELF32VersionDef? {
+        guard osSpecificType.gnu == .verdef || osSpecificType.solaris == .verdef else {
+            return nil
+        }
+        let layout: ELF32VersionDef.Layout = elf.fileHandle.read(
+            offset: numericCast(offset)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: offset
+        )
+    }
+}
+
+// MARK: - Verson Needs
+extension ELF32SectionHeader {
+    public func _versionNeed(in elf: ELFFile) -> ELF32VersionNeed? {
+        guard osSpecificType.gnu == .verneed || osSpecificType.solaris == .verneed else {
+            return nil
+        }
+        let layout: ELF32VersionNeed.Layout = elf.fileHandle.read(
+            offset: numericCast(offset)
+        )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: offset
+        )
+    }
+}

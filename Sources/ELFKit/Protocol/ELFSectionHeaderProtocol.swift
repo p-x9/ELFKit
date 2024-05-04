@@ -32,6 +32,20 @@ public protocol ELFSectionHeaderProtocol {
     func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
     func _note(in elf: ELFFile) -> Note?
     func _dynamics(in elf: ELFFile) -> Dynamics?
+
+    func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader?
+    func _hashTable(in elf: ELFFile) -> Dynamics.HashTable?
+
+    func _gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader?
+    func _gnuHashTable(in elf: ELFFile) -> Dynamics.GnuHashTable?
+
+    func _versionDef(in elf: ELFFile) -> Dynamics.VersionDef?
+    func _versionDefs(in elf: ELFFile) -> [Dynamics.VersionDef]?
+
+    func _versionNeed(in elf: ELFFile) -> Dynamics.VersionNeed?
+    func _versionNeeds(in elf: ELFFile) -> [Dynamics.VersionNeed]?
+
+    func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamics.VersionSym>?
 }
 
 extension ELFSectionHeaderProtocol {
@@ -116,13 +130,57 @@ extension ELFSectionHeaderProtocol {
         )
     }
 
-    public func gnuHashTable(in elf: ELFFile) -> Dynamics.GnuHashTable? {
+    public func _gnuHashTable(in elf: ELFFile) -> Dynamics.GnuHashTable? {
         guard let header = _gnuHashTableHeader(in: elf) else {
             return nil
         }
         return header._readContent(
             in: elf,
             at: offset
+        )
+    }
+}
+
+// MARK: - Verson Defs
+extension ELFSectionHeaderProtocol {
+    public func _versionDefs(in elf: ELFFile) -> [Dynamics.VersionDef]? {
+        var def = _versionDef(in: elf)
+        if def == nil { return nil }
+        var defs: [Dynamics.VersionDef] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
+}
+
+// MARK: - Verson Needs
+extension ELFSectionHeaderProtocol {
+    public func _versionNeeds(in elf: ELFFile) -> [Dynamics.VersionNeed]? {
+        var def = _versionNeed(in: elf)
+        if def == nil { return nil }
+        var defs: [Dynamics.VersionNeed] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
+}
+
+// MARK: - Version Syms
+extension ELFSectionHeaderProtocol {
+    public func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamics.VersionSym>? {
+        guard osSpecificType.gnu == .versym || osSpecificType.solaris == .versym else {
+            return nil
+        }
+        let numberOfSymbols = size / Dynamics.VersionSym.layoutSize
+        return elf.fileHandle.readDataSequence(
+            offset: numericCast(offset),
+            numberOfElements: numberOfSymbols
         )
     }
 }

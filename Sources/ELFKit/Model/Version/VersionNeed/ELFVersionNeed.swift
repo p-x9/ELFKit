@@ -113,10 +113,12 @@ extension ELF64VersionNeed: ELFVersionNeedProtocol {
     }
 
     public func _next(in elf: ELFFile) -> Self? {
-        guard let dynamics = elf.dynamics64,
-              let max = dynamics.numberOfVersionNeeds,
-              _index + 1 < max,
-              nextOffset != 0 else {
+        guard nextOffset != 0 else {
+            return nil
+        }
+        if let dynamics = elf.dynamics64,
+           let max = dynamics.numberOfVersionNeeds,
+           _index + 1 >= max {
             return nil
         }
         let offset = self._offset + nextOffset
