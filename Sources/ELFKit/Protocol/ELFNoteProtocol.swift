@@ -28,7 +28,7 @@ extension ELFNoteProtocol {
     var padding: Int {
         let reminder = layoutSize % align
         if reminder == 0 { return 0 }
-        return layoutSize - reminder
+        return align - reminder
     }
 }
 
