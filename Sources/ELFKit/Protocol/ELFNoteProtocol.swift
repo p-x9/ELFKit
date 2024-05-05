@@ -53,6 +53,11 @@ extension ELFNoteProtocol {
                 .map { String(format: "%02x", $0) }
                 .joined()
             return .build_id(id)
+        case .gold_version:
+            guard let version = String(cString: descriptionData) else {
+                return nil
+            }
+            return .gold_version(version)
         default:
             return nil
         }
