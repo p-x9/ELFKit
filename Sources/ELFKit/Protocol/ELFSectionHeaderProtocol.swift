@@ -81,6 +81,16 @@ extension ELFSectionHeaderProtocol {
         )
         return .init(data: data)
     }
+
+    @_disfavoredOverload
+    public func _notes(in elf: ELFFile) -> AnySequence<any ELFNoteProtocol>? {
+        guard let sequence: _ELFNotes<Note> = _notes(in: elf) else {
+            return nil
+        }
+        return AnySequence(sequence.map {
+            $0 as (any ELFNoteProtocol)
+        })
+    }
 }
 
 // MARK: - Dynamics
