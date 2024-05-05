@@ -24,12 +24,12 @@ public protocol ELFProgramHeaderProtocol {
     var memorySize: Int { get }
     var align: Int { get }
 
-    func _notes(in elf: ELFFile) -> Note?
+    func _notes(in elf: ELFFile) -> _ELFNotes<Note>?
     func _dynamics(in elf: ELFFile) -> Dynamics?
 }
 
 extension ELFProgramHeaderProtocol {
-    public func _notes(in elf: ELFFile) -> Note? {
+    public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
         guard type == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),

@@ -30,7 +30,7 @@ public protocol ELFSectionHeaderProtocol {
 
     func _strings(in elf: ELFFile) -> ELFFile.Strings?
     func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
-    func _note(in elf: ELFFile) -> Note?
+    func _notes(in elf: ELFFile) ->  _ELFNotes<Note>?
     func _dynamics(in elf: ELFFile) -> Dynamics?
 
     func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader?
@@ -73,7 +73,7 @@ extension ELFSectionHeaderProtocol {
 
 // MARK: - Note
 extension ELFSectionHeaderProtocol {
-    public func _note(in elf: ELFFile) -> Note? {
+    public func _notes(in elf: ELFFile) ->  _ELFNotes<Note>? {
         guard type == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
