@@ -47,6 +47,11 @@ extension ELFNoteProtocol {
                 return nil
             }
             return .abi_tag(abiTag)
+        case .hwcap:
+            guard let cap = GnuHardwareCapabilities(data: descriptionData) else {
+                return nil
+            }
+            return .hwcap(cap)
         case .build_id:
             let id = descriptionData
                 .map { $0 & 0xFF }
@@ -58,8 +63,8 @@ extension ELFNoteProtocol {
                 return nil
             }
             return .gold_version(version)
-        default:
-            return nil
+        case .property_type_0:
+            return .property_type_0(descriptionData)
         }
     }
 }

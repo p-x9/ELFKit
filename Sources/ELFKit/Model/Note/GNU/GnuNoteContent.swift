@@ -18,7 +18,7 @@ public enum GnuNoteContent {
     /// NT_GNU_GOLD_VERSION
     case gold_version(String)
     /// NT_GNU_PROPERTY_TYPE_0
-    case property_type_0
+    case property_type_0(Data)
 }
 
 extension GnuNoteContent {
