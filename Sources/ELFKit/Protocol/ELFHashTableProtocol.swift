@@ -83,17 +83,17 @@ extension ELFGnuHashTableProtocol {
         in elf: ELFFile
     ) -> ELF64Symbol? {
         guard let dynamics = elf.dynamics64,
-              let hashTable = dynamics.gnuHashTable(in: elf),
               let symbols = dynamics.symbols(in: elf) else {
             return nil
         }
+        let hashTable = self
         let header = hashTable.header
         let bits = 64
 
         let hash = Self.hash(for: symbol)
 
         let word = hashTable.bloom[(hash / bits) % numericCast(header.gh_maskwords)]
-        let mask: UInt64 = 0 | 1 << (hash % bits) | 1 << ((hash >> UInt64(header.gh_shift2)) % bits)
+        let mask: Bloom = 0 | 1 << (hash % bits) | 1 << ((hash >> Bloom(header.gh_shift2)) % bits)
 
         if (word & mask) != mask {
             // Symbol Not Found"
@@ -110,7 +110,7 @@ extension ELFGnuHashTableProtocol {
             let current = symbols[Int(symix)]
             let name = current.name(in: elf, isDynamic: true)
             let nhash: UInt32 = elf.fileHandle.read(
-                offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(symix - header.gh_symndx))
+                offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx))
             if (hash|1) == (nhash|1) && name == symbol {
                return current
             }
@@ -126,17 +126,17 @@ extension ELFGnuHashTableProtocol {
         in elf: ELFFile
     ) -> ELF32Symbol? {
         guard let dynamics = elf.dynamics32,
-              let hashTable = dynamics.gnuHashTable(in: elf),
               let symbols = dynamics.symbols(in: elf) else {
             return nil
         }
+        let hashTable = self
         let header = hashTable.header
         let bits = 32
 
         let hash = Self.hash(for: symbol)
 
         let word = hashTable.bloom[(hash / bits) % numericCast(header.gh_maskwords)]
-        let mask: UInt32 = 0 | 1 << (hash % bits) | 1 << ((hash >> UInt32(header.gh_shift2)) % bits)
+        let mask: Bloom = 0 | 1 << (hash % bits) | 1 << ((hash >> Bloom(header.gh_shift2)) % bits)
 
         if (word & mask) != mask {
             // Symbol Not Found"
@@ -153,7 +153,7 @@ extension ELFGnuHashTableProtocol {
             let current = symbols[Int(symix)]
             let name = current.name(in: elf, isDynamic: true)
             let nhash: UInt32 = elf.fileHandle.read(
-                offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(symix - header.gh_symndx))
+                offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx))
             if (hash|1) == (nhash|1) && name == symbol {
                 return current
             }
