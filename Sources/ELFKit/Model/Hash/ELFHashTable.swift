@@ -12,6 +12,7 @@ import ELFKitC
 public struct ELF32HashTable: ELFHashTableProtocol {
     public typealias Header = ELF32HashTableHeader
     public typealias Hashelt = Elf32_Hashelt
+    public typealias Symbol = ELF32Symbol
 
     public let header: Header
 
@@ -32,6 +33,7 @@ public struct ELF32HashTable: ELFHashTableProtocol {
 public struct ELF64HashTable: ELFHashTableProtocol {
     public typealias Header = ELF64HashTableHeader
     public typealias Hashelt = Elf64_Hashelt
+    public typealias Symbol = ELF64Symbol
 
     public let header: Header
 
@@ -46,5 +48,67 @@ public struct ELF64HashTable: ELFHashTableProtocol {
         self.header = header
         self.buckets = buckets
         self.chains = chains
+    }
+}
+
+extension ELF32HashTable {
+    // ref: https://flapenguin.me/elf-dt-hash
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFFile
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics32,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        let hashTable = self
+        let header = hashTable.header
+
+        let hash = Self.hash(for: symbol)
+
+        var symix = hashTable.buckets[hash % header.numberOfBuckets]
+        while true {
+            let current = symbols[Int(symix)]
+            let name = current.name(in: elf, isDynamic: true)
+            if name == symbol {
+                return current
+            }
+            if current.specialSection == .undef {
+                break
+            }
+            symix = hashTable.chains[Int(symix)]
+        }
+        return nil
+    }
+}
+
+extension ELF64HashTable {
+    // ref: https://flapenguin.me/elf-dt-hash
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFFile
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics64,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        let hashTable = self
+        let header = hashTable.header
+
+        let hash = Self.hash(for: symbol)
+
+        var symix = hashTable.buckets[hash % header.numberOfBuckets]
+        while true {
+            let current = symbols[Int(symix)]
+            let name = current.name(in: elf, isDynamic: true)
+            if name == symbol {
+                return current
+            }
+            if current.specialSection == .undef {
+                break
+            }
+            symix = hashTable.chains[Int(symix)]
+        }
+        return nil
     }
 }

@@ -16,12 +16,17 @@ public protocol ELFHashTableHeaderProtocol {
 public protocol ELFHashTableProtocol {
     associatedtype Header: ELFHashTableHeaderProtocol
     associatedtype Hashelt: FixedWidthInteger
+    associatedtype Symbol: ELFSymbolProtocol
 
     var header: Header { get }
     var buckets: [Hashelt] { get }
     var chains: [Hashelt] { get }
 
     init(header: Header, buckets: [Hashelt], chains: [Hashelt])
+
+    func findSymbol(named symbol: String, in elf: ELFFile) -> Symbol?
+
+    static func hash(for name: String) -> Int
 }
 
 extension ELFHashTableProtocol {
@@ -45,72 +50,12 @@ extension ELFHashTableProtocol {
 }
 
 extension ELFHashTableProtocol {
-    // ref: https://flapenguin.me/elf-dt-hash
-    public func findSymbol64(
-        named symbol: String,
-        in elf: ELFFile
-    ) -> ELF64Symbol? {
-        guard let dynamics = elf.dynamics64,
-              let symbols = dynamics.symbols(in: elf) else {
-            return nil
-        }
-        let hashTable = self
-        let header = hashTable.header
-
-        let hash = Self.hash(for: symbol)
-
-        var symix = hashTable.buckets[hash % header.numberOfBuckets]
-        while true {
-            let current = symbols[Int(symix)]
-            let name = current.name(in: elf, isDynamic: true)
-            if name == symbol {
-                return current
-            }
-            if current.specialSection == .undef {
-                break
-            }
-            symix = hashTable.chains[Int(symix)]
-        }
-        return nil
-    }
-
-    public func findSymbol32(
-        named symbol: String,
-        in elf: ELFFile
-    ) -> ELF32Symbol? {
-        guard let dynamics = elf.dynamics32,
-              let symbols = dynamics.symbols(in: elf) else {
-            return nil
-        }
-        let hashTable = self
-        let header = hashTable.header
-
-        let hash = Self.hash(for: symbol)
-
-        var symix = hashTable.buckets[hash % header.numberOfBuckets]
-        while true {
-            let current = symbols[Int(symix)]
-            let name = current.name(in: elf, isDynamic: true)
-            if name == symbol {
-                return current
-            }
-            if current.specialSection == .undef {
-                break
-            }
-            symix = hashTable.chains[Int(symix)]
-        }
-        return nil
-    }
-
+    @_disfavoredOverload
     public func findSymbol(
         named symbol: String,
         in elf: ELFFile
     ) -> (any ELFSymbolProtocol)? {
-        if elf.is64Bit {
-            findSymbol64(named: symbol, in: elf)
-        } else {
-            findSymbol32(named: symbol, in: elf)
-        }
+        findSymbol(named: symbol, in: elf)
     }
 }
 
