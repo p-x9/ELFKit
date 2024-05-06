@@ -223,3 +223,16 @@ extension ELFFile {
         return []
     }
 }
+
+extension ELFFile {
+    /// List of depended shared objects.
+    public var dependencies: [String] {
+        if let dynamics64 {
+            return dynamics64.neededs(in: self)
+        }
+        if let dynamics32 {
+            return dynamics32.neededs(in: self)
+        }
+        return []
+    }
+}
