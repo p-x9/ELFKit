@@ -76,6 +76,8 @@ extension ELFGnuHashTableProtocol {
 }
 
 extension ELFGnuHashTableProtocol {
+    // ref: https://flapenguin.me/elf-dt-gnu-hash
+    // ref: https://github.com/bminor/glibc/blob/ea73eb5f581ef5931fd67005aa0c526ba43366c9/elf/dl-lookup.c#L340
     public func findSymbol64(
         named symbol: String,
         in elf: ELFFile
