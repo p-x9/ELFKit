@@ -14,11 +14,15 @@ public class ELFFile {
 
     let fileHandle: FileHandle
 
+    /// A boolean value that indicates whether ELF is a 64-bit architecture.
     public var is64Bit: Bool { header.identifier.class == ._64 }
+
+    /// Size of ELF header. [byte]
     public var headerSize: Int {
         is64Bit ? ELF64Header.layoutSize : ELF32Header.layoutSize
     }
 
+    /// ELF header
     public let header: ELFHeader
 
     init(url: URL) throws {
@@ -54,6 +58,33 @@ public class ELFFile {
 }
 
 extension ELFFile {
+    public var programs32: DataSequence<ELF32ProgramHeader>? {
+        guard !is64Bit else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(header.programTableOffset),
+            numberOfElements: header.numberOfPrograms
+        )
+    }
+
+    public var programs64: DataSequence<ELF64ProgramHeader>? {
+        guard is64Bit else { return nil }
+        return fileHandle.readDataSequence(
+            offset: numericCast(header.programTableOffset),
+            numberOfElements: header.numberOfPrograms
+        )
+    }
+
+    public var programs: [any ELFProgramHeaderProtocol] {
+        if let programs64 {
+            return Array(programs64)
+        } else if let programs32 {
+            return Array(programs32)
+        }
+        return []
+    }
+}
+
+extension ELFFile {
     public var sections32: DataSequence<ELF32SectionHeader>? {
         guard !is64Bit else { return nil }
         return fileHandle.readDataSequence(
@@ -85,6 +116,38 @@ extension ELFFile {
         }
         let section = sections[header.sectionNameStringTableIndex]
         return section._strings(in: self)
+    }
+}
+
+extension ELFFile {
+    public var dynamics64: Dynamics64? {
+        guard is64Bit else { return nil }
+        if let dynamic = sections64?._dynamic {
+            return dynamic._dynamics(in: self)
+        }
+        if let dynamic = programs64?._dynamic {
+            return dynamic._dynamics(in: self)
+        }
+        return nil
+    }
+
+    public var dynamics32: Dynamics32? {
+        guard !is64Bit else { return nil }
+        if let dynamic = sections32?._dynamic {
+            return dynamic._dynamics(in: self)
+        }
+        if let dynamic = programs32?._dynamic {
+            return dynamic._dynamics(in: self)
+        }
+        return nil
+    }
+
+    public var dynamics: [any ELFDynamicProtocol]? {
+        if is64Bit {
+            dynamics64?.map { $0 }
+        } else {
+            dynamics32?.map { $0 }
+        }
     }
 }
 
@@ -145,60 +208,18 @@ extension ELFFile {
 }
 
 extension ELFFile {
-    public var programs32: DataSequence<ELF32ProgramHeader>? {
-        guard !is64Bit else { return nil }
-        return fileHandle.readDataSequence(
-            offset: numericCast(header.programTableOffset),
-            numberOfElements: header.numberOfPrograms
-        )
-    }
-
-    public var programs64: DataSequence<ELF64ProgramHeader>? {
-        guard is64Bit else { return nil }
-        return fileHandle.readDataSequence(
-            offset: numericCast(header.programTableOffset),
-            numberOfElements: header.numberOfPrograms
-        )
-    }
-
-    public var programs: [any ELFProgramHeaderProtocol] {
-        if let programs64 {
-            return Array(programs64)
-        } else if let programs32 {
-            return Array(programs32)
+    /// List of runpaths
+    public var rpaths: [String] {
+        if let dynamics64 {
+            let rpaths = dynamics64.rpaths(in: self)
+            let runpaths = dynamics64.runpaths(in: self)
+            return rpaths + runpaths
+        }
+        if let dynamics32 {
+            let rpaths = dynamics32.rpaths(in: self)
+            let runpaths = dynamics32.runpaths(in: self)
+            return rpaths + runpaths
         }
         return []
-    }
-}
-
-extension ELFFile {
-    public var dynamics64: Dynamics64? {
-        guard is64Bit else { return nil }
-        if let dynamic = sections64?._dynamic {
-            return dynamic._dynamics(in: self)
-        }
-        if let dynamic = programs64?._dynamic {
-            return dynamic._dynamics(in: self)
-        }
-        return nil
-    }
-
-    public var dynamics32: Dynamics32? {
-        guard !is64Bit else { return nil }
-        if let dynamic = sections32?._dynamic {
-            return dynamic._dynamics(in: self)
-        }
-        if let dynamic = programs32?._dynamic {
-            return dynamic._dynamics(in: self)
-        }
-        return nil
-    }
-
-    public var dynamics: [any ELFDynamicProtocol]? {
-        if is64Bit {
-            dynamics64?.map { $0 }
-        } else {
-            dynamics32?.map { $0 }
-        }
     }
 }
