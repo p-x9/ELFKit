@@ -52,6 +52,10 @@ extension FileHandle {
         var data = readData(
             ofLength: Element.layoutSize
         )
+        precondition(
+            data.count >= Element.layoutSize,
+            "Invalid Data Size"
+        )
         if let swapHandler { swapHandler(&data) }
         return data.withUnsafeBytes {
             $0.load(as: Element.self)
@@ -65,6 +69,10 @@ extension FileHandle {
         seek(toFileOffset: offset)
         var data = readData(
             ofLength: MemoryLayout<Element>.size
+        )
+        precondition(
+            data.count >= MemoryLayout<Element>.size,
+            "Invalid Data Size"
         )
         if let swapHandler { swapHandler(&data) }
         return data.withUnsafeBytes {
@@ -80,6 +88,10 @@ extension FileHandle {
         var data = readData(
             ofLength: Element.layoutSize
         )
+        precondition(
+            data.count >= Element.layoutSize,
+            "Invalid Data Size"
+        )
         if let swapHandler { swapHandler(&data) }
         return data.withUnsafeBytes {
             $0.load(as: Element.self)
@@ -93,6 +105,10 @@ extension FileHandle {
         seek(toFileOffset: offset)
         var data = readData(
             ofLength: MemoryLayout<Element>.size
+        )
+        precondition(
+            data.count >= MemoryLayout<Element>.size,
+            "Invalid Data Size"
         )
         if let swapHandler { swapHandler(&data) }
         return data.withUnsafeBytes {
