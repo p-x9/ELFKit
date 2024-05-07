@@ -78,7 +78,9 @@ extension ELFFileDynamicsSequence {
         guard let _strtab, let _strsiz else {
             return nil
         }
-        let offset = _strtab.pointer
+        guard let offset = elf.fileOffset(of: _strtab.pointer) else {
+            return nil
+        }
         let size = _strsiz.value
         return .init(elf: elf, offset: offset, size: size)
     }
@@ -124,8 +126,11 @@ extension ELFFileDynamicsSequence {
 extension ELFFileDynamicsSequence {
     public func hashTableHeader(in elf: ELFFile) -> HashTableHeader? {
         guard let _hash else { return nil }
+        guard let offset = elf.fileOffset(of: _hash.pointer) else {
+            return nil
+        }
         return elf.fileHandle.read(
-            offset: numericCast(_hash.pointer)
+            offset: numericCast(offset)
         )
     }
 
@@ -134,9 +139,12 @@ extension ELFFileDynamicsSequence {
         guard let header = hashTableHeader(in: elf) else {
             return nil
         }
+        guard let offset = elf.fileOffset(of: _hash.pointer) else {
+            return nil
+        }
         return header._readContent(
             in: elf,
-            at: numericCast(_hash.pointer)
+            at: numericCast(offset)
         )
     }
 }
@@ -145,8 +153,11 @@ extension ELFFileDynamicsSequence {
 extension ELFFileDynamicsSequence {
     public func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
         guard let _gnu_hash else { return nil }
+        guard let offset = elf.fileOffset(of: _gnu_hash.pointer) else {
+            return nil
+        }
         return elf.fileHandle.read(
-            offset: numericCast(_gnu_hash.pointer)
+            offset: numericCast(offset)
         )
     }
 
@@ -155,9 +166,12 @@ extension ELFFileDynamicsSequence {
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
         }
+        guard let offset = elf.fileOffset(of: _gnu_hash.pointer) else {
+            return nil
+        }
         return header._readContent(
             in: elf,
-            at: numericCast(_gnu_hash.pointer)
+            at: offset
         )
     }
 }
@@ -178,8 +192,11 @@ extension ELFFileDynamicsSequence {
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
         }
+        guard let offset = elf.fileOffset(of: _symtab.pointer) else {
+            return nil
+        }
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(_symtab.pointer),
+            offset: numericCast(offset),
             numberOfElements: numberOfSymbols
         )
     }
@@ -212,8 +229,11 @@ extension ELFFileDynamicsSequence {
 extension ELFFileDynamicsSequence where SymbolInfo: LayoutWrapper {
     public func symbolInfos(in elf: ELFFile) -> DataSequence<SymbolInfo>? {
         guard let _syminfo, let _syminsz else { return nil }
+        guard let offset = elf.fileOffset(of: _syminfo.pointer) else {
+            return nil
+        }
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(_syminfo.pointer),
+            offset: numericCast(offset),
             numberOfElements: numericCast(_syminsz.value) / SymbolInfo.layoutSize
         )
     }
@@ -281,8 +301,11 @@ extension ELFFileDynamicsSequence {
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
         }
+        guard let offset = elf.fileOffset(of: _versym.pointer) else {
+            return nil
+        }
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(_versym.pointer),
+            offset: numericCast(offset),
             numberOfElements: numberOfSymbols
         )
     }

@@ -13,8 +13,11 @@ import ELFKitC
 extension ELFFile.Dynamics64 {
     public func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<ELF64Relocation>? {
         if let _rel, let relcount {
+            guard let offset = elf.fileOffset(of: _rel.pointer) else {
+                return nil
+            }
             let sequence: DataSequence<ELF64RelocationInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(_rel.pointer),
+                offset: numericCast(offset),
                 numberOfElements: relcount
             )
             return AnyRandomAccessCollection(
@@ -23,8 +26,11 @@ extension ELFFile.Dynamics64 {
         }
 
         if let _rela, let relacount {
+            guard let offset = elf.fileOffset(of: _rela.pointer) else {
+                return nil
+            }
             let sequence: DataSequence<ELF64RelocationAddendInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(_rela.pointer),
+                offset: numericCast(offset),
                 numberOfElements: relacount
             )
             return AnyRandomAccessCollection(
@@ -39,13 +45,16 @@ extension ELFFile.Dynamics64 {
 extension ELFFile.Dynamics64 {
     public func _versionDef(in elf: ELFFile) -> ELF64VersionDef? {
         guard let _verdef else { return nil }
+        guard let offset = elf.fileOffset(of: _verdef.pointer) else {
+            return nil
+        }
         let layout: ELF64VersionDef.Layout = elf.fileHandle.read(
-            offset: numericCast(_verdef.pointer)
+            offset: numericCast(offset)
         )
         return .init(
             layout: layout,
             _index: 0,
-            _offset: numericCast(_verdef.pointer)
+            _offset: numericCast(offset)
         )
     }
 }
@@ -54,13 +63,16 @@ extension ELFFile.Dynamics64 {
 extension ELFFile.Dynamics64 {
     public func _versionNeed(in elf: ELFFile) -> ELF64VersionNeed? {
         guard let _verneed else { return nil }
+        guard let offset = elf.fileOffset(of: _verneed.pointer) else {
+            return nil
+        }
         let layout: ELF64VersionNeed.Layout = elf.fileHandle.read(
-            offset: numericCast(_verneed.pointer)
+            offset: numericCast(offset)
         )
         return .init(
             layout: layout,
             _index: 0,
-            _offset: numericCast(_verneed.pointer)
+            _offset: numericCast(offset)
         )
     }
 }

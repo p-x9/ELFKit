@@ -283,3 +283,25 @@ extension ELFFile {
         return []
     }
 }
+
+extension ELFFile {
+    public func fileOffset(of virtualAddress: Int) -> Int? {
+        for program in self.programs {
+            if virtualAddress >= program.virtualAddress & -program.align,
+               virtualAddress < program.virtualAddress + program.memorySize {
+                let diff = program.virtualAddress - program.offset
+                return virtualAddress - diff
+            }
+        }
+
+        for section in self.sections {
+            if virtualAddress >= section.address & -section.addressAlignment,
+               virtualAddress < section.address + section.size {
+                let diff = section.address - section.offset
+                return virtualAddress - diff
+            }
+        }
+
+        return nil
+    }
+}
