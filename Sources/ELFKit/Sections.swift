@@ -29,25 +29,3 @@ extension Sequence where Element: ELFSectionHeaderProtocol {
         first(where: { $0.name(in: elf) == ".strtab" })
     }
 }
-
-extension ELFFile {
-    var _dysym: (any ELFSectionHeaderProtocol)? {
-        if is64Bit { sections64?._dynsym }
-        else { sections32?._dynsym }
-    }
-
-    var _dynstr: (any ELFSectionHeaderProtocol)? {
-        if is64Bit { sections64?._dynstr(in: self) }
-        else { sections32?._dynstr(in: self) }
-    }
-
-    var _symtab: (any ELFSectionHeaderProtocol)? {
-        if is64Bit { sections64?._symtab }
-        else { sections32?._symtab }
-    }
-
-    var _strtab: (any ELFSectionHeaderProtocol)? {
-        if is64Bit { sections64?._strtab(in: self) }
-        else { sections32?._strtab(in: self) }
-    }
-}

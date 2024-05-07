@@ -20,17 +20,13 @@ public protocol ELFSymbolProtocol {
 
 extension ELFSymbolProtocol {
     public func name(in elf: ELFFile, isDynamic: Bool) -> String? {
-        var stringTable: (any ELFSectionHeaderProtocol)?
+        var strings: ELFFile.Strings?
         if isDynamic {
-            stringTable = elf._dynstr
+            strings = elf.dynamicStringTable
         } else {
-            stringTable = elf._strtab
+            strings = elf.stringTable
         }
-
-        guard let stringTable,
-              let strings = stringTable._strings(in: elf) else {
-            return nil
-        }
+        guard let strings else { return nil }
         return strings.string(at: nameOffset)?.string
     }
 }

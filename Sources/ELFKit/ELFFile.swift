@@ -153,7 +153,10 @@ extension ELFFile {
 
 extension ELFFile {
     public var symbols32: DataSequence<ELF32Symbol>? {
-        guard !is64Bit, let _symtab else { return nil }
+        guard !is64Bit,
+              let _symtab = sections32?._symtab else {
+            return nil
+        }
         return fileHandle.readDataSequence(
             offset: numericCast(_symtab.offset),
             numberOfElements: _symtab.size / ELF32Symbol.layoutSize
@@ -161,7 +164,10 @@ extension ELFFile {
     }
 
     public var symbols64: DataSequence<ELF64Symbol>? {
-        guard is64Bit, let _symtab else { return nil }
+        guard is64Bit,
+              let _symtab = sections64?._symtab else {
+            return nil
+        }
         return fileHandle.readDataSequence(
             offset: numericCast(_symtab.offset),
             numberOfElements: _symtab.size / ELF64Symbol.layoutSize
@@ -181,7 +187,10 @@ extension ELFFile {
 
 extension ELFFile {
     public var dynamicSymbols32: DataSequence<ELF32Symbol>? {
-        guard !is64Bit, let _dysym else { return nil }
+        guard !is64Bit,
+              let _dysym = sections32?._dynsym else {
+            return dynamics32?.symbols(in: self)
+        }
         return fileHandle.readDataSequence(
             offset: numericCast(_dysym.offset),
             numberOfElements: _dysym.size / ELF32Symbol.layoutSize
@@ -189,7 +198,10 @@ extension ELFFile {
     }
 
     public var dynamicSymbols64: DataSequence<ELF64Symbol>? {
-        guard is64Bit, let _dysym else { return nil }
+        guard is64Bit,
+              let _dysym = sections64?._dynsym else {
+            return dynamics64?.symbols(in: self)
+        }
         return fileHandle.readDataSequence(
             offset: numericCast(_dysym.offset),
             numberOfElements: _dysym.size / ELF64Symbol.layoutSize
@@ -203,6 +215,41 @@ extension ELFFile {
             return Array(dynamicSymbols32)
         } else {
             return []
+        }
+    }
+}
+
+extension ELFFile {
+    public var stringTable: Strings? {
+        if let sections64,
+           let strtab = sections64._strtab(in: self) {
+            return strtab._strings(in: self)
+        } else if let sections32,
+                  let strtab = sections32._strtab(in: self) {
+            return strtab._strings(in: self)
+        }
+        return nil
+    }
+
+    public var dynamicStringTable: Strings? {
+        if let sections64,
+           let dynstr = sections64._dynstr(in: self) {
+            return dynstr._strings(in: self)
+        } else if let sections32,
+                  let dynstr = sections32._dynstr(in: self) {
+            return dynstr._strings(in: self)
+        }
+        if let dynamics64 {
+            return dynamics64.strings(in: self)
+        } else if let dynamics32 {
+            return dynamics32.strings(in: self)
+        }
+        return nil
+    }
+
+    public var allCStringTables: [Strings] {
+        sections.compactMap {
+            $0._strings(in: self)
         }
     }
 }
