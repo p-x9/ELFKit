@@ -38,9 +38,9 @@ extension HeaderIdentifier {
         layout.6 /* EI_VERSION */
     }
 
-    public var osABI: EFIOSABI! {
-        .init(rawValue: layout.7) // EI_OSABI
-    }
+    /* OSABI */
+    // EI_OSABI
+    // Not defined here because OSABI needs to take into account the value of the `machine` in the header.
 
     public var abiVersion: UInt8 {
         layout.8 // EI_ABIVERSION

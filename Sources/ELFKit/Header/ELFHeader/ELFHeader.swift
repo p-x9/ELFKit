@@ -34,6 +34,13 @@ extension ELFHeader {
         case ._64(let v): v.machine
         }
     }
+
+    public var osABI: EFIOSABI! {
+        switch self {
+        case ._32(let v): v.osABI
+        case ._64(let v): v.osABI
+        }
+    }
 }
 
 extension ELFHeader {
