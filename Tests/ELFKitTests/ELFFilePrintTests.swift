@@ -28,7 +28,7 @@ extension ELFFilePrintTests {
         print("Class:", identifier.class ?? .none)
         print("Data Type:", identifier.data ?? .none)
         print("Version:", identifier.version)
-        print("OS ABI:", identifier.osABI ?? .none)
+        print("OS ABI:", header.osABI ?? .none)
         print("ABI Version:", identifier.abiVersion)
 
         print("Type:", header.type ?? .none)
