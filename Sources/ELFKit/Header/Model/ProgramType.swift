@@ -132,6 +132,8 @@ public enum ProgramType: CaseIterable {
     case hp_stack
     /// PT_HP_CORE_UTSNAME
     case hp_core_utsname
+    /// PT_SPU_INFO
+    case spu_info
 }
 
 extension ProgramType/*: RawRepresentable*/ {
@@ -250,6 +252,12 @@ extension ProgramType/*: RawRepresentable*/ {
             default: return nil
             }
 
+        case _ where machine == .spu:
+            switch rawValue {
+            case 0x70000000: self = .spu_info
+            default: return nil
+            }
+
         case _ where osabi == .hpux:
             switch machine {
             case .parisc:
@@ -351,6 +359,7 @@ extension ProgramType/*: RawRepresentable*/ {
         case .hp_hsl_annot: 0x60000013
         case .hp_stack: 0x60000014
         case .hp_core_utsname: 0x60000015
+        case .spu_info: 0x70000000
         }
     }
 }
@@ -419,6 +428,7 @@ extension ProgramType: CustomStringConvertible {
         case .hp_hsl_annot: "PT_HP_HSL_ANNOT"
         case .hp_stack: "PT_HP_STACK"
         case .hp_core_utsname: "PT_HP_CORE_UTSNAME"
+        case .spu_info: "PT_SPU_INFO"
         }
     }
 }
