@@ -42,11 +42,10 @@ extension ELFFilePrintTests {
                 "[\(i)] Name:",
                 section.name(in: elf) ?? "Unknown"
             )
-            let specificTypes = section.osSpecificType.description + ", " +
-            section.processorSpecificType.description
+            let type = section.type(inELF: elf.header)
             print(
                 "Type:",
-                section.type?.description ?? specificTypes
+                type?.description ?? "Unknown"
             )
             print("Flags:", section.flags.bits)
             print("Address:", section.address)
@@ -119,7 +118,7 @@ extension ELFFilePrintTests {
 
     func testRelocations() {
         let sections = elf.sections64!.filter({
-            [.rel, .rela].contains($0.type)
+            [.rel, .rela].contains($0.type(inELF: elf.header))
         })
 
         let symbols = Array(elf.dynamicSymbols)
@@ -272,7 +271,7 @@ extension ELFFilePrintTests {
 extension ELFFilePrintTests {
     func testNotes() {
         let sections = elf.sections64!.filter({
-            $0.type == .note
+            $0.type(inELF: elf.header) == .note
         })
 
         for section in sections {

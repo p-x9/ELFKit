@@ -122,7 +122,7 @@ extension ELFFile {
 extension ELFFile {
     public var dynamics64: Dynamics64? {
         guard is64Bit else { return nil }
-        if let dynamic = sections64?._dynamic {
+        if let dynamic = sections64?._dynamic(in: self) {
             return dynamic._dynamics(in: self)
         }
         if let dynamic = programs64?._dynamic(in: self) {
@@ -133,7 +133,7 @@ extension ELFFile {
 
     public var dynamics32: Dynamics32? {
         guard !is64Bit else { return nil }
-        if let dynamic = sections32?._dynamic {
+        if let dynamic = sections32?._dynamic(in: self) {
             return dynamic._dynamics(in: self)
         }
         if let dynamic = programs32?._dynamic(in: self) {
@@ -154,7 +154,7 @@ extension ELFFile {
 extension ELFFile {
     public var symbols32: DataSequence<ELF32Symbol>? {
         guard !is64Bit,
-              let _symtab = sections32?._symtab else {
+              let _symtab = sections32?._symtab(in: self) else {
             return nil
         }
         return fileHandle.readDataSequence(
@@ -165,7 +165,7 @@ extension ELFFile {
 
     public var symbols64: DataSequence<ELF64Symbol>? {
         guard is64Bit,
-              let _symtab = sections64?._symtab else {
+              let _symtab = sections64?._symtab(in: self) else {
             return nil
         }
         return fileHandle.readDataSequence(
@@ -188,7 +188,7 @@ extension ELFFile {
 extension ELFFile {
     public var dynamicSymbols32: DataSequence<ELF32Symbol>? {
         guard !is64Bit,
-              let _dysym = sections32?._dynsym else {
+              let _dysym = sections32?._dynsym(in: self) else {
             return dynamics32?.symbols(in: self)
         }
         return fileHandle.readDataSequence(
@@ -199,7 +199,7 @@ extension ELFFile {
 
     public var dynamicSymbols64: DataSequence<ELF64Symbol>? {
         guard is64Bit,
-              let _dysym = sections64?._dynsym else {
+              let _dysym = sections64?._dynsym(in: self) else {
             return dynamics64?.symbols(in: self)
         }
         return fileHandle.readDataSequence(

@@ -22,16 +22,16 @@ extension ELF32SectionHeader: ELFSectionHeaderProtocol {
 
     public var nameOffset: Int { numericCast(layout.sh_name) }
 
-    public var type: SectionType? {
-        .init(rawValue: numericCast(layout.sh_type))
-    }
-
-    public var osSpecificType: SectionType.OSSpecific {
-        .init(rawValue: numericCast(layout.sh_type))
-    }
-
-    public var processorSpecificType: SectionType.ProcessorSpecific {
-        .init(rawValue: numericCast(layout.sh_type))
+    public func type(inELF header: ELFHeader) -> SectionType? {
+        guard let osABI = header.osABI,
+              let machine = header.machine else {
+            return nil
+        }
+        return .init(
+            rawValue: layout.sh_type,
+            osabi: osABI,
+            machine: machine
+        )
     }
 
     public var flags: SectionFlags {
@@ -48,7 +48,7 @@ extension ELF32SectionHeader: ELFSectionHeaderProtocol {
 
 extension ELF32SectionHeader {
     public func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>? {
-        switch type {
+        switch type(inELF: elf.header) {
         case .rel:
             let count = size / ELF32RelocationInfo.layoutSize
             let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
@@ -82,7 +82,7 @@ extension ELF32SectionHeader {
 // MARK: - Version Defs
 extension ELF32SectionHeader {
     public func _versionDef(in elf: ELFFile) -> ELF32VersionDef? {
-        guard osSpecificType.gnu == .verdef || osSpecificType.solaris == .verdef else {
+        guard [.gnu_verdef, .sunw_verdef].contains(type(inELF: elf.header)) else {
             return nil
         }
         let layout: ELF32VersionDef.Layout = elf.fileHandle.read(
@@ -99,7 +99,7 @@ extension ELF32SectionHeader {
 // MARK: - Verson Needs
 extension ELF32SectionHeader {
     public func _versionNeed(in elf: ELFFile) -> ELF32VersionNeed? {
-        guard osSpecificType.gnu == .verneed || osSpecificType.solaris == .verneed else {
+        guard [.gnu_verneed, .sunw_verneed].contains(type(inELF: elf.header)) else {
             return nil
         }
         let layout: ELF32VersionNeed.Layout = elf.fileHandle.read(

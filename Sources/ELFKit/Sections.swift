@@ -9,16 +9,16 @@
 import Foundation
 
 extension Sequence where Element: ELFSectionHeaderProtocol {
-    var _dynamic: Element? {
-        first(where: { $0.type == .dynamic })
+    func _dynamic(in elf: ELFFile) -> Element? {
+        first(where: { $0.type(inELF: elf.header) == .dynamic })
     }
 
-    var _dynsym: Element? {
-        first(where: { $0.type == .dynsym })
+    func _dynsym(in elf: ELFFile) -> Element? {
+        first(where: { $0.type(inELF: elf.header) == .dynsym })
     }
 
-    var _symtab: Element? {
-        first(where: { $0.type == .symtab })
+    func _symtab(in elf: ELFFile) -> Element? {
+        first(where: { $0.type(inELF: elf.header) == .symtab })
     }
 
     func _dynstr(in elf: ELFFile) -> Element? {

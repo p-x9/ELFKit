@@ -14,7 +14,6 @@ public protocol ELFSectionHeaderProtocol {
     associatedtype Dynamics: ELFFileDynamicsSequence
 
     var nameOffset: Int { get }
-    var type: SectionType? { get }
     var flags: SectionFlags { get }
     var address: Int { get }
     var offset: Int { get }
@@ -23,8 +22,7 @@ public protocol ELFSectionHeaderProtocol {
     var addressAlignment: Int { get }
     var entrySize: Int { get }
 
-    var osSpecificType: SectionType.OSSpecific { get }
-    var processorSpecificType: SectionType.ProcessorSpecific { get }
+    func type(inELF header: ELFHeader) -> SectionType?
 
     func name(in elf: ELFFile) -> String?
 
@@ -62,7 +60,7 @@ extension ELFSectionHeaderProtocol {
 // MARK: - String Table
 extension ELFSectionHeaderProtocol {
     public func _strings(in elf: ELFFile) -> ELFFile.Strings? {
-        guard type == .strtab else { return nil }
+        guard type(inELF: elf.header) == .strtab else { return nil }
         return .init(
             elf: elf,
             offset: offset,
@@ -74,7 +72,7 @@ extension ELFSectionHeaderProtocol {
 // MARK: - Note
 extension ELFSectionHeaderProtocol {
     public func _notes(in elf: ELFFile) ->  _ELFNotes<Note>? {
-        guard type == .note else { return nil }
+        guard type(inELF: elf.header) == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: size
@@ -96,7 +94,7 @@ extension ELFSectionHeaderProtocol {
 // MARK: - Dynamics
 extension ELFSectionHeaderProtocol {
     public func _dynamics(in elf: ELFFile) -> Dynamics? {
-        guard type == .dynamic else { return nil }
+        guard type(inELF: elf.header) == .dynamic else { return nil }
         let count = size / Dynamics.Dynamic.layoutSize
         return .init(
             elf.fileHandle.readDataSequence(
@@ -110,7 +108,7 @@ extension ELFSectionHeaderProtocol {
 // MARK: - Hash Table
 extension ELFSectionHeaderProtocol {
     public func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader? {
-        guard type == .hash else { return nil }
+        guard type(inELF: elf.header) == .hash else { return nil }
         return elf.fileHandle.read(
             offset: numericCast(offset)
         )
@@ -132,7 +130,7 @@ extension ELFSectionHeaderProtocol {
     public func _gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
         guard let name = name(in: elf),
               name.starts(with: ".gnu"),
-              osSpecificType.gnu == .hash else {
+              type(inELF: elf.header) == .gnu_hash else {
             return nil
         }
         return elf.fileHandle.read(
@@ -184,7 +182,7 @@ extension ELFSectionHeaderProtocol {
 // MARK: - Version Syms
 extension ELFSectionHeaderProtocol {
     public func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamics.VersionSym>? {
-        guard osSpecificType.gnu == .versym || osSpecificType.solaris == .versym else {
+        guard [.gnu_versym, .sunw_versym].contains(type(inELF: elf.header)) else {
             return nil
         }
         let numberOfSymbols = size / Dynamics.VersionSym.layoutSize
