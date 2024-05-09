@@ -13,6 +13,7 @@ public protocol ELFProgramHeaderProtocol {
     associatedtype Note: ELFNoteProtocol
     associatedtype Dynamics: ELFFileDynamicsSequence
 
+    var _commonType: ProgramType? { get }
     func type(inELF header: ELFHeader) -> ProgramType?
 
     var flags: ProgramFlags { get }

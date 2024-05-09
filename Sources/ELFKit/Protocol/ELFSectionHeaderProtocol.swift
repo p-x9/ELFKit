@@ -22,6 +22,7 @@ public protocol ELFSectionHeaderProtocol {
     var addressAlignment: Int { get }
     var entrySize: Int { get }
 
+    var _commonType: SectionType? { get }
     func type(inELF header: ELFHeader) -> SectionType?
 
     func name(in elf: ELFFile) -> String?

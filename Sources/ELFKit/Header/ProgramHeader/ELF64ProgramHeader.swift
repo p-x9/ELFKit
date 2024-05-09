@@ -20,6 +20,14 @@ extension ELF64ProgramHeader: ELFProgramHeaderProtocol {
     public typealias Note = ELF64Note
     public typealias Dynamics = ELFFile.Dynamics64
 
+    public var _commonType: ProgramType? {
+        .init(
+            rawValue: layout.p_type,
+            osabi: .none,
+            machine: .none
+        )
+    }
+
     public func type(inELF header: ELFHeader) -> ProgramType? {
         guard let osABI = header.osABI,
               let machine = header.machine else {

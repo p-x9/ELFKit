@@ -22,6 +22,14 @@ extension ELF64SectionHeader: ELFSectionHeaderProtocol {
 
     public var nameOffset: Int { numericCast(layout.sh_name) }
 
+    public var _commonType: SectionType? {
+        .init(
+            rawValue: layout.sh_type,
+            osabi: .none,
+            machine: .none
+        )
+    }
+    
     public func type(inELF header: ELFHeader) -> SectionType? {
         guard let osABI = header.osABI,
               let machine = header.machine else {
