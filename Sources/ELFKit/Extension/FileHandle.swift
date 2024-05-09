@@ -15,8 +15,13 @@ extension FileHandle {
         swapHandler: ((inout Data) -> Void)? = nil
     ) -> DataSequence<Element> where Element: LayoutWrapper {
         seek(toFileOffset: offset)
+        let size = Element.layoutSize * numberOfElements
         var data = readData(
-            ofLength: Element.layoutSize * numberOfElements
+            ofLength: size
+        )
+        precondition(
+            data.count >= size,
+            "Invalid Data Size"
         )
         if let swapHandler { swapHandler(&data) }
         return .init(
@@ -32,8 +37,13 @@ extension FileHandle {
         swapHandler: ((inout Data) -> Void)? = nil
     ) -> DataSequence<Element> {
         seek(toFileOffset: offset)
+        let size = MemoryLayout<Element>.size * numberOfElements
         var data = readData(
-            ofLength: MemoryLayout<Element>.size * numberOfElements
+            ofLength: size
+        )
+        precondition(
+            data.count >= size,
+            "Invalid Data Size"
         )
         if let swapHandler { swapHandler(&data) }
         return .init(
