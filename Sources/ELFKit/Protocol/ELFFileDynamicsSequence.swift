@@ -152,7 +152,7 @@ extension ELFFileDynamicsSequence {
 // MARK: - GNU Hash Table
 extension ELFFileDynamicsSequence {
     public func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
-        guard let _gnu_hash else { return nil }
+        guard let _gnu_hash = _gnu_hash(in: elf) else { return nil }
         guard let offset = elf.fileOffset(of: _gnu_hash.pointer) else {
             return nil
         }
@@ -162,7 +162,7 @@ extension ELFFileDynamicsSequence {
     }
 
     public func gnuHashTable(in elf: ELFFile) -> GnuHashTable? {
-        guard let _gnu_hash else { return nil }
+        guard let _gnu_hash = _gnu_hash(in: elf) else { return nil }
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
         }

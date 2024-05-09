@@ -16,16 +16,24 @@ public struct ELF32Dynamic: LayoutWrapper {
 }
 
 extension ELF32Dynamic: ELFDynamicProtocol {
-    public var tag: DynamicTag? {
-        .init(rawValue: numericCast(layout.d_tag))
+    public var _commonTag: DynamicTag? {
+        .init(
+            rawValue: numericCast(layout.d_tag),
+            osabi: .none,
+            machine: .none
+        )
     }
 
-    public var osSpecificTag: DynamicTag.OSSpecific {
-        .init(rawValue: numericCast(layout.d_tag))
-    }
-
-    public var processorSpecificTag: DynamicTag.ProcessorSpecific {
-        .init(rawValue: numericCast(layout.d_tag))
+    public func tag(inELF header: ELFHeader) -> DynamicTag? {
+        guard let osABI = header.osABI,
+              let machine = header.machine else {
+            return nil
+        }
+        return .init(
+            rawValue: numericCast(layout.d_tag),
+            osabi: osABI,
+            machine: machine
+        )
     }
 
     public var value: Int {

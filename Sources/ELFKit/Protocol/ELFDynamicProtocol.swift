@@ -9,9 +9,9 @@
 import Foundation
 
 public protocol ELFDynamicProtocol {
-    var tag: DynamicTag? { get }
-    var osSpecificTag: DynamicTag.OSSpecific { get }
-    var processorSpecificTag: DynamicTag.ProcessorSpecific { get }
+    var _commonTag: DynamicTag? { get }
+    func tag(inELF header: ELFHeader) -> DynamicTag?
+
     var value: Int { get }
     var pointer: Int { get }
 }

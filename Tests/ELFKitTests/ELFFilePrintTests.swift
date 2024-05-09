@@ -71,7 +71,8 @@ extension ELFFilePrintTests {
         for (i, dynamic) in dynamics.enumerated() {
             print("----")
             print("[\(i)]")
-            print("Tag:", dynamic.tag?.description ?? "Unknown")
+            let tag = dynamic.tag(inELF: elf.header)
+            print("Tag:", tag?.description ?? "Unknown")
             print("Value/Pointer:", dynamic.value)
         }
     }
