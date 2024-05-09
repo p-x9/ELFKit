@@ -10,7 +10,7 @@ import Foundation
 import ELFKitC
 
 public struct ProgramFlags: BitFlags {
-    public typealias RawValue = UInt64
+    public typealias RawValue = UInt32
 
     public var rawValue: RawValue
 
@@ -21,64 +21,48 @@ public struct ProgramFlags: BitFlags {
 
 extension ProgramFlags {
     public var isOSSpecific: Bool {
-        (rawValue & numericCast(PF_MASKOS)) > 0
+        let PF_MASKOS = 0x0ff00000
+        return (rawValue & numericCast(PF_MASKOS)) > 0
     }
 
     public var isProcessorSpecific: Bool {
-        (rawValue & numericCast(PF_MASKPROC)) > 0
+        let PF_MASKPROC = 0xf0000000
+        return (rawValue & numericCast(PF_MASKPROC)) > 0
     }
 }
 
 extension ProgramFlags {
-    public static let r = ProgramFlags(
-        rawValue: Bit.r.rawValue
-    )
-    public static let w = ProgramFlags(
-        rawValue: Bit.w.rawValue
-    )
+    /// PF_X
     public static let x = ProgramFlags(
         rawValue: Bit.x.rawValue
     )
+    /// PF_W
+    public static let w = ProgramFlags(
+        rawValue: Bit.w.rawValue
+    )
+    /// PF_R
+    public static let r = ProgramFlags(
+        rawValue: Bit.r.rawValue
+    )
 }
 
 extension ProgramFlags {
-    public enum Bit: CaseIterable {
-        /// PF_R
-        case r
-        /// PF_W
-        case w
+    public enum Bit: UInt32, CaseIterable {
         /// PF_X
-        case x
-    }
-}
-
-extension ProgramFlags.Bit: RawRepresentable {
-    public typealias RawValue = UInt64
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(PF_R): self = .r
-        case RawValue(PF_W): self = .w
-        case RawValue(PF_X): self = .x
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .r: RawValue(PF_R)
-        case .w: RawValue(PF_W)
-        case .x: RawValue(PF_X)
-        }
+        case x = 1
+        /// PF_W
+        case w = 2
+        /// PF_R
+        case r = 4
     }
 }
 
 extension ProgramFlags.Bit: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .r: "PF_R"
-        case .w: "PF_W"
         case .x: "PF_X"
+        case .w: "PF_W"
+        case .r: "PF_R"
         }
     }
 }
