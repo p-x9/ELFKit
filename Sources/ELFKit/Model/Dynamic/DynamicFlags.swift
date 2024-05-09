@@ -43,45 +43,19 @@ extension DynamicFlags {
 }
 
 extension DynamicFlags {
-    public enum Bit: CaseIterable {
+    public enum Bit: UInt32, CaseIterable {
         /// DF_ORIGIN
-        case origin
+        case origin = 1
         /// DF_SYMBOLIC
-        case symbolic
+        case symbolic = 2
         /// DF_TEXTREL
-        case textrel
+        case textrel = 4
         /// DF_BIND_NOW
-        case bind_now
+        case bind_now = 8
         /// DF_STATIC_TLS
-        case static_tls
+        case static_tls = 0x10
     }
 }
-
-extension DynamicFlags.Bit: RawRepresentable {
-    public typealias RawValue = UInt32
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(DF_ORIGIN): self = .origin
-        case RawValue(DF_SYMBOLIC): self = .symbolic
-        case RawValue(DF_TEXTREL): self = .textrel
-        case RawValue(DF_BIND_NOW): self = .bind_now
-        case RawValue(DF_STATIC_TLS): self = .static_tls
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .origin: RawValue(DF_ORIGIN)
-        case .symbolic: RawValue(DF_SYMBOLIC)
-        case .textrel: RawValue(DF_TEXTREL)
-        case .bind_now: RawValue(DF_BIND_NOW)
-        case .static_tls: RawValue(DF_STATIC_TLS)
-        }
-    }
-}
-
 
 extension DynamicFlags.Bit: CustomStringConvertible {
     public var description: String {
