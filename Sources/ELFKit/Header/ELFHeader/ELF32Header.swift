@@ -27,7 +27,7 @@ extension ELF32Header {
         .init(rawValue: numericCast(layout.e_machine))
     }
 
-    public var osABI: EFIOSABI! {
+    public var osABI: ELFOSABI! {
         .init(
             rawValue: identifier.layout.7,  // EI_OSABI
             machine: machine

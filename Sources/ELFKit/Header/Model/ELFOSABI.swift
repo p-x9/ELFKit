@@ -1,5 +1,5 @@
 //
-//  EFIOSABI.swift
+//  ELFOSABI.swift
 //
 //
 //  Created by p-x9 on 2024/04/28
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum EFIOSABI: CaseIterable {
+public enum ELFOSABI: CaseIterable {
     /// ELFOSABI_NONE
     case none
     /// ELFOSABI_HPUX
@@ -67,7 +67,7 @@ public enum EFIOSABI: CaseIterable {
     case standalone
 }
 
-extension EFIOSABI/*: RawRepresentable*/ {
+extension ELFOSABI/*: RawRepresentable*/ {
     public typealias RawValue = UInt8
 
     public init?(rawValue: RawValue, machine: ELFMachine) {
@@ -152,7 +152,7 @@ extension EFIOSABI/*: RawRepresentable*/ {
         }
     }
 }
-extension EFIOSABI: CustomStringConvertible {
+extension ELFOSABI: CustomStringConvertible {
     public var description: String {
         switch self {
         case .none: "ELFOSABI_NONE"
