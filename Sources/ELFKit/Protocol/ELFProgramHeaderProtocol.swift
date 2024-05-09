@@ -13,9 +13,8 @@ public protocol ELFProgramHeaderProtocol {
     associatedtype Note: ELFNoteProtocol
     associatedtype Dynamics: ELFFileDynamicsSequence
 
-    var type: ProgramType! { get }
-    var osSpecificType: ProgramType.OSSpecific { get }
-    var processorSpecificType: ProgramType.ProcessorSpecific { get }
+    func type(inELF header: ELFHeader) -> ProgramType?
+
     var flags: ProgramFlags { get }
     var offset: Int { get }
     var virtualAddress: Int { get }
@@ -30,7 +29,7 @@ public protocol ELFProgramHeaderProtocol {
 
 extension ELFProgramHeaderProtocol {
     public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
-        guard type == .note else { return nil }
+        guard type(inELF: elf.header) == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),
             size: fileSize
@@ -51,7 +50,7 @@ extension ELFProgramHeaderProtocol {
 
 extension ELFProgramHeaderProtocol {
     public func _dynamics(in elf: ELFFile) -> Dynamics? {
-        guard type == .dynamic else { return nil }
+        guard type(inELF: elf.header) == .dynamic else { return nil }
         let count = fileSize / Dynamics.Dynamic.layoutSize
         return .init(
             elf.fileHandle.readDataSequence(

@@ -59,9 +59,8 @@ extension ELFFilePrintTests {
         for (i, program) in elf.programs.enumerated() {
             print("----")
             print("[\(i)]")
-            let specificTypes = program.osSpecificType.description + ", " +
-            program.processorSpecificType.description
-            print("Type:", program.type?.description ?? specificTypes)
+            let type = program.type(inELF: elf.header)
+            print("Type:", type ?? "Unknown")
             print("Flags:", program.flags.bits)
             print("Offset:", program.offset)
             print("FileSize:", program.fileSize)

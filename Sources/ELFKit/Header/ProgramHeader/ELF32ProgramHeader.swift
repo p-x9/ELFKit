@@ -20,16 +20,16 @@ extension ELF32ProgramHeader: ELFProgramHeaderProtocol {
     public typealias Note = ELF32Note
     public typealias Dynamics = ELFFile.Dynamics32
 
-    public var type: ProgramType! {
-        .init(rawValue: layout.p_type)
-    }
-
-    public var osSpecificType: ProgramType.OSSpecific {
-        .init(rawValue: numericCast(layout.p_type))
-    }
-
-    public var processorSpecificType: ProgramType.ProcessorSpecific {
-        .init(rawValue: numericCast(layout.p_type))
+    public func type(inELF header: ELFHeader) -> ProgramType? {
+        guard let osABI = header.osABI,
+              let machine = header.machine else {
+            return nil
+        }
+        return .init(
+            rawValue: layout.p_type,
+            osabi: osABI,
+            machine: machine
+        )
     }
 
     public var flags: ProgramFlags {

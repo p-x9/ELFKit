@@ -125,7 +125,7 @@ extension ELFFile {
         if let dynamic = sections64?._dynamic {
             return dynamic._dynamics(in: self)
         }
-        if let dynamic = programs64?._dynamic {
+        if let dynamic = programs64?._dynamic(in: self) {
             return dynamic._dynamics(in: self)
         }
         return nil
@@ -136,7 +136,7 @@ extension ELFFile {
         if let dynamic = sections32?._dynamic {
             return dynamic._dynamics(in: self)
         }
-        if let dynamic = programs32?._dynamic {
+        if let dynamic = programs32?._dynamic(in: self) {
             return dynamic._dynamics(in: self)
         }
         return nil
