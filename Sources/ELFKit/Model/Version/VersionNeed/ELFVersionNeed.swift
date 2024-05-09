@@ -45,7 +45,7 @@ extension ELF32VersionNeed: ELFVersionNeedProtocol {
     }
 
     public func fileName(in elf: ELFFile) -> String? {
-        guard let dynamics = elf.dynamics64,
+        guard let dynamics = elf.dynamics32,
               let strings = dynamics.strings(in: elf) else {
             return nil
         }
