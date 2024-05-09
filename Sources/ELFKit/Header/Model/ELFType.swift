@@ -9,42 +9,17 @@
 import Foundation
 import ELFKitC
 
-public enum ELFType {
+public enum ELFType: UInt16 {
     /// ET_NONE
-    case none
+    case none = 0
     /// ET_REL
-    case rel
+    case rel = 1
     /// ET_EXEC
-    case exec
+    case exec = 2
     /// ET_DYN
-    case dyn
+    case dyn = 3
     /// ET_CORE
-    case core
-}
-
-extension ELFType: RawRepresentable {
-    public typealias RawValue = UInt16
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(ET_NONE): self = .none
-        case RawValue(ET_REL): self = .rel
-        case RawValue(ET_EXEC): self = .exec
-        case RawValue(ET_DYN): self = .dyn
-        case RawValue(ET_CORE): self = .core
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .none: RawValue(ET_NONE)
-        case .rel: RawValue(ET_REL)
-        case .exec: RawValue(ET_EXEC)
-        case .dyn: RawValue(ET_DYN)
-        case .core: RawValue(ET_CORE)
-        }
-    }
+    case core = 4
 }
 
 extension ELFType: CustomStringConvertible {

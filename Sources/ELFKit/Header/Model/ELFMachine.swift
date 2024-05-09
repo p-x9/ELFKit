@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum ELFMachine: Int32 {
+public enum ELFMachine: UInt16 {
     /// EM_NONE
     case none = 0
     /// EM_M32

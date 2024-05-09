@@ -9,34 +9,13 @@
 import Foundation
 import ELFKitC
 
-public enum ELFClass {
+public enum ELFClass: UInt8 {
     /// ELFCLASSNONE
-    case none
+    case none = 0
     /// ELFCLASS32
-    case _32
+    case _32 = 1
     /// ELFCLASS64
-    case _64
-}
-
-extension ELFClass: RawRepresentable {
-    public typealias RawValue = UInt8
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(ELFCLASSNONE): self = .none
-        case RawValue(ELFCLASS32): self = ._32
-        case RawValue(ELFCLASS64): self = ._64
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .none: RawValue(ELFCLASSNONE)
-        case ._32: RawValue(ELFCLASS32)
-        case ._64: RawValue(ELFCLASS64)
-        }
-    }
+    case _64 = 2
 }
 
 extension ELFClass: CustomStringConvertible {
