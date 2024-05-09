@@ -218,8 +218,11 @@ extension ProgramType/*: RawRepresentable*/ {
         case _ where machine == .parisc:
             switch rawValue {
             case 0x70000000: self = .parisc_archext
+                return
             case 0x70000001: self = .parisc_unwind
+                return
             case 0x70000002: self = .parisc_weakorder
+                return
             default:
                 break
             }
@@ -228,7 +231,9 @@ extension ProgramType/*: RawRepresentable*/ {
         case _ where machine == .ia_64:
             switch rawValue {
             case 0x70000000: self = .ia_64_archext
+                return
             case 0x70000001: self = .ia_64_unwind
+                return
             default:
                 break
             }

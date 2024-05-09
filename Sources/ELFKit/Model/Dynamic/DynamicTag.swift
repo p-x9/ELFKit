@@ -572,28 +572,50 @@ extension DynamicTag/*: RawRepresentable*/ {
         case _ where osabi == .solaris:
             switch rawValue {
             case 0x6000000d: self = .sunw_auxiliary
+                return
             case 0x6000000e: self = .sunw_rtldinf
+                return
             case 0x6000000f: self = .sunw_filter
+                return
             case 0x60000010: self = .sunw_cap
+                return
             case 0x60000011: self = .sunw_symtab
+                return
             case 0x60000012: self = .sunw_symsz
-                //            case 0x60000013: self = .sunw_encoding
+                return
+//            case 0x60000013: self = .sunw_encoding
             case 0x60000013: self = .sunw_sortent
+                return
             case 0x60000014: self = .sunw_symsort
+                return
             case 0x60000015: self = .sunw_symsortsz
+                return
             case 0x60000016: self = .sunw_tlssort
+                return
             case 0x60000017: self = .sunw_tlssortsz
+                return
             case 0x60000018: self = .sunw_capinfo
+                return
             case 0x60000019: self = .sunw_strpad
+                return
             case 0x6000001a: self = .sunw_capchain
+                return
             case 0x6000001b: self = .sunw_ldmach
+                return
             case 0x6000001d: self = .sunw_capchainent
+                return
             case 0x6000001f: self = .sunw_capchainsz
+                return
             case 0x60000021: self = .sunw_parent
+                return
             case 0x60000023: self = .sunw_aslr
+                return
             case 0x60000025: self = .sunw_relax
+                return
             case 0x60000029: self = .sunw_nxheap
+                return
             case 0x6000002b: self = .sunw_nxstack
+                return
             default:
                 break
             }

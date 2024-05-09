@@ -366,10 +366,15 @@ extension SectionType/*: RawRepresentable*/ {
         case _ where osabi == .hpux:
             switch rawValue {
             case 0x60000000: self = .hp_ovlbits
+                return
             case 0x60000001: self = .hp_dlkm
+                return
             case 0x60000002: self = .hp_comdat
+                return
             case 0x60000003: self = .hp_objdict
+                return
             case 0x60000004: self = .hp_annot
+                return
             default:
                 break
             }
