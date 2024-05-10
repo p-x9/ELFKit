@@ -31,9 +31,25 @@ extension ELF32Symbol: ELFSymbolProtocol {
         .init(rawValue: numericCast(layout.st_info >> 4))
     }
 
-    public var type: SymbolType! {
+    public var _commonType: SymbolType? {
         // ELF32_ST_TYPE
-        .init(rawValue: numericCast(layout.st_info & 0xf))
+        .init(
+            rawValue: numericCast(layout.st_info & 0xf),
+            osabi: .none,
+            machine: .none
+        )
+    }
+
+    public func type(inELF header: ELFHeader) -> SymbolType? {
+        guard let osABI = header.osABI,
+              let machine = header.machine else {
+            return nil
+        }
+        return .init(
+            rawValue: numericCast(layout.st_info & 0xf),
+            osabi: osABI,
+            machine: machine
+        )
     }
 
     public var visibility: SymbolVisibility! {
@@ -60,9 +76,25 @@ extension ELF64Symbol: ELFSymbolProtocol {
         .init(rawValue: numericCast(layout.st_info >> 4))
     }
 
-    public var type: SymbolType! {
+    public var _commonType: SymbolType? {
         // ELF64_ST_TYPE
-        .init(rawValue: numericCast(layout.st_info & 0xf))
+        .init(
+            rawValue: numericCast(layout.st_info & 0xf),
+            osabi: .none,
+            machine: .none
+        )
+    }
+
+    public func type(inELF header: ELFHeader) -> SymbolType? {
+        guard let osABI = header.osABI,
+              let machine = header.machine else {
+            return nil
+        }
+        return .init(
+            rawValue: numericCast(layout.st_info & 0xf),
+            osabi: osABI,
+            machine: machine
+        )
     }
 
     public var visibility: SymbolVisibility! {

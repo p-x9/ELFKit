@@ -12,7 +12,10 @@ import ELFKitC
 public protocol ELFSymbolProtocol {
     var nameOffset: Int { get }
     var binding: SymbolBinding! { get }
-    var type: SymbolType! { get }
+    
+    var _commonType: SymbolType? { get }
+    func type(inELF header: ELFHeader) -> SymbolType?
+
     var visibility: SymbolVisibility! { get }
     var sectionIndex: Int? { get }
     var specialSection: SpecialSectionIndex? { get }

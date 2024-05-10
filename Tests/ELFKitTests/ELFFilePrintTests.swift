@@ -87,7 +87,10 @@ extension ELFFilePrintTests {
                     symbol.name(in: elf, isDynamic: false) ?? "Unknown"
                 )
                 print("Binding:", symbol.binding!)
-                print("Type:", symbol.type!)
+                print(
+                    "Type:",
+                    symbol.type(inELF: elf.header)?.description ?? "Unknown"
+                )
                 print("Visibility:", symbol.visibility!)
                 if let specialSection = symbol.specialSection {
                     print("Special:", specialSection)
@@ -107,7 +110,10 @@ extension ELFFilePrintTests {
                 symbol.name(in: elf, isDynamic: true) ?? "Unknown"
             )
             print("Binding:", symbol.binding!)
-            print("Type:", symbol.type!)
+            print(
+                "Type:",
+                symbol.type(inELF: elf.header)?.description ?? "Unknown"
+            )
             print("Visibility:", symbol.visibility!)
             if let specialSection = symbol.specialSection {
                 print("Special:", specialSection)
