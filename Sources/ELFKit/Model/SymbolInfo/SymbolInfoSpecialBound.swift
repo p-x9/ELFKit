@@ -9,38 +9,15 @@
 import Foundation
 import ELFKitC
 
-public enum SymbolInfoSpecialBound: CaseIterable {
+public enum SymbolInfoSpecialBound: UInt16, CaseIterable {
     /// SYMINFO_BT_SELF
-    case `self`
+    case `self` = 0xffff
     /// SYMINFO_BT_PARENT
-    case parent
+    case parent = 0xfffe
     /// SYMINFO_BT_NONE
-    case none
+    case none = 0xfffd
     /// SYMINFO_BT_EXTERN
-    case extern
-}
-
-extension SymbolInfoSpecialBound: RawRepresentable {
-    public typealias RawValue = UInt16
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(SYMINFO_BT_SELF): self = .`self`
-        case RawValue(SYMINFO_BT_PARENT): self = .parent
-        case RawValue(SYMINFO_BT_NONE): self = .none
-        case RawValue(SYMINFO_BT_EXTERN): self = .extern
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .`self`: RawValue(SYMINFO_BT_SELF)
-        case .parent: RawValue(SYMINFO_BT_PARENT)
-        case .none: RawValue(SYMINFO_BT_NONE)
-        case .extern: RawValue(SYMINFO_BT_EXTERN)
-        }
-    }
+    case extern = 0xfffc
 }
 
 extension SymbolInfoSpecialBound: CustomStringConvertible {
