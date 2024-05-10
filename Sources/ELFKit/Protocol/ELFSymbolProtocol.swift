@@ -11,8 +11,10 @@ import ELFKitC
 
 public protocol ELFSymbolProtocol {
     var nameOffset: Int { get }
-    var binding: SymbolBinding! { get }
     
+    var _commonBinding: SymbolBinding? { get }
+    func binding(inELF header: ELFHeader) -> SymbolBinding?
+
     var _commonType: SymbolType? { get }
     func type(inELF header: ELFHeader) -> SymbolType?
 

@@ -26,9 +26,20 @@ extension ELF32Symbol: ELFSymbolProtocol {
         numericCast(layout.st_name)
     }
 
-    public var binding: SymbolBinding! {
+    public var _commonBinding: SymbolBinding? {
         // ELF32_ST_BIND
-        .init(rawValue: numericCast(layout.st_info >> 4))
+        .init(
+            rawValue: numericCast(layout.st_info >> 4),
+            osabi: .none
+        )
+    }
+
+    public func binding(inELF header: ELFHeader) -> SymbolBinding? {
+        // ELF32_ST_BIND
+        .init(
+            rawValue: numericCast(layout.st_info >> 4),
+            osabi: header.osABI ?? .none
+        )
     }
 
     public var _commonType: SymbolType? {
@@ -71,9 +82,20 @@ extension ELF64Symbol: ELFSymbolProtocol {
         numericCast(layout.st_name)
     }
 
-    public var binding: SymbolBinding! {
+    public var _commonBinding: SymbolBinding? {
         // ELF64_ST_BIND
-        .init(rawValue: numericCast(layout.st_info >> 4))
+        .init(
+            rawValue: numericCast(layout.st_info >> 4),
+            osabi: .none
+        )
+    }
+
+    public func binding(inELF header: ELFHeader) -> SymbolBinding? {
+        // ELF64_ST_BIND
+        .init(
+            rawValue: numericCast(layout.st_info >> 4),
+            osabi: header.osABI ?? .none
+        )
     }
 
     public var _commonType: SymbolType? {

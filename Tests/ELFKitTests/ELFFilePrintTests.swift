@@ -86,7 +86,10 @@ extension ELFFilePrintTests {
                     "[\(i)] Name:",
                     symbol.name(in: elf, isDynamic: false) ?? "Unknown"
                 )
-                print("Binding:", symbol.binding!)
+                print(
+                    "Binding:",
+                    symbol.binding(inELF: elf.header)?.description ?? "Unknown"
+                )
                 print(
                     "Type:",
                     symbol.type(inELF: elf.header)?.description ?? "Unknown"
@@ -109,7 +112,10 @@ extension ELFFilePrintTests {
                 "[\(i)] Name:",
                 symbol.name(in: elf, isDynamic: true) ?? "Unknown"
             )
-            print("Binding:", symbol.binding!)
+            print(
+                "Binding:",
+                symbol.binding(inELF: elf.header)?.description ?? "Unknown"
+            )
             print(
                 "Type:",
                 symbol.type(inELF: elf.header)?.description ?? "Unknown"
