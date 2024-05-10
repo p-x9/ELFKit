@@ -28,33 +28,20 @@ extension VersionFlags {
     public static let weak = VersionFlags(
         rawValue: Bit.weak.rawValue
     )
+    /// VER_FLG_INFO
+    public static let info = VersionFlags(
+        rawValue: Bit.info.rawValue
+    )
 }
 
 extension VersionFlags {
-    public enum Bit: CaseIterable {
+    public enum Bit: UInt16, CaseIterable {
         /// VER_FLG_BASE
-        case base
+        case base = 1
         /// VER_FLG_WEAK
-        case weak
-    }
-}
-
-extension VersionFlags.Bit: RawRepresentable {
-    public typealias RawValue = UInt16
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(VER_FLG_BASE): self = .base
-        case RawValue(VER_FLG_WEAK): self = .weak
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .base: RawValue(VER_FLG_BASE)
-        case .weak: RawValue(VER_FLG_WEAK)
-        }
+        case weak = 2
+        /// VER_FLG_INFO
+        case info = 4
     }
 }
 
@@ -63,6 +50,7 @@ extension VersionFlags.Bit: CustomStringConvertible {
         switch self {
         case .base: "VER_FLG_BASE"
         case .weak: "VER_FLG_WEAK"
+        case .info: "VER_FLG_INFO"
         }
     }
 }
