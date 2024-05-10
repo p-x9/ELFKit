@@ -29,14 +29,10 @@ extension ELF32ProgramHeader: ELFProgramHeaderProtocol {
     }
 
     public func type(inELF header: ELFHeader) -> ProgramType? {
-        guard let osABI = header.osABI,
-              let machine = header.machine else {
-            return nil
-        }
-        return .init(
+        .init(
             rawValue: layout.p_type,
-            osabi: osABI,
-            machine: machine
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
         )
     }
 

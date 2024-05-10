@@ -52,14 +52,10 @@ extension ELF32Symbol: ELFSymbolProtocol {
     }
 
     public func type(inELF header: ELFHeader) -> SymbolType? {
-        guard let osABI = header.osABI,
-              let machine = header.machine else {
-            return nil
-        }
-        return .init(
+        .init(
             rawValue: numericCast(layout.st_info & 0xf),
-            osabi: osABI,
-            machine: machine
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
         )
     }
 
@@ -108,14 +104,10 @@ extension ELF64Symbol: ELFSymbolProtocol {
     }
 
     public func type(inELF header: ELFHeader) -> SymbolType? {
-        guard let osABI = header.osABI,
-              let machine = header.machine else {
-            return nil
-        }
-        return .init(
+        .init(
             rawValue: numericCast(layout.st_info & 0xf),
-            osabi: osABI,
-            machine: machine
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
         )
     }
 

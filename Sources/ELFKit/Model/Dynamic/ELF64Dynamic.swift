@@ -25,14 +25,10 @@ extension ELF64Dynamic: ELFDynamicProtocol {
     }
 
     public func tag(inELF header: ELFHeader) -> DynamicTag? {
-        guard let osABI = header.osABI,
-              let machine = header.machine else {
-            return nil
-        }
-        return .init(
+        .init(
             rawValue: numericCast(layout.d_tag),
-            osabi: osABI,
-            machine: machine
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
         )
     }
 

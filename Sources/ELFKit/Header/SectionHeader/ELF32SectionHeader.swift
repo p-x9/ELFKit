@@ -31,14 +31,10 @@ extension ELF32SectionHeader: ELFSectionHeaderProtocol {
     }
 
     public func type(inELF header: ELFHeader) -> SectionType? {
-        guard let osABI = header.osABI,
-              let machine = header.machine else {
-            return nil
-        }
-        return .init(
+        .init(
             rawValue: layout.sh_type,
-            osabi: osABI,
-            machine: machine
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
         )
     }
 
