@@ -9,7 +9,7 @@
 import Foundation
 
 extension Sequence where Element: ELFProgramHeaderProtocol {
-    func _dynamic(in elf: ELFFile) -> Element? {
-        first(where: { $0.type(inELF: elf.header) == .dynamic })
+    var _dynamic: Element? {
+        first(where: { $0._commonType == .dynamic })
     }
 }
