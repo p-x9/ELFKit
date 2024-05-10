@@ -9,50 +9,21 @@
 import Foundation
 import ELFKitC
 
-public enum SymbolVisibility: CaseIterable {
+public enum SymbolVisibility: UInt8, CaseIterable {
     /// STV_DEFAULT
-    case `default`
+    case `default` = 0
     /// STV_INTERNAL
-    case `internal`
+    case `internal` = 1
     /// STV_HIDDEN
-    case hidden
+    case hidden = 2
     /// STV_PROTECTED
-    case protected
+    case protected = 3
     /// STV_EXPORTED
-    case exported
+    case exported = 4
     /// STV_SINGLETON
-    case singleton
+    case singleton = 5
     /// STV_ELIMINATE
-    case eliminate
-}
-
-extension SymbolVisibility: RawRepresentable {
-    public typealias RawValue = UInt8
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(STV_DEFAULT): self = .default
-        case RawValue(STV_INTERNAL): self = .internal
-        case RawValue(STV_HIDDEN): self = .hidden
-        case RawValue(STV_PROTECTED): self = .protected
-        case RawValue(STV_EXPORTED): self = .exported
-        case RawValue(STV_SINGLETON): self = .singleton
-        case RawValue(STV_ELIMINATE): self = .eliminate
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .default: RawValue(STV_DEFAULT)
-        case .internal: RawValue(STV_INTERNAL)
-        case .hidden: RawValue(STV_HIDDEN)
-        case .protected: RawValue(STV_PROTECTED)
-        case .exported: RawValue(STV_EXPORTED)
-        case .singleton: RawValue(STV_SINGLETON)
-        case .eliminate: RawValue(STV_ELIMINATE)
-        }
-    }
+    case eliminate = 6
 }
 
 extension SymbolVisibility: CustomStringConvertible {
