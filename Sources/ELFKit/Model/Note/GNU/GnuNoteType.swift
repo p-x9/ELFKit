@@ -8,42 +8,17 @@
 
 import Foundation
 
-public enum GnuNoteType: CaseIterable {
+public enum GnuNoteType: UInt32, CaseIterable {
     /// NT_GNU_ABI_TAG
-    case abi_tag
+    case abi_tag = 1
     /// NT_GNU_HWCAP
-    case hwcap
+    case hwcap = 2
     /// NT_GNU_BUILD_ID
-    case build_id
+    case build_id = 3
     /// NT_GNU_GOLD_VERSION
-    case gold_version
+    case gold_version = 4
     /// NT_GNU_PROPERTY_TYPE_0
-    case property_type_0
-}
-
-extension GnuNoteType: RawRepresentable {
-    public typealias RawValue = UInt32
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(NT_GNU_ABI_TAG): self = .abi_tag
-        case RawValue(NT_GNU_HWCAP): self = .hwcap
-        case RawValue(NT_GNU_BUILD_ID): self = .build_id
-        case RawValue(NT_GNU_GOLD_VERSION): self = .gold_version
-        case RawValue(NT_GNU_PROPERTY_TYPE_0): self = .property_type_0
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .abi_tag: RawValue(NT_GNU_ABI_TAG)
-        case .hwcap: RawValue(NT_GNU_HWCAP)
-        case .build_id: RawValue(NT_GNU_BUILD_ID)
-        case .gold_version: RawValue(NT_GNU_GOLD_VERSION)
-        case .property_type_0: RawValue(NT_GNU_PROPERTY_TYPE_0)
-        }
-    }
+    case property_type_0 = 5
 }
 
 extension GnuNoteType: CustomStringConvertible {

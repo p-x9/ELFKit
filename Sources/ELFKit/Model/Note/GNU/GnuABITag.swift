@@ -57,50 +57,21 @@ extension GnuABITag {
 }
 
 extension GnuABITag {
-    public enum OS: CaseIterable {
+    public enum OS: UInt32, CaseIterable {
         /// GNU_ABI_TAG_LINUX
-        case linux
+        case linux = 0
         /// GNU_ABI_TAG_HURD
-        case hurd
+        case hurd = 1
         /// GNU_ABI_TAG_SOLARIS
-        case solaris
+        case solaris = 2
         /// GNU_ABI_TAG_FREEBSD
-        case freebsd
+        case freebsd = 3
         /// GNU_ABI_TAG_NETBSD
-        case netbsd
+        case netbsd = 4
         /// GNU_ABI_TAG_SYLLABLE
-        case syllable
+        case syllable = 5
         /// GNU_ABI_TAG_NACL
-        case nacl
-    }
-}
-
-extension GnuABITag.OS: RawRepresentable {
-    public typealias RawValue = UInt32
-
-    public init?(rawValue: RawValue) {
-        switch rawValue {
-        case RawValue(GNU_ABI_TAG_LINUX): self = .linux
-        case RawValue(GNU_ABI_TAG_HURD): self = .hurd
-        case RawValue(GNU_ABI_TAG_SOLARIS): self = .solaris
-        case RawValue(GNU_ABI_TAG_FREEBSD): self = .freebsd
-        case RawValue(GNU_ABI_TAG_NETBSD): self = .netbsd
-        case RawValue(GNU_ABI_TAG_SYLLABLE): self = .syllable
-        case RawValue(GNU_ABI_TAG_NACL): self = .nacl
-        default: return nil
-        }
-    }
-
-    public var rawValue: RawValue {
-        switch self {
-        case .linux: RawValue(GNU_ABI_TAG_LINUX)
-        case .hurd: RawValue(GNU_ABI_TAG_HURD)
-        case .solaris: RawValue(GNU_ABI_TAG_SOLARIS)
-        case .freebsd: RawValue(GNU_ABI_TAG_FREEBSD)
-        case .netbsd: RawValue(GNU_ABI_TAG_NETBSD)
-        case .syllable: RawValue(GNU_ABI_TAG_SYLLABLE)
-        case .nacl: RawValue(GNU_ABI_TAG_NACL)
-        }
+        case nacl = 6
     }
 }
 
