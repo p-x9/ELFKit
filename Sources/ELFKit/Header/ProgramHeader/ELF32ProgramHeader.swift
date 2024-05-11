@@ -36,8 +36,20 @@ extension ELF32ProgramHeader: ELFProgramHeaderProtocol {
         )
     }
 
-    public var flags: ProgramFlags {
-        .init(rawValue: numericCast(layout.p_flags))
+    public var _commonFlags: ProgramFlags {
+        .init(
+            rawValue: numericCast(layout.p_flags),
+            osabi: .none,
+            machine: .none
+        )
+    }
+
+    public func flags(inELF header: ELFHeader) -> ProgramFlags {
+        .init(
+            rawValue: numericCast(layout.p_flags),
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
+        )
     }
 
     public var offset: Int { numericCast(layout.p_offset) }

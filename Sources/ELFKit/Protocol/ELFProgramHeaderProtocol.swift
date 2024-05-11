@@ -16,7 +16,9 @@ public protocol ELFProgramHeaderProtocol {
     var _commonType: ProgramType? { get }
     func type(inELF header: ELFHeader) -> ProgramType?
 
-    var flags: ProgramFlags { get }
+    var _commonFlags: ProgramFlags { get }
+    func flags(inELF header: ELFHeader) -> ProgramFlags
+
     var offset: Int { get }
     var virtualAddress: Int { get }
     var physicalAddress: Int { get }

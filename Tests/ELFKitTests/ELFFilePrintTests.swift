@@ -60,7 +60,7 @@ extension ELFFilePrintTests {
             print("[\(i)]")
             let type = program.type(inELF: elf.header)
             print("Type:", type ?? "Unknown")
-            print("Flags:", program.flags.bits)
+            print("Flags:", program.flags(inELF: elf.header).bits)
             print("Offset:", program.offset)
             print("FileSize:", program.fileSize)
         }
