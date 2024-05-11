@@ -215,28 +215,28 @@ extension SectionFlags.Bit: RawRepresentable {
         machine: ELFMachine
     ) {
         switch rawValue {
-        case 1: self = .write
-        case 2: self = .alloc
-        case 4: self = .execinstr
-        case 16: self = .merge
-        case 32: self = .strings
-        case 64: self = .info_link
-        case 128: self = .link_order
-        case 0x100: self = .os_nonconforming
-        case 0x200: self = .group
-        case 0x400: self = .tls
-        case 0x800: self = .compressed
+        case 0x00000001: self = .write
+        case 0x00000002: self = .alloc
+        case 0x00000004: self = .execinstr
+        case 0x00000010: self = .merge
+        case 0x00000020: self = .strings
+        case 0x00000040: self = .info_link
+        case 0x00000080: self = .link_order
+        case 0x00000100: self = .os_nonconforming
+        case 0x00000200: self = .group
+        case 0x00000400: self = .tls
+        case 0x00000800: self = .compressed
 
         default:
             switch (osabi, machine, rawValue) {
             case (_, .ia_64, 0x10000000): self = .ia_64_short
             case (_, .ia_64, 0x20000000): self = .ia_64_norecov
-            case (_, .ia_64, 0x1000000): self = .ia_64_hp_tls
+            case (_, .ia_64, 0x01000000): self = .ia_64_hp_tls
 
-            case (.openvms, .ia_64, 0x100000000): self = .ia_64_vms_global
-            case (.openvms, .ia_64, 0x200000000): self = .ia_64_vms_overlaid
-            case (.openvms, .ia_64, 0x400000000): self = .ia_64_vms_shared
-            case (.openvms, .ia_64, 0x800000000): self = .ia_64_vms_vector
+            case (.openvms, .ia_64, 0x0100000000): self = .ia_64_vms_global
+            case (.openvms, .ia_64, 0x0200000000): self = .ia_64_vms_overlaid
+            case (.openvms, .ia_64, 0x0400000000): self = .ia_64_vms_shared
+            case (.openvms, .ia_64, 0x0800000000): self = .ia_64_vms_vector
             case (.openvms, .ia_64, 0x1000000000): self = .ia_64_vms_alloc_64bit
             case (.openvms, .ia_64, 0x2000000000): self = .ia_64_vms_protected
 
@@ -264,7 +264,7 @@ extension SectionFlags.Bit: RawRepresentable {
 
             case (_, .ppc, 0x10000000): self = .ppc_vle
 
-            case (_, _, 0x200000) where [.linux, .freebsd].contains(osabi):
+            case (_, _, 0x00200000) where [.linux, .freebsd].contains(osabi):
                 self = .gnu_retain
 
             case (.none, _, 0x1000000): self = .gnu_mbind
@@ -273,19 +273,19 @@ extension SectionFlags.Bit: RawRepresentable {
             case (_, .score, 0x20000000): self = .score_merge
             case (_, .score, 0x40000000): self = .score_addr
             case (_, .score, 0x80000000): self = .score_string
-            case (_, .score, 0x8000000): self = .score_nostrip
-            case (_, .score, 0x4000000): self = .score_local
-            case (_, .score, 0x2000000): self = .score_names
-            case (_, .score, 0x1000000): self = .score_nodupes
+            case (_, .score, 0x08000000): self = .score_nostrip
+            case (_, .score, 0x04000000): self = .score_local
+            case (_, .score, 0x02000000): self = .score_names
+            case (_, .score, 0x01000000): self = .score_nodupes
 
             case (_, .mips, 0x10000000): self = .mips_gprel
             case (_, .mips, 0x20000000): self = .mips_merge
             case (_, .mips, 0x40000000): self = .mips_addr
             case (_, .mips, 0x80000000): self = .mips_string
-            case (_, .mips, 0x8000000): self = .mips_nostrip
-            case (_, .mips, 0x4000000): self = .mips_local
-            case (_, .mips, 0x2000000): self = .mips_names
-            case (_, .mips, 0x1000000): self = .mips_nodupes
+            case (_, .mips, 0x08000000): self = .mips_nostrip
+            case (_, .mips, 0x04000000): self = .mips_local
+            case (_, .mips, 0x02000000): self = .mips_names
+            case (_, .mips, 0x01000000): self = .mips_nodupes
 
             case (_, .parisc, 0x80000000): self = .parisc_sbp
             case (_, .parisc, 0x40000000): self = .parisc_huge
@@ -295,11 +295,11 @@ extension SectionFlags.Bit: RawRepresentable {
             case (_, _, 0x10000000) where [.alpha, .old_alpha].contains(machine):
                 self = .alpha_gprel
 
-            case (.hpux, _, 0x1000000): self = .hp_tls
-            case (.hpux, _, 0x2000000): self = .hp_near_shared
-            case (.hpux, _, 0x4000000): self = .hp_far_shared
-            case (.hpux, _, 0x8000000): self = .hp_comdat
-            case (.hpux, _, 0x800000): self = .hp_const
+            case (.hpux, _, 0x01000000): self = .hp_tls
+            case (.hpux, _, 0x02000000): self = .hp_near_shared
+            case (.hpux, _, 0x04000000): self = .hp_far_shared
+            case (.hpux, _, 0x08000000): self = .hp_comdat
+            case (.hpux, _, 0x00800000): self = .hp_const
 
             case (_, _, 0x10000000) where [.m32r, .cygnus_m32r].contains(machine):
                 self = .m32r_can_relax
@@ -326,7 +326,7 @@ extension SectionFlags.Bit: RawRepresentable {
                 case 0x20000000: self = .v850_eprel
                 case 0x40000000: self = .v850_r0rel
                 case 0x80000000: self = .renesas_abs
-                case 0x400: self = .ghs_abs
+                case 0x00000400: self = .ghs_abs
                 default:
                     return nil
                 }
@@ -340,42 +340,42 @@ extension SectionFlags.Bit: RawRepresentable {
 
     public var rawValue: RawValue {
         switch self {
-        case .write: 1
-        case .alloc: 2
-        case .execinstr: 4
-        case .merge: 16
-        case .strings: 32
-        case .info_link: 64
-        case .link_order: 128
-        case .os_nonconforming: 0x100
-        case .group: 0x200
-        case .tls: 0x400
-        case .compressed: 0x800
+        case .write: 0x00000001
+        case .alloc: 0x00000002
+        case .execinstr: 0x00000004
+        case .merge: 0x00000010
+        case .strings: 0x00000020
+        case .info_link: 0x00000040
+        case .link_order: 0x00000080
+        case .os_nonconforming: 0x00000100
+        case .group: 0x00000200
+        case .tls: 0x00000400
+        case .compressed: 0x00000800
         case .entrysect: 0x10000000
         case .comdef: 0x80000000
         case .alpha_gprel: 0x10000000
         case .arm_purecode: 0x20000000
-        case .gnu_retain: 0x200000
+        case .gnu_retain: 0x00200000
         case .exclude: 0x80000000
-        case .gnu_mbind: 0x1000000
+        case .gnu_mbind: 0x01000000
         case .parisc_sbp: 0x80000000
         case .parisc_huge: 0x40000000
         case .parisc_short: 0x20000000
         case .parisc_weakorder: 0x10000000
-        case .hp_tls: 0x1000000
-        case .hp_near_shared: 0x2000000
-        case .hp_far_shared: 0x4000000
-        case .hp_comdat: 0x8000000
-        case .hp_const: 0x800000
+        case .hp_tls: 0x01000000
+        case .hp_near_shared: 0x02000000
+        case .hp_far_shared: 0x04000000
+        case .hp_comdat: 0x08000000
+        case .hp_const: 0x00800000
         case .ia_64_short: 0x10000000
         case .ia_64_norecov: 0x20000000
-        case .ia_64_hp_tls: 0x1000000
-        case .ia_64_vms_global: 0x100000000
-        case .ia_64_vms_overlaid: 0x200000000
-        case .ia_64_vms_shared: 0x400000000
-        case .ia_64_vms_vector: 0x800000000
-        case .ia_64_vms_alloc_64bit: 0x1000000000
-        case .ia_64_vms_protected: 0x2000000000
+        case .ia_64_hp_tls: 0x01000000
+        case .ia_64_vms_global: 0x0000000100000000
+        case .ia_64_vms_overlaid: 0x0000000200000000
+        case .ia_64_vms_shared: 0x0000000400000000
+        case .ia_64_vms_vector: 0x0000000800000000
+        case .ia_64_vms_alloc_64bit: 0x0000001000000000
+        case .ia_64_vms_protected: 0x0000002000000000
         case .m32r_can_relax: 0x10000000
         case .mcore_noread: 0x80000000
         case .mep_vliw: 0x10000000
@@ -384,10 +384,10 @@ extension SectionFlags.Bit: RawRepresentable {
         case .mips_merge: 0x20000000
         case .mips_addr: 0x40000000
         case .mips_string: 0x80000000
-        case .mips_nostrip: 0x8000000
-        case .mips_local: 0x4000000
-        case .mips_names: 0x2000000
-        case .mips_nodupes: 0x1000000
+        case .mips_nostrip: 0x08000000
+        case .mips_local: 0x04000000
+        case .mips_names: 0x02000000
+        case .mips_nodupes: 0x01000000
         case .mmix_canrelax: 0x80000000
         case .nfp_init: 0x80000000
         case .nfp_init2: 0x40000000
@@ -397,16 +397,16 @@ extension SectionFlags.Bit: RawRepresentable {
         case .score_merge: 0x20000000
         case .score_addr: 0x40000000
         case .score_string: 0x80000000
-        case .score_nostrip: 0x8000000
-        case .score_local: 0x4000000
-        case .score_names: 0x2000000
-        case .score_nodupes: 0x1000000
+        case .score_nostrip: 0x08000000
+        case .score_local: 0x04000000
+        case .score_names: 0x02000000
+        case .score_nodupes: 0x01000000
         case .ordered: 0x40000000
         case .v850_gprel: 0x10000000
         case .v850_eprel: 0x20000000
         case .v850_r0rel: 0x40000000
         case .renesas_abs: 0x80000000
-        case .ghs_abs: 0x400
+        case .ghs_abs: 0x00000400
         case .x86_64_large: 0x10000000
         }
     }
