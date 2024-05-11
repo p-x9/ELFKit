@@ -14,7 +14,10 @@ public protocol ELFSectionHeaderProtocol {
     associatedtype Dynamics: ELFFileDynamicsSequence
 
     var nameOffset: Int { get }
-    var flags: SectionFlags { get }
+
+    var _commonFlags: SectionFlags { get } 
+    func flags(inELF header: ELFHeader) -> SectionFlags
+
     var address: Int { get }
     var offset: Int { get }
     var size: Int { get }

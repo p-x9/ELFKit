@@ -430,12 +430,8 @@ extension SectionType/*: RawRepresentable*/ {
             case (_, .ia_64, 0x60000006): self = .ia_64_vms_fixup
             case (_, .ia_64, 0x60000007): self = .ia_64_vms_display_name_info
 
-            case _ where [.x86_64, .l10m, .k10m].contains(machine):
-                switch rawValue {
-                case 0x70000001: self = .x86_64_unwind
-                default:
-                    return nil
-                }
+            case (_, _, 0x70000001) where [.x86_64, .l10m, .k10m].contains(machine):
+                self = .x86_64_unwind
 
             case (_, .aarch64, 0x70000003): self = .aarch64_attributes
 

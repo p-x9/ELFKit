@@ -38,8 +38,20 @@ extension ELF32SectionHeader: ELFSectionHeaderProtocol {
         )
     }
 
-    public var flags: SectionFlags {
-        .init(rawValue: numericCast(layout.sh_flags))
+    public var _commonFlags: SectionFlags {
+        .init(
+            rawValue: numericCast(layout.sh_flags),
+            osabi: .none,
+            machine: .none
+        )
+    }
+
+    public func flags(inELF header: ELFHeader) -> SectionFlags {
+        .init(
+            rawValue: numericCast(layout.sh_flags),
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
+        )
     }
 
     public var address: Int { numericCast(layout.sh_addr) }

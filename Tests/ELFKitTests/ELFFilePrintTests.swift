@@ -47,7 +47,7 @@ extension ELFFilePrintTests {
                 "Type:",
                 type?.description ?? "Unknown"
             )
-            print("Flags:", section.flags.bits)
+            print("Flags:", section.flags(inELF: elf.header).bits)
             print("Address:", section.address)
             print("Offset:", section.offset)
             print("Size:", section.size)

@@ -571,7 +571,6 @@ extension DynamicTag/*: RawRepresentable*/ {
 
         default:
             switch (osabi, machine, rawValue) {
-
             case (.solaris, _, 0x6000000d): self = .sunw_auxiliary
             case (.solaris, _, 0x6000000e): self = .sunw_rtldinf
             case (.solaris, _, 0x6000000f): self = .sunw_filter
