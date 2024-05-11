@@ -321,272 +321,186 @@ extension SectionType/*: RawRepresentable*/ {
         case 18: self = .symtab_shndx
         case 19: self = .relr
 
-        case _ where osabi == .solaris:
-            switch rawValue {
-            case 0x6fffffee: self = .sunw_ancillary
-                return
-            case 0x6fffffef: self = .sunw_capchain
-                return
-            case 0x6ffffff0: self = .sunw_capinfo
-                return
-            case 0x6ffffff1: self = .sunw_symsort
-                return
-            case 0x6ffffff2: self = .sunw_tlssort
-                return
-            case 0x6ffffff3: self = .sunw_ldynsym
-                return
-            case 0x6ffffff4: self = .sunw_dof
-                return
-            case 0x6ffffff5: self = .sunw_cap
-                return
-            case 0x6ffffff6: self = .sunw_signature
-                return
-            case 0x6ffffff7: self = .sunw_annotate
-                return
-            case 0x6ffffff8: self = .sunw_debugstr
-                return
-            case 0x6ffffff9: self = .sunw_debug
-                return
-            case 0x6ffffffa: self = .sunw_move
-                return
-            case 0x6ffffffb: self = .sunw_comdat
-                return
-            case 0x6ffffffc: self = .sunw_syminfo
-                return
-            case 0x6ffffffd: self = .sunw_verdef
-                return
-            case 0x6ffffffe: self = .sunw_verneed
-                return
-            case 0x6fffffff: self = .sunw_versym
-                return
-            default: break
+        default:
+            switch (osabi, machine, rawValue) {
+            case (.solaris, _, 0x6fffffee): self = .sunw_ancillary
+            case (.solaris, _, 0x6fffffef): self = .sunw_capchain
+            case (.solaris, _, 0x6ffffff0): self = .sunw_capinfo
+            case (.solaris, _, 0x6ffffff1): self = .sunw_symsort
+            case (.solaris, _, 0x6ffffff2): self = .sunw_tlssort
+            case (.solaris, _, 0x6ffffff3): self = .sunw_ldynsym
+            case (.solaris, _, 0x6ffffff4): self = .sunw_dof
+            case (.solaris, _, 0x6ffffff5): self = .sunw_cap
+            case (.solaris, _, 0x6ffffff6): self = .sunw_signature
+            case (.solaris, _, 0x6ffffff7): self = .sunw_annotate
+            case (.solaris, _, 0x6ffffff8): self = .sunw_debugstr
+            case (.solaris, _, 0x6ffffff9): self = .sunw_debug
+            case (.solaris, _, 0x6ffffffa): self = .sunw_move
+            case (.solaris, _, 0x6ffffffb): self = .sunw_comdat
+            case (.solaris, _, 0x6ffffffc): self = .sunw_syminfo
+            case (.solaris, _, 0x6ffffffd): self = .sunw_verdef
+            case (.solaris, _, 0x6ffffffe): self = .sunw_verneed
+            case (.solaris, _, 0x6fffffff): self = .sunw_versym
+
+            case (.hpux, _, 0x60000000): self = .hp_ovlbits
+            case (.hpux, _, 0x60000001): self = .hp_dlkm
+            case (.hpux, _, 0x60000002): self = .hp_comdat
+            case (.hpux, _, 0x60000003): self = .hp_objdict
+            case (.hpux, _, 0x60000004): self = .hp_annot
+
+            case (_, _, 0x6fff4700): self = .gnu_incremental_inputs
+            case (_, _, 0x6ffffff5): self = .gnu_attributes
+            case (_, _, 0x6ffffff6): self = .gnu_hash
+            case (_, _, 0x6ffffff7): self = .gnu_liblist
+
+            case (_, _, 0x6ffffffd): self = .gnu_verdef
+            case (_, _, 0x6ffffffe): self = .gnu_verneed
+            case (_, _, 0x6fffffff): self = .gnu_versym
+
+            case _ where [.arc, .arc_compact].contains(machine):
+                switch rawValue {
+                case 0x70000001: self = .arc_attributes
+                default:
+                    return nil
+                }
+
+            case _ where [.mips, .mips_rs3_le].contains(machine):
+                switch rawValue {
+                case 0x70000000: self = .mips_liblist
+                case 0x70000001: self = .mips_msym
+                case 0x70000002: self = .mips_conflict
+                case 0x70000003: self = .mips_gptab
+                case 0x70000004: self = .mips_ucode
+                case 0x70000005: self = .mips_debug
+                case 0x70000006: self = .mips_reginfo
+                case 0x70000007: self = .mips_package
+                case 0x70000008: self = .mips_packsym
+                case 0x70000009: self = .mips_reld
+                case 0x7000000b: self = .mips_iface
+                case 0x7000000c: self = .mips_content
+                case 0x7000000d: self = .mips_options
+                case 0x70000010: self = .mips_shdr
+                case 0x70000011: self = .mips_fdesc
+                case 0x70000012: self = .mips_extsym
+                case 0x70000013: self = .mips_dense
+                case 0x70000014: self = .mips_pdesc
+                case 0x70000015: self = .mips_locsym
+                case 0x70000016: self = .mips_auxsym
+                case 0x70000017: self = .mips_optsym
+                case 0x70000018: self = .mips_locstr
+                case 0x70000019: self = .mips_line
+                case 0x7000001a: self = .mips_rfdesc
+                case 0x7000001b: self = .mips_deltasym
+                case 0x7000001c: self = .mips_deltainst
+                case 0x7000001d: self = .mips_deltaclass
+                case 0x7000001e: self = .mips_dwarf
+                case 0x7000001f: self = .mips_deltadecl
+                case 0x70000020: self = .mips_symbol_lib
+                case 0x70000021: self = .mips_events
+                case 0x70000022: self = .mips_translate
+                case 0x70000023: self = .mips_pixie
+                case 0x70000024: self = .mips_xlate
+                case 0x70000025: self = .mips_xlate_debug
+                case 0x70000026: self = .mips_whirl
+                case 0x70000027: self = .mips_eh_region
+                case 0x70000028: self = .mips_xlate_old
+                case 0x70000029: self = .mips_pdr_exception
+                case 0x7000002a: self = .mips_abiflags
+                case 0x7000002b: self = .mips_xhash
+                default:
+                    return nil
+                }
+
+            case (_, .parisc, 0x70000000): self = .parisc_ext
+            case (_, .parisc, 0x70000001): self = .parisc_unwind
+            case (_, .parisc, 0x70000002): self = .parisc_doc
+            case (_, .parisc, 0x70000003): self = .parisc_annot
+            case (_, .parisc, 0x70000004): self = .parisc_dlkm
+
+            case (_, .ia_64, 0x70000000): self = .ia_64_ext
+            case (_, .ia_64, 0x70000001): self = .ia_64_unwind
+            case (_, .ia_64, 0x79000000): self = .ia_64_priority_init
+//            case (_, .ia_64, 0x60000004): self = .ia_64_hp_opt_anot
+            case (_, .ia_64, 0x60000000): self = .ia_64_vms_trace
+            case (_, .ia_64, 0x60000001): self = .ia_64_vms_tie_signatures
+            case (_, .ia_64, 0x60000002): self = .ia_64_vms_debug
+            case (_, .ia_64, 0x60000003): self = .ia_64_vms_debug_str
+            case (_, .ia_64, 0x60000004): self = .ia_64_vms_linkages
+            case (_, .ia_64, 0x60000005): self = .ia_64_vms_symbol_vector
+            case (_, .ia_64, 0x60000006): self = .ia_64_vms_fixup
+            case (_, .ia_64, 0x60000007): self = .ia_64_vms_display_name_info
+
+            case _ where [.x86_64, .l10m, .k10m].contains(machine):
+                switch rawValue {
+                case 0x70000001: self = .x86_64_unwind
+                default:
+                    return nil
+                }
+
+            case (_, .aarch64, 0x70000003): self = .aarch64_attributes
+
+            case (_, .arm, 0x70000001): self = .arm_exidx
+            case (_, .arm, 0x70000002): self = .arm_preemptmap
+            case (_, .arm, 0x70000003): self = .arm_attributes
+            case (_, .arm, 0x70000004): self = .arm_debugoverlay
+            case (_, .arm, 0x70000005): self = .arm_overlaysection
+
+            case (_, .ti_c6000, 0x70000001): self = .c6000_unwind
+            case (_, .ti_c6000, 0x70000002): self = .c6000_preemptmap
+            case (_, .ti_c6000, 0x70000003): self = .c6000_attributes
+            case (_, .ti_c6000, 0x7f000000): self = .ti_icode
+            case (_, .ti_c6000, 0x7f000001): self = .ti_xref
+            case (_, .ti_c6000, 0x7f000002): self = .ti_handler
+            case (_, .ti_c6000, 0x7f000003): self = .ti_initinfo
+            case (_, .ti_c6000, 0x7f000004): self = .ti_phattrs
+
+            case (_, .msp430, 0x70000003): self = .msp430_attributes
+            case (_, .msp430, 0x7f000005): self = .msp430_sec_flags
+            case (_, .msp430, 0x7f000006): self = .msp430_sym_aliases
+
+            case (_, .nfp, 0x70000003): self = .msp430_attributes
+            case (_, .nfp, 0x7f000005): self = .msp430_sec_flags
+            case (_, .nfp, 0x7f000006): self = .msp430_sym_aliases
+
+            case _ where [.v800, .v850, .cygnus_v850].contains(machine):
+                switch rawValue {
+                case 0x70000000: self = .v850_scommon
+                case 0x70000001: self = .v850_tcommon
+                case 0x70000002: self = .v850_zcommon
+                case 0x80000000: self = .renesas_iop
+                case 0xa0000000: self = .renesas_info
+                default:
+                    return nil
+                }
+
+            case (_, .riscv, 0x70000003): self = .riscv_attributes
+
+            case (_, .csky, 0x70000001): self = .csky_attributes
+
+            case _ where [.alpha, .old_alpha].contains(machine):
+                switch rawValue {
+                case 0x70000001: self = .alpha_debug
+                case 0x70000002: self = .alpha_reginfo
+                default:
+                    return nil
+                }
+
+            case (_, .parisc, 0x70000008): self = .parisc_symextn
+            case (_, .parisc, 0x70000009): self = .parisc_stubs
+
+            case (_, .nfp, 0x70000001): self = .nfp_meconfig
+            case (_, .nfp, 0x70000002): self = .nfp_initreg
+            case (_, .nfp, 0x80000000): self = .nfp_udebug
+
+            case _ where [.ppc].contains(machine):
+                switch rawValue {
+                case 0x7fffffff: self = .ordered
+                default:
+                    return nil
+                }
+
+            default: return nil
             }
-            fallthrough
-
-        case _ where osabi == .hpux:
-            switch rawValue {
-            case 0x60000000: self = .hp_ovlbits
-                return
-            case 0x60000001: self = .hp_dlkm
-                return
-            case 0x60000002: self = .hp_comdat
-                return
-            case 0x60000003: self = .hp_objdict
-                return
-            case 0x60000004: self = .hp_annot
-                return
-            default:
-                break
-            }
-            fallthrough
-
-        case 0x6fff4700: self = .gnu_incremental_inputs
-        case 0x6ffffff5: self = .gnu_attributes
-        case 0x6ffffff6: self = .gnu_hash
-        case 0x6ffffff7: self = .gnu_liblist
-
-        case 0x6ffffffd: self = .gnu_verdef
-        case 0x6ffffffe: self = .gnu_verneed
-        case 0x6fffffff: self = .gnu_versym
-
-        case _ where [.arc, .arc_compact].contains(machine):
-            switch rawValue {
-            case 0x70000001: self = .arc_attributes
-            default:
-                return nil
-            }
-
-        case _ where [.mips, .mips_rs3_le].contains(machine):
-            switch rawValue {
-            case 0x70000000: self = .mips_liblist
-            case 0x70000001: self = .mips_msym
-            case 0x70000002: self = .mips_conflict
-            case 0x70000003: self = .mips_gptab
-            case 0x70000004: self = .mips_ucode
-            case 0x70000005: self = .mips_debug
-            case 0x70000006: self = .mips_reginfo
-            case 0x70000007: self = .mips_package
-            case 0x70000008: self = .mips_packsym
-            case 0x70000009: self = .mips_reld
-            case 0x7000000b: self = .mips_iface
-            case 0x7000000c: self = .mips_content
-            case 0x7000000d: self = .mips_options
-            case 0x70000010: self = .mips_shdr
-            case 0x70000011: self = .mips_fdesc
-            case 0x70000012: self = .mips_extsym
-            case 0x70000013: self = .mips_dense
-            case 0x70000014: self = .mips_pdesc
-            case 0x70000015: self = .mips_locsym
-            case 0x70000016: self = .mips_auxsym
-            case 0x70000017: self = .mips_optsym
-            case 0x70000018: self = .mips_locstr
-            case 0x70000019: self = .mips_line
-            case 0x7000001a: self = .mips_rfdesc
-            case 0x7000001b: self = .mips_deltasym
-            case 0x7000001c: self = .mips_deltainst
-            case 0x7000001d: self = .mips_deltaclass
-            case 0x7000001e: self = .mips_dwarf
-            case 0x7000001f: self = .mips_deltadecl
-            case 0x70000020: self = .mips_symbol_lib
-            case 0x70000021: self = .mips_events
-            case 0x70000022: self = .mips_translate
-            case 0x70000023: self = .mips_pixie
-            case 0x70000024: self = .mips_xlate
-            case 0x70000025: self = .mips_xlate_debug
-            case 0x70000026: self = .mips_whirl
-            case 0x70000027: self = .mips_eh_region
-            case 0x70000028: self = .mips_xlate_old
-            case 0x70000029: self = .mips_pdr_exception
-            case 0x7000002a: self = .mips_abiflags
-            case 0x7000002b: self = .mips_xhash
-            default:
-                return nil
-            }
-
-        case _ where machine == .parisc:
-            switch rawValue {
-            case 0x70000000: self = .parisc_ext
-            case 0x70000001: self = .parisc_unwind
-            case 0x70000002: self = .parisc_doc
-            case 0x70000003: self = .parisc_annot
-            case 0x70000004: self = .parisc_dlkm
-            default:
-                return nil
-            }
-
-        case _ where machine == .ia_64:
-            switch rawValue {
-            case 0x70000000: self = .ia_64_ext
-            case 0x70000001: self = .ia_64_unwind
-            case 0x79000000: self = .ia_64_priority_init
-//            case 0x60000004: self = .ia_64_hp_opt_anot
-            case 0x60000000: self = .ia_64_vms_trace
-            case 0x60000001: self = .ia_64_vms_tie_signatures
-            case 0x60000002: self = .ia_64_vms_debug
-            case 0x60000003: self = .ia_64_vms_debug_str
-            case 0x60000004: self = .ia_64_vms_linkages
-            case 0x60000005: self = .ia_64_vms_symbol_vector
-            case 0x60000006: self = .ia_64_vms_fixup
-            case 0x60000007: self = .ia_64_vms_display_name_info
-            default:
-                return nil
-            }
-
-        case _ where [.x86_64, .l10m, .k10m].contains(machine):
-            switch rawValue {
-            case 0x70000001: self = .x86_64_unwind
-            default:
-                return nil
-            }
-
-        case _ where machine == .aarch64:
-            switch rawValue {
-            case 0x70000003: self = .aarch64_attributes
-            default:
-                return nil
-            }
-
-        case _ where machine == .arm:
-            switch rawValue {
-            case 0x70000001: self = .arm_exidx
-            case 0x70000002: self = .arm_preemptmap
-            case 0x70000003: self = .arm_attributes
-            case 0x70000004: self = .arm_debugoverlay
-            case 0x70000005: self = .arm_overlaysection
-            default:
-                return nil
-            }
-
-        case _ where machine == .ti_c6000:
-            switch rawValue {
-            case 0x70000001: self = .c6000_unwind
-            case 0x70000002: self = .c6000_preemptmap
-            case 0x70000003: self = .c6000_attributes
-            case 0x7f000000: self = .ti_icode
-            case 0x7f000001: self = .ti_xref
-            case 0x7f000002: self = .ti_handler
-            case 0x7f000003: self = .ti_initinfo
-            case 0x7f000004: self = .ti_phattrs
-            default:
-                return nil
-            }
-
-        case _ where machine == .msp430:
-            switch rawValue {
-            case 0x70000003: self = .msp430_attributes
-            case 0x7f000005: self = .msp430_sec_flags
-            case 0x7f000006: self = .msp430_sym_aliases
-            default:
-                return nil
-            }
-
-        case _ where machine == .nfp:
-            switch rawValue {
-            case 0x70000003: self = .msp430_attributes
-            case 0x7f000005: self = .msp430_sec_flags
-            case 0x7f000006: self = .msp430_sym_aliases
-            default:
-                return nil
-            }
-
-        case _ where [.v800, .v850, .cygnus_v850].contains(machine):
-            switch rawValue {
-            case 0x70000000: self = .v850_scommon
-            case 0x70000001: self = .v850_tcommon
-            case 0x70000002: self = .v850_zcommon
-            case 0x80000000: self = .renesas_iop
-            case 0xa0000000: self = .renesas_info
-            default:
-                return nil
-            }
-
-        case _ where machine == .riscv:
-            switch rawValue {
-            case 0x70000003: self = .riscv_attributes
-            default:
-                return nil
-            }
-
-        case _ where machine == .csky:
-            switch rawValue {
-            case 0x70000001: self = .csky_attributes
-            default:
-                return nil
-            }
-
-        case _ where [.alpha, .old_alpha].contains(machine):
-            switch rawValue {
-            case 0x70000001: self = .alpha_debug
-            case 0x70000002: self = .alpha_reginfo
-            default:
-                return nil
-            }
-
-        case _ where machine == .parisc:
-            switch rawValue {
-            case 0x70000008: self = .parisc_symextn
-            case 0x70000009: self = .parisc_stubs
-            default:
-                return nil
-            }
-
-        case _ where machine == .nfp:
-            switch rawValue {
-            case 0x70000001: self = .nfp_meconfig
-            case 0x70000002: self = .nfp_initreg
-            case 0x80000000: self = .nfp_udebug
-            default:
-                return nil
-            }
-
-        case _ where [.ppc].contains(machine):
-            switch rawValue {
-            case 0x7fffffff: self = .ordered
-            default:
-                return nil
-            }
-
-        default: return nil
         }
     }
 

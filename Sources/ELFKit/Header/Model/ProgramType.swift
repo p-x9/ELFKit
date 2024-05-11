@@ -154,150 +154,84 @@ extension ProgramType/*: RawRepresentable*/ {
         case 6: self = .phdr
         case 7: self = .tls
 
-        case _ where osabi == .solaris:
-            switch rawValue {
-            case 0x6464e550: 
-                self = .sunw_unwind
-                return
-            case 0x6ffffffa:
-                self = .sunwbss
-                return
-            case 0x6ffffffb:
-                self = .sunwstack
-                return
-            case 0x6ffffffc:
-                self = .sunwdtrace
-                return
-            case 0x6ffffffd:
-                self = .sunwcap
-                return
-            case 0x6474e550:
-                self = .sunw_eh_frame
-                return
-            default: break
-            }
-            fallthrough
+        default:
+            switch (osabi, machine, rawValue) {
+            case (.solaris, _, 0x6464e550): self = .sunw_unwind
+            case (.solaris, _, 0x6ffffffa): self = .sunwbss
+            case (.solaris, _, 0x6ffffffb): self = .sunwstack
+            case (.solaris, _, 0x6ffffffc): self = .sunwdtrace
+            case (.solaris, _, 0x6ffffffd): self = .sunwcap
+            case (.solaris, _, 0x6474e550): self = .sunw_eh_frame
 
-        case 0x6474e550: self = .gnu_eh_frame
-        case 0x6474e551: self = .gnu_stack
-        case 0x6474e552: self = .gnu_relro
-        case 0x6474e553: self = .gnu_property
-        case 0x6474e554: self = .gnu_sframe
+            case (_, _, 0x6474e550): self = .gnu_eh_frame
+            case (_, _, 0x6474e551): self = .gnu_stack
+            case (_, _, 0x6474e552): self = .gnu_relro
+            case (_, _, 0x6474e553): self = .gnu_property
+            case (_, _, 0x6474e554): self = .gnu_sframe
 
-        case 0x65a3dbe5: self = .openbsd_mutable
-        case 0x65a3dbe6: self = .openbsd_randomize
-        case 0x65a3dbe7: self = .openbsd_wxneeded
-        case 0x65a3dbe8: self = .openbsd_nobtcfi
-        case 0x65a3dbe9: self = .openbsd_syscalls
-        case 0x65a41be6: self = .openbsd_bootdata
+            case (_, _, 0x65a3dbe5): self = .openbsd_mutable
+            case (_, _, 0x65a3dbe6): self = .openbsd_randomize
+            case (_, _, 0x65a3dbe7): self = .openbsd_wxneeded
+            case (_, _, 0x65a3dbe8): self = .openbsd_nobtcfi
+            case (_, _, 0x65a3dbe9): self = .openbsd_syscalls
+            case (_, _, 0x65a41be6): self = .openbsd_bootdata
 
-        case _ where machine == .aarch64:
-            switch rawValue {
-            case 0x70000000: self = .aarch64_archext
-            case 0x70000001: self = .aarch64_unwind
-            case 0x70000002: self = .aarch64_memtag_mte
-            default: return nil
-            }
+            case (_, .aarch64, 0x70000000): self = .aarch64_archext
+            case (_, .aarch64, 0x70000001): self = .aarch64_unwind
+            case (_, .aarch64, 0x70000002): self = .aarch64_memtag_mte
 
-        case _ where machine == .arm:
-            switch rawValue {
-            case 0x70000000: self = .arm_archext
-            case 0x70000001: self = .arm_exidx
-            default: return nil
-            }
 
-        case _ where [.mips, .mips_rs3_le].contains(machine):
-            switch rawValue {
-            case 0x70000000: self = .mips_reginfo
-            case 0x70000001: self = .mips_rtproc
-            case 0x70000002: self = .mips_options
-            case 0x70000003: self = .mips_abiflags
-            default: return nil
-            }
+            case (_, .arm, 0x70000000): self = .arm_archext
+            case (_, .arm, 0x70000001): self = .arm_exidx
 
-        case _ where machine == .parisc:
-            switch rawValue {
-            case 0x70000000: self = .parisc_archext
-                return
-            case 0x70000001: self = .parisc_unwind
-                return
-            case 0x70000002: self = .parisc_weakorder
-                return
-            default:
-                break
-            }
-            fallthrough
-
-        case _ where machine == .ia_64:
-            switch rawValue {
-            case 0x70000000: self = .ia_64_archext
-                return
-            case 0x70000001: self = .ia_64_unwind
-                return
-            default:
-                break
-            }
-            fallthrough
-
-        case _ where machine == .ti_c6000:
-            switch rawValue {
-            case 0x70000000: self = .c6000_phattr
-            default: return nil
-            }
-
-        case _ where machine == .s390:
-            switch rawValue {
-            case 0x70000000: self = .s390_pgste
-            default: return nil
-            }
-
-        case _ where machine == .riscv:
-            switch rawValue {
-            case 0x70000003: self = .riscv_attributes
-            default: return nil
-            }
-
-        case _ where machine == .spu:
-            switch rawValue {
-            case 0x70000000: self = .spu_info
-            default: return nil
-            }
-
-        case _ where osabi == .hpux:
-            switch machine {
-            case .parisc:
+            case _ where [.mips, .mips_rs3_le].contains(machine):
                 switch rawValue {
-                case 0x60000000: self = .hp_tls
-                case 0x60000001: self = .hp_core_none
-                case 0x60000002: self = .hp_core_version
-                case 0x60000003: self = .hp_core_kernel
-                case 0x60000004: self = .hp_core_comm
-                case 0x60000005: self = .hp_core_proc
-                case 0x60000006: self = .hp_core_loadable
-                case 0x60000007: self = .hp_core_stack
-                case 0x60000008: self = .hp_core_shm
-                case 0x60000009: self = .hp_core_mmf
-                case 0x60000010: self = .hp_parallel
-                case 0x60000011: self = .hp_fastbind
-                case 0x60000012: self = .hp_oannot
-                case 0x60000013: self = .hp_hsl_annot
-                case 0x60000014: self = .hp_stack
-                case 0x60000015: self = .hp_core_utsname
+                case 0x70000000: self = .mips_reginfo
+                case 0x70000001: self = .mips_rtproc
+                case 0x70000002: self = .mips_options
+                case 0x70000003: self = .mips_abiflags
                 default: return nil
                 }
-            case .ia_64:
-                switch rawValue {
-                case 0x60000000: self = .hp_tls
-                case 0x60000012: self = .ia_64_hp_oanot
-                case 0x60000013: self = .ia_64_hp_hsl_anot
-                case 0x60000014: self = .ia_64_hp_stack
-                default: return nil
-                }
-            default:
-                return nil
-            }
 
-        default: return nil
+            case (_, .parisc, 0x70000000): self = .parisc_archext
+            case (_, .parisc, 0x70000001): self = .parisc_unwind
+            case (_, .parisc, 0x70000002): self = .parisc_weakorder
+
+            case (_, .ia_64, 0x70000000): self = .ia_64_archext
+            case (_, .ia_64, 0x70000001): self = .ia_64_unwind
+
+            case (_, .ti_c6000, 0x70000000): self = .c6000_phattr
+
+            case (_, .s390, 0x70000000): self = .s390_pgste
+
+            case (_, .riscv, 0x70000003): self = .riscv_attributes
+
+            case (_, .spu, 0x70000000): self = .spu_info
+
+            case (.hpux, .parisc, 0x60000000): self = .hp_tls
+            case (.hpux, .parisc, 0x60000001): self = .hp_core_none
+            case (.hpux, .parisc, 0x60000002): self = .hp_core_version
+            case (.hpux, .parisc, 0x60000003): self = .hp_core_kernel
+            case (.hpux, .parisc, 0x60000004): self = .hp_core_comm
+            case (.hpux, .parisc, 0x60000005): self = .hp_core_proc
+            case (.hpux, .parisc, 0x60000006): self = .hp_core_loadable
+            case (.hpux, .parisc, 0x60000007): self = .hp_core_stack
+            case (.hpux, .parisc, 0x60000008): self = .hp_core_shm
+            case (.hpux, .parisc, 0x60000009): self = .hp_core_mmf
+            case (.hpux, .parisc, 0x60000010): self = .hp_parallel
+            case (.hpux, .parisc, 0x60000011): self = .hp_fastbind
+            case (.hpux, .parisc, 0x60000012): self = .hp_oannot
+            case (.hpux, .parisc, 0x60000013): self = .hp_hsl_annot
+            case (.hpux, .parisc, 0x60000014): self = .hp_stack
+            case (.hpux, .parisc, 0x60000015): self = .hp_core_utsname
+
+            case (.hpux, .ia_64, 0x60000000): self = .hp_tls
+            case (.hpux, .ia_64, 0x60000012): self = .ia_64_hp_oanot
+            case (.hpux, .ia_64, 0x60000013): self = .ia_64_hp_hsl_anot
+            case (.hpux, .ia_64, 0x60000014): self = .ia_64_hp_stack
+
+            default: return nil
+            }
         }
     }
 

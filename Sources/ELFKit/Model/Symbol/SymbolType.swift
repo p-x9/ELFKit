@@ -96,7 +96,7 @@ extension SymbolType/*: RawRepresentable*/ {
                 return nil
             }
 
-        case _ where machine == .v850:
+        case _ where [.v800, .v850, .cygnus_v850].contains(machine):
             switch rawValue {
             case 14: self = .renesas_entry
                 return

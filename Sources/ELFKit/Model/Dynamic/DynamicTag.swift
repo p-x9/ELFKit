@@ -569,281 +569,197 @@ extension DynamicTag/*: RawRepresentable*/ {
         case 0x7ffffffe: self = .used
         case 0x7fffffff: self = .filter
 
-        case _ where osabi == .solaris:
-            switch rawValue {
-            case 0x6000000d: self = .sunw_auxiliary
-                return
-            case 0x6000000e: self = .sunw_rtldinf
-                return
-            case 0x6000000f: self = .sunw_filter
-                return
-            case 0x60000010: self = .sunw_cap
-                return
-            case 0x60000011: self = .sunw_symtab
-                return
-            case 0x60000012: self = .sunw_symsz
-                return
+        default:
+            switch (osabi, machine, rawValue) {
+
+            case (.solaris, _, 0x6000000d): self = .sunw_auxiliary
+            case (.solaris, _, 0x6000000e): self = .sunw_rtldinf
+            case (.solaris, _, 0x6000000f): self = .sunw_filter
+            case (.solaris, _, 0x60000010): self = .sunw_cap
+            case (.solaris, _, 0x60000011): self = .sunw_symtab
+            case (.solaris, _, 0x60000012): self = .sunw_symsz
 //            case 0x60000013: self = .sunw_encoding
-            case 0x60000013: self = .sunw_sortent
-                return
-            case 0x60000014: self = .sunw_symsort
-                return
-            case 0x60000015: self = .sunw_symsortsz
-                return
-            case 0x60000016: self = .sunw_tlssort
-                return
-            case 0x60000017: self = .sunw_tlssortsz
-                return
-            case 0x60000018: self = .sunw_capinfo
-                return
-            case 0x60000019: self = .sunw_strpad
-                return
-            case 0x6000001a: self = .sunw_capchain
-                return
-            case 0x6000001b: self = .sunw_ldmach
-                return
-            case 0x6000001d: self = .sunw_capchainent
-                return
-            case 0x6000001f: self = .sunw_capchainsz
-                return
-            case 0x60000021: self = .sunw_parent
-                return
-            case 0x60000023: self = .sunw_aslr
-                return
-            case 0x60000025: self = .sunw_relax
-                return
-            case 0x60000029: self = .sunw_nxheap
-                return
-            case 0x6000002b: self = .sunw_nxstack
-                return
-            default:
-                break
+            case (.solaris, _, 0x60000013): self = .sunw_sortent
+            case (.solaris, _, 0x60000014): self = .sunw_symsort
+            case (.solaris, _, 0x60000015): self = .sunw_symsortsz
+            case (.solaris, _, 0x60000016): self = .sunw_tlssort
+            case (.solaris, _, 0x60000017): self = .sunw_tlssortsz
+            case (.solaris, _, 0x60000018): self = .sunw_capinfo
+            case (.solaris, _, 0x60000019): self = .sunw_strpad
+            case (.solaris, _, 0x6000001a): self = .sunw_capchain
+            case (.solaris, _, 0x6000001b): self = .sunw_ldmach
+            case (.solaris, _, 0x6000001d): self = .sunw_capchainent
+            case (.solaris, _, 0x6000001f): self = .sunw_capchainsz
+            case (.solaris, _, 0x60000021): self = .sunw_parent
+            case (.solaris, _, 0x60000023): self = .sunw_aslr
+            case (.solaris, _, 0x60000025): self = .sunw_relax
+            case (.solaris, _, 0x60000029): self = .sunw_nxheap
+            case (.solaris, _, 0x6000002b): self = .sunw_nxstack
+
+            case (_, .aarch64, 0x70000001): self = .aarch64_bti_plt
+            case (_, .aarch64, 0x70000003): self = .aarch64_pac_plt
+            case (_, .aarch64, 0x70000005): self = .aarch64_variant_pcs
+
+            case _ where [.mips, .mips_rs3_le].contains(machine):
+                switch rawValue {
+                case 0x70000001: self = .mips_rld_version
+                case 0x70000002: self = .mips_time_stamp
+                case 0x70000003: self = .mips_ichecksum
+                case 0x70000004: self = .mips_iversion
+                case 0x70000005: self = .mips_flags
+                case 0x70000006: self = .mips_base_address
+                case 0x70000007: self = .mips_msym
+                case 0x70000008: self = .mips_conflict
+                case 0x70000009: self = .mips_liblist
+                case 0x7000000a: self = .mips_local_gotno
+                case 0x7000000b: self = .mips_conflictno
+                case 0x70000010: self = .mips_liblistno
+                case 0x70000011: self = .mips_symtabno
+                case 0x70000012: self = .mips_unrefextno
+                case 0x70000013: self = .mips_gotsym
+                case 0x70000014: self = .mips_hipageno
+                case 0x70000016: self = .mips_rld_map
+                case 0x70000017: self = .mips_delta_class
+                case 0x70000018: self = .mips_delta_class_no
+                case 0x70000019: self = .mips_delta_instance
+                case 0x7000001a: self = .mips_delta_instance_no
+                case 0x7000001b: self = .mips_delta_reloc
+                case 0x7000001c: self = .mips_delta_reloc_no
+                case 0x7000001d: self = .mips_delta_sym
+                case 0x7000001e: self = .mips_delta_sym_no
+                case 0x70000020: self = .mips_delta_classsym
+                case 0x70000021: self = .mips_delta_classsym_no
+                case 0x70000022: self = .mips_cxx_flags
+                case 0x70000023: self = .mips_pixie_init
+                case 0x70000024: self = .mips_symbol_lib
+                case 0x70000025: self = .mips_localpage_gotidx
+                case 0x70000026: self = .mips_local_gotidx
+                case 0x70000027: self = .mips_hidden_gotidx
+                case 0x70000028: self = .mips_protected_gotidx
+                case 0x70000029: self = .mips_options
+                case 0x7000002a: self = .mips_interface
+                case 0x7000002b: self = .mips_dynstr_align
+                case 0x7000002c: self = .mips_interface_size
+                case 0x7000002d: self = .mips_rld_text_resolve_addr
+                case 0x7000002e: self = .mips_perf_suffix
+                case 0x7000002f: self = .mips_compact_size
+                case 0x70000030: self = .mips_gp_value
+                case 0x70000031: self = .mips_aux_dynamic
+                case 0x70000032: self = .mips_pltgot
+                case 0x70000034: self = .mips_rwplt
+                case 0x70000035: self = .mips_rld_map_rel
+                case 0x70000036: self = .mips_xhash
+                default:
+                    return nil
+                }
+
+            case (_, .sparcv9, 0x70000001): self = .sparc_register
+
+            case (_, .ppc, 0x70000000): self = .ppc_got
+            case (_, .ppc, 0x70000001): self = .ppc_opt
+
+            case (_, .ppc64, 0x70000000): self = .ppc64_glink
+            case (_, .ppc64, 0x70000001): self = .ppc64_opd
+            case (_, .ppc64, 0x70000002): self = .ppc64_opdsz
+            case (_, .ppc64, 0x70000003): self = .ppc64_opt
+
+            case (_, .ia_64, 0x70000000): self = .ia_64_plt_reserve
+            case (_, .ia_64, 0x6000000d): self = .ia_64_vms_subtype
+            case (_, .ia_64, 0x6000000f): self = .ia_64_vms_imgiocnt
+            case (_, .ia_64, 0x60000015): self = .ia_64_vms_lnkflags
+            case (_, .ia_64, 0x60000017): self = .ia_64_vms_vir_mem_blk_siz
+            case (_, .ia_64, 0x60000019): self = .ia_64_vms_ident
+            case (_, .ia_64, 0x6000001d): self = .ia_64_vms_needed_ident
+            case (_, .ia_64, 0x6000001f): self = .ia_64_vms_img_rela_cnt
+            case (_, .ia_64, 0x60000021): self = .ia_64_vms_seg_rela_cnt
+            case (_, .ia_64, 0x60000023): self = .ia_64_vms_fixup_rela_cnt
+            case (_, .ia_64, 0x60000025): self = .ia_64_vms_fixup_needed
+            case (_, .ia_64, 0x60000027): self = .ia_64_vms_symvec_cnt
+            case (_, .ia_64, 0x6000002b): self = .ia_64_vms_xlated
+            case (_, .ia_64, 0x6000002d): self = .ia_64_vms_stacksize
+            case (_, .ia_64, 0x6000002f): self = .ia_64_vms_unwindsz
+            case (_, .ia_64, 0x60000031): self = .ia_64_vms_unwind_codseg
+            case (_, .ia_64, 0x60000033): self = .ia_64_vms_unwind_infoseg
+            case (_, .ia_64, 0x60000035): self = .ia_64_vms_linktime
+            case (_, .ia_64, 0x60000037): self = .ia_64_vms_seg_no
+            case (_, .ia_64, 0x60000039): self = .ia_64_vms_symvec_offset
+            case (_, .ia_64, 0x6000003b): self = .ia_64_vms_symvec_seg
+            case (_, .ia_64, 0x6000003d): self = .ia_64_vms_unwind_offset
+            case (_, .ia_64, 0x6000003f): self = .ia_64_vms_unwind_seg
+            case (_, .ia_64, 0x60000041): self = .ia_64_vms_strtab_offset
+            case (_, .ia_64, 0x60000043): self = .ia_64_vms_sysver_offset
+            case (_, .ia_64, 0x60000045): self = .ia_64_vms_img_rela_off
+            case (_, .ia_64, 0x60000047): self = .ia_64_vms_seg_rela_off
+            case (_, .ia_64, 0x60000049): self = .ia_64_vms_fixup_rela_off
+            case (_, .ia_64, 0x6000004b): self = .ia_64_vms_pltgot_offset
+            case (_, .ia_64, 0x6000004d): self = .ia_64_vms_pltgot_seg
+            case (_, .ia_64, 0x6000004f): self = .ia_64_vms_fpmode
+
+            case (_, .alpha, 0x70000000): self = .alpha_pltro
+
+            case (_, .score, 0x70000001): self = .score_base_address
+            case (_, .score, 0x70000002): self = .score_local_gotno
+            case (_, .score, 0x70000003): self = .score_symtabno
+            case (_, .score, 0x70000004): self = .score_gotsym
+            case (_, .score, 0x70000005): self = .score_unrefextno
+            case (_, .score, 0x70000006): self = .score_hipageno
+
+            case (_, .ti_c6000, 0x6000000d): self = .c6000_gsym_offset
+            case (_, .ti_c6000, 0x6000000f): self = .c6000_gstr_offset
+            case (_, .ti_c6000, 0x70000000): self = .c6000_dsbt_base
+            case (_, .ti_c6000, 0x70000001): self = .c6000_dsbt_size
+            case (_, .ti_c6000, 0x70000002): self = .c6000_preemptmap
+            case (_, .ti_c6000, 0x70000003): self = .c6000_dsbt_index
+
+            case (_, .altera_nios2, 0x70000002): self = .nios2_gp
+
+            case (_, .riscv, 0x70000001): self = .riscv_variant_cc
+
+            case (_, .x86_64, 0x70000000): self = .x86_64_plt
+            case (_, .x86_64, 0x70000001): self = .x86_64_pltsz
+            case (_, .x86_64, 0x70000003): self = .x86_64_pltent
+
+            case (_, .parisc, 0x60000000): self = .hp_load_map
+            case (_, .parisc, 0x60000001): self = .hp_dld_flags
+            case (_, .parisc, 0x60000002): self = .hp_dld_hook
+            case (_, .parisc, 0x60000003): self = .hp_ux10_init
+            case (_, .parisc, 0x60000004): self = .hp_ux10_initsz
+            case (_, .parisc, 0x60000005): self = .hp_preinit
+            case (_, .parisc, 0x60000006): self = .hp_preinitsz
+            case (_, .parisc, 0x60000007): self = .hp_needed
+            case (_, .parisc, 0x60000008): self = .hp_time_stamp
+            case (_, .parisc, 0x60000009): self = .hp_checksum
+            case (_, .parisc, 0x6000000a): self = .hp_gst_size
+            case (_, .parisc, 0x6000000b): self = .hp_gst_version
+            case (_, .parisc, 0x6000000c): self = .hp_gst_hashval
+            case (_, .parisc, 0x6000000d): self = .hp_epltrel
+            case (_, .parisc, 0x6000000e): self = .hp_epltrelsz
+            case (_, .parisc, 0x6000000f): self = .hp_filtered
+            case (_, .parisc, 0x60000010): self = .hp_filter_tls
+            case (_, .parisc, 0x60000011): self = .hp_compat_filtered
+            case (_, .parisc, 0x60000012): self = .hp_lazyload
+            case (_, .parisc, 0x60000013): self = .hp_bind_now_count
+            case (_, .parisc, 0x60000014): self = .plt
+            case (_, .parisc, 0x60000015): self = .plt_size
+            case (_, .parisc, 0x60000016): self = .dlt
+            case (_, .parisc, 0x60000017): self = .dlt_size
+
+            case _ where [.xtensa, .xtensa_old].contains(machine):
+                switch rawValue {
+                case 0x70000000: self = .xtensa_got_loc_off
+                case 0x70000001: self = .xtensa_got_loc_sz
+                default:
+                    return nil
+                }
+
+//            case 0x60000010: self = .vx_wrs_tls_data_start
+//            case 0x60000011: self = .vx_wrs_tls_data_size
+//            case 0x60000015: self = .vx_wrs_tls_data_align
+//            case 0x60000012: self = .vx_wrs_tls_vars_start
+//            case 0x60000013: self = .vx_wrs_tls_vars_size
+
+            default: return nil
             }
-            fallthrough
-
-        case _ where machine == .aarch64:
-            switch rawValue {
-            case 0x70000001: self = .aarch64_bti_plt
-            case 0x70000003: self = .aarch64_pac_plt
-            case 0x70000005: self = .aarch64_variant_pcs
-            default:
-                return nil
-            }
-
-        case _ where [.mips, .mips_rs3_le].contains(machine):
-            switch rawValue {
-            case 0x70000001: self = .mips_rld_version
-            case 0x70000002: self = .mips_time_stamp
-            case 0x70000003: self = .mips_ichecksum
-            case 0x70000004: self = .mips_iversion
-            case 0x70000005: self = .mips_flags
-            case 0x70000006: self = .mips_base_address
-            case 0x70000007: self = .mips_msym
-            case 0x70000008: self = .mips_conflict
-            case 0x70000009: self = .mips_liblist
-            case 0x7000000a: self = .mips_local_gotno
-            case 0x7000000b: self = .mips_conflictno
-            case 0x70000010: self = .mips_liblistno
-            case 0x70000011: self = .mips_symtabno
-            case 0x70000012: self = .mips_unrefextno
-            case 0x70000013: self = .mips_gotsym
-            case 0x70000014: self = .mips_hipageno
-            case 0x70000016: self = .mips_rld_map
-            case 0x70000017: self = .mips_delta_class
-            case 0x70000018: self = .mips_delta_class_no
-            case 0x70000019: self = .mips_delta_instance
-            case 0x7000001a: self = .mips_delta_instance_no
-            case 0x7000001b: self = .mips_delta_reloc
-            case 0x7000001c: self = .mips_delta_reloc_no
-            case 0x7000001d: self = .mips_delta_sym
-            case 0x7000001e: self = .mips_delta_sym_no
-            case 0x70000020: self = .mips_delta_classsym
-            case 0x70000021: self = .mips_delta_classsym_no
-            case 0x70000022: self = .mips_cxx_flags
-            case 0x70000023: self = .mips_pixie_init
-            case 0x70000024: self = .mips_symbol_lib
-            case 0x70000025: self = .mips_localpage_gotidx
-            case 0x70000026: self = .mips_local_gotidx
-            case 0x70000027: self = .mips_hidden_gotidx
-            case 0x70000028: self = .mips_protected_gotidx
-            case 0x70000029: self = .mips_options
-            case 0x7000002a: self = .mips_interface
-            case 0x7000002b: self = .mips_dynstr_align
-            case 0x7000002c: self = .mips_interface_size
-            case 0x7000002d: self = .mips_rld_text_resolve_addr
-            case 0x7000002e: self = .mips_perf_suffix
-            case 0x7000002f: self = .mips_compact_size
-            case 0x70000030: self = .mips_gp_value
-            case 0x70000031: self = .mips_aux_dynamic
-            case 0x70000032: self = .mips_pltgot
-            case 0x70000034: self = .mips_rwplt
-            case 0x70000035: self = .mips_rld_map_rel
-            case 0x70000036: self = .mips_xhash
-            default:
-                return nil
-            }
-
-        case _ where machine == .sparcv9:
-            switch rawValue {
-            case 0x70000001: self = .sparc_register
-            default:
-                return nil
-            }
-
-        case _ where machine == .ppc:
-            switch rawValue {
-            case 0x70000000: self = .ppc_got
-            case 0x70000001: self = .ppc_opt
-            default:
-                return nil
-            }
-
-        case _ where machine == .ppc64:
-            switch rawValue {
-            case 0x70000000: self = .ppc64_glink
-            case 0x70000001: self = .ppc64_opd
-            case 0x70000002: self = .ppc64_opdsz
-            case 0x70000003: self = .ppc64_opt
-            default:
-                return nil
-            }
-
-        case _ where machine == .ia_64:
-            switch rawValue {
-            case 0x70000000: self = .ia_64_plt_reserve
-            case 0x6000000d: self = .ia_64_vms_subtype
-            case 0x6000000f: self = .ia_64_vms_imgiocnt
-            case 0x60000015: self = .ia_64_vms_lnkflags
-            case 0x60000017: self = .ia_64_vms_vir_mem_blk_siz
-            case 0x60000019: self = .ia_64_vms_ident
-            case 0x6000001d: self = .ia_64_vms_needed_ident
-            case 0x6000001f: self = .ia_64_vms_img_rela_cnt
-            case 0x60000021: self = .ia_64_vms_seg_rela_cnt
-            case 0x60000023: self = .ia_64_vms_fixup_rela_cnt
-            case 0x60000025: self = .ia_64_vms_fixup_needed
-            case 0x60000027: self = .ia_64_vms_symvec_cnt
-            case 0x6000002b: self = .ia_64_vms_xlated
-            case 0x6000002d: self = .ia_64_vms_stacksize
-            case 0x6000002f: self = .ia_64_vms_unwindsz
-            case 0x60000031: self = .ia_64_vms_unwind_codseg
-            case 0x60000033: self = .ia_64_vms_unwind_infoseg
-            case 0x60000035: self = .ia_64_vms_linktime
-            case 0x60000037: self = .ia_64_vms_seg_no
-            case 0x60000039: self = .ia_64_vms_symvec_offset
-            case 0x6000003b: self = .ia_64_vms_symvec_seg
-            case 0x6000003d: self = .ia_64_vms_unwind_offset
-            case 0x6000003f: self = .ia_64_vms_unwind_seg
-            case 0x60000041: self = .ia_64_vms_strtab_offset
-            case 0x60000043: self = .ia_64_vms_sysver_offset
-            case 0x60000045: self = .ia_64_vms_img_rela_off
-            case 0x60000047: self = .ia_64_vms_seg_rela_off
-            case 0x60000049: self = .ia_64_vms_fixup_rela_off
-            case 0x6000004b: self = .ia_64_vms_pltgot_offset
-            case 0x6000004d: self = .ia_64_vms_pltgot_seg
-            case 0x6000004f: self = .ia_64_vms_fpmode
-            default:
-                return nil
-            }
-
-        case _ where machine == .alpha:
-            switch rawValue {
-            case 0x70000000: self = .alpha_pltro
-            default:
-                return nil
-            }
-
-        case _ where machine == .score:
-            switch rawValue {
-            case 0x70000001: self = .score_base_address
-            case 0x70000002: self = .score_local_gotno
-            case 0x70000003: self = .score_symtabno
-            case 0x70000004: self = .score_gotsym
-            case 0x70000005: self = .score_unrefextno
-            case 0x70000006: self = .score_hipageno
-            default:
-                return nil
-            }
-
-        case _ where machine == .ti_c6000:
-            switch rawValue {
-            case 0x6000000d: self = .c6000_gsym_offset
-            case 0x6000000f: self = .c6000_gstr_offset
-            case 0x70000000: self = .c6000_dsbt_base
-            case 0x70000001: self = .c6000_dsbt_size
-            case 0x70000002: self = .c6000_preemptmap
-            case 0x70000003: self = .c6000_dsbt_index
-            default:
-                return nil
-            }
-
-        case _ where machine == .altera_nios2:
-            switch rawValue {
-            case 0x70000002: self = .nios2_gp
-            default:
-                return nil
-            }
-
-        case _ where machine == .riscv:
-            switch rawValue {
-            case 0x70000001: self = .riscv_variant_cc
-            default:
-                return nil
-            }
-
-        case _ where machine == .x86_64:
-            switch rawValue {
-            case 0x70000000: self = .x86_64_plt
-            case 0x70000001: self = .x86_64_pltsz
-            case 0x70000003: self = .x86_64_pltent
-            default:
-                return nil
-            }
-
-        case _ where machine == .parisc:
-            switch rawValue {
-            case 0x60000000: self = .hp_load_map
-            case 0x60000001: self = .hp_dld_flags
-            case 0x60000002: self = .hp_dld_hook
-            case 0x60000003: self = .hp_ux10_init
-            case 0x60000004: self = .hp_ux10_initsz
-            case 0x60000005: self = .hp_preinit
-            case 0x60000006: self = .hp_preinitsz
-            case 0x60000007: self = .hp_needed
-            case 0x60000008: self = .hp_time_stamp
-            case 0x60000009: self = .hp_checksum
-            case 0x6000000a: self = .hp_gst_size
-            case 0x6000000b: self = .hp_gst_version
-            case 0x6000000c: self = .hp_gst_hashval
-            case 0x6000000d: self = .hp_epltrel
-            case 0x6000000e: self = .hp_epltrelsz
-            case 0x6000000f: self = .hp_filtered
-            case 0x60000010: self = .hp_filter_tls
-            case 0x60000011: self = .hp_compat_filtered
-            case 0x60000012: self = .hp_lazyload
-            case 0x60000013: self = .hp_bind_now_count
-            case 0x60000014: self = .plt
-            case 0x60000015: self = .plt_size
-            case 0x60000016: self = .dlt
-            case 0x60000017: self = .dlt_size
-            default:
-                return nil
-            }
-
-        case _ where [.xtensa, .xtensa_old].contains(machine):
-            switch rawValue {
-            case 0x70000000: self = .xtensa_got_loc_off
-            case 0x70000001: self = .xtensa_got_loc_sz
-            default:
-                return nil
-            }
-
-//        case 0x60000010: self = .vx_wrs_tls_data_start
-//        case 0x60000011: self = .vx_wrs_tls_data_size
-//        case 0x60000015: self = .vx_wrs_tls_data_align
-//        case 0x60000012: self = .vx_wrs_tls_vars_start
-//        case 0x60000013: self = .vx_wrs_tls_vars_size
-
-        default: return nil
         }
     }
 
