@@ -29,12 +29,12 @@
 #ifndef _SYS_ELF64_H_
 #define _SYS_ELF64_H_ 1
 
-#if !__has_include(<elf.h>)
-
 /** Modified Start **/
 //#include <sys/elf_common.h>
 #include "elf_common.h"
 /** Modified End **/
+
+#if !__has_include(<elf.h>)
 
 /*
  * ELF definitions common to all 64-bit architectures.
@@ -271,9 +271,11 @@ typedef struct {
     Elf64_Xword    ch_addralign;
 } Elf64_Chdr;
 
-#endif /* !__has_include(<elf.h>) */
+#else
 
 typedef Elf64_Word    Elf64_Hashelt;
+
+#endif /* !__has_include(<elf.h>) */
 
 #endif /* !_SYS_ELF64_H_ */
 

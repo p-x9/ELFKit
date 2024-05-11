@@ -29,12 +29,12 @@
 #ifndef _SYS_ELF32_H_
 #define _SYS_ELF32_H_ 1
 
-#if !__has_include(<elf.h>)
-
 /** Modified Start **/
 //#include <sys/elf_common.h>
 #include "elf_common.h"
 /** Modified End **/
+
+#if !__has_include(<elf.h>)
 
 /*
  * ELF definitions common to all 32-bit architectures.
@@ -267,8 +267,10 @@ typedef struct {
     Elf32_Word    ch_addralign;
 } Elf32_Chdr;
 
-#endif /* !__has_include(<elf.h>) */
+#else
 
 typedef Elf32_Word    Elf32_Hashelt;
+
+#endif /* !__has_include(<elf.h>) */
 
 #endif /* !_SYS_ELF32_H_ */
