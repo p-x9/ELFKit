@@ -65,11 +65,25 @@ extension ELF32Symbol: ELFSymbolProtocol {
     }
 
     public var sectionIndex: Int? {
-        specialSection == nil ? numericCast(layout.st_shndx) : 0
+        let SHN_LORESERVE = 0xff00
+        guard numericCast(layout.st_shndx) < SHN_LORESERVE else { return nil }
+        return numericCast(layout.st_shndx)
     }
 
-    public var specialSection: SpecialSectionIndex? {
-        .init(rawValue: numericCast(layout.st_shndx))
+    public var _commonSpecialSection: SpecialSectionIndex? {
+        .init(
+            rawValue: numericCast(layout.st_shndx),
+            osabi: .none,
+            machine: .none
+        )
+    }
+
+    public func specialSection(inELF header: ELFHeader) -> SpecialSectionIndex? {
+        .init(
+            rawValue: numericCast(layout.st_shndx),
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
+        )
     }
 }
 
@@ -117,10 +131,24 @@ extension ELF64Symbol: ELFSymbolProtocol {
     }
 
     public var sectionIndex: Int? {
-        specialSection == nil ? numericCast(layout.st_shndx) : 0
+        let SHN_LORESERVE = 0xff00
+        guard numericCast(layout.st_shndx) < SHN_LORESERVE else { return nil }
+        return numericCast(layout.st_shndx)
     }
 
-    public var specialSection: SpecialSectionIndex? {
-        .init(rawValue: numericCast(layout.st_shndx))
+    public var _commonSpecialSection: SpecialSectionIndex? {
+        .init(
+            rawValue: numericCast(layout.st_shndx),
+            osabi: .none,
+            machine: .none
+        )
+    }
+
+    public func specialSection(inELF header: ELFHeader) -> SpecialSectionIndex? {
+        .init(
+            rawValue: numericCast(layout.st_shndx),
+            osabi: header.osABI ?? .none,
+            machine: header.machine ?? .none
+        )
     }
 }

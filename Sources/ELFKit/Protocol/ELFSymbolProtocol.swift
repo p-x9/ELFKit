@@ -20,7 +20,9 @@ public protocol ELFSymbolProtocol {
 
     var visibility: SymbolVisibility! { get }
     var sectionIndex: Int? { get }
-    var specialSection: SpecialSectionIndex? { get }
+
+    var _commonSpecialSection: SpecialSectionIndex? { get }
+    func specialSection(inELF header: ELFHeader) -> SpecialSectionIndex?
 }
 
 extension ELFSymbolProtocol {

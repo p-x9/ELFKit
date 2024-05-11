@@ -95,7 +95,7 @@ extension ELFFilePrintTests {
                     symbol.type(inELF: elf.header)?.description ?? "Unknown"
                 )
                 print("Visibility:", symbol.visibility!)
-                if let specialSection = symbol.specialSection {
+                if let specialSection = symbol.specialSection(inELF: elf.header) {
                     print("Special:", specialSection)
                 } else if let sectionIndex = symbol.sectionIndex {
                     print("SectionIndex:", sectionIndex)
@@ -121,7 +121,7 @@ extension ELFFilePrintTests {
                 symbol.type(inELF: elf.header)?.description ?? "Unknown"
             )
             print("Visibility:", symbol.visibility!)
-            if let specialSection = symbol.specialSection {
+            if let specialSection = symbol.specialSection(inELF: elf.header) {
                 print("Special:", specialSection)
             } else if let sectionIndex = symbol.sectionIndex {
                 print("SectionIndex:", sectionIndex)

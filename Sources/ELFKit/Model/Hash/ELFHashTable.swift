@@ -73,7 +73,7 @@ extension ELF32HashTable {
             if name == symbol {
                 return current
             }
-            if current.specialSection == .undef {
+            if current._commonSpecialSection == .undef {
                 break
             }
             symix = hashTable.chains[Int(symix)]
@@ -104,7 +104,7 @@ extension ELF64HashTable {
             if name == symbol {
                 return current
             }
-            if current.specialSection == .undef {
+            if current._commonSpecialSection == .undef {
                 break
             }
             symix = hashTable.chains[Int(symix)]
