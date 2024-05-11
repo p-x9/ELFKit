@@ -15,7 +15,7 @@ public struct HeaderIdentifier: LayoutWrapper {
     public var layout: Layout
 
     init?(layout: Layout) {
-        guard layout.0 == ELFMAG0, /* EI_MAG0 */
+        guard layout.0 == 0x7f, /* EI_MAG0 */
               layout.1 == UInt8(ascii: "E") /* EI_MAG1 */,
               layout.2 == UInt8(ascii: "L") /* EI_MAG2 */,
               layout.3 == UInt8(ascii: "F") /* EI_MAG3 */ else {

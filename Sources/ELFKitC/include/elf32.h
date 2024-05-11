@@ -29,6 +29,8 @@
 #ifndef _SYS_ELF32_H_
 #define _SYS_ELF32_H_ 1
 
+#if !__has_include(<elf.h>)
+
 /** Modified Start **/
 //#include <sys/elf_common.h>
 #include "elf_common.h"
@@ -264,5 +266,9 @@ typedef struct {
     Elf32_Word    ch_size;
     Elf32_Word    ch_addralign;
 } Elf32_Chdr;
+
+#endif /* !__has_include(<elf.h>) */
+
+typedef Elf32_Word    Elf32_Hashelt;
 
 #endif /* !_SYS_ELF32_H_ */

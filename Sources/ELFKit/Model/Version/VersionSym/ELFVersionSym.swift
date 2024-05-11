@@ -23,28 +23,32 @@ public struct ELF64VersionSym: LayoutWrapper {
 
 extension ELF32VersionSym: ELFVersionSymProtocol {
     public var isHidden: Bool {
-        (numericCast(layout) & VERSYM_HIDDEN) != 0
+        let VERSYM_HIDDEN = 0x8000
+        return (numericCast(layout) & VERSYM_HIDDEN) != 0
     }
 
     public var version: Int {
+        let VERSYM_VERSION = 0x7fff
         if isHidden {
-            numericCast((numericCast(layout) & VERSYM_VERSION))
+            return numericCast((numericCast(layout) & VERSYM_VERSION))
         } else {
-            numericCast(layout)
+            return numericCast(layout)
         }
     }
 }
 
 extension ELF64VersionSym: ELFVersionSymProtocol {
     public var isHidden: Bool {
-        (numericCast(layout) & VERSYM_HIDDEN) != 0
+        let VERSYM_HIDDEN = 0x8000
+        return (numericCast(layout) & VERSYM_HIDDEN) != 0
     }
 
     public var version: Int {
+        let VERSYM_VERSION = 0x7fff
         if isHidden {
-            numericCast((numericCast(layout) & VERSYM_VERSION))
+            return numericCast((numericCast(layout) & VERSYM_VERSION))
         } else {
-            numericCast(layout)
+            return numericCast(layout)
         }
     }
 }
