@@ -46,7 +46,7 @@ public class ELFFile {
             )
             header = ._64(_header)
         default:
-            throw NSError() // FIXME: Invalid ELF class
+            throw ELFKitError.invalidFile
         }
 
         self.header = header
