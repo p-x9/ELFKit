@@ -89,7 +89,7 @@ extension FileHandle {
             $0.load(as: Element.self)
         }
     }
-    
+
     func read<Element>(
         offset: UInt64,
         swapHandler: ((inout Data) -> Void)? = nil

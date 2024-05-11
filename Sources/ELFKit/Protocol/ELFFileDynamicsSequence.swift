@@ -12,10 +12,9 @@ public protocol ELFFileDynamicsSequence<Dynamic>: RandomAccessCollection
 where Element == Dynamic,
       Iterator == WrappedSequence.Iterator,
       Index == Int,
-      HashTable.Header == HashTableHeader
-{
-    associatedtype Dynamic: ELFDynamicProtocol & LayoutWrapper
-    associatedtype HashTableHeader: ELFHashTableHeaderProtocol & LayoutWrapper
+      HashTable.Header == HashTableHeader {
+    associatedtype Dynamic: ELFDynamicProtocol, LayoutWrapper
+    associatedtype HashTableHeader: ELFHashTableHeaderProtocol, LayoutWrapper
     associatedtype HashTable: ELFHashTableProtocol
     associatedtype GnuHashTable: ELFGnuHashTableProtocol
     associatedtype Symbol: ELFSymbolProtocol
@@ -23,7 +22,7 @@ where Element == Dynamic,
     associatedtype SymbolInfo: ELFSymbolInfoProtocol
     associatedtype VersionDef: ELFVersionDefProtocol
     associatedtype VersionNeed: ELFVersionNeedProtocol
-    associatedtype VersionSym: ELFVersionSymProtocol & LayoutWrapper
+    associatedtype VersionSym: ELFVersionSymProtocol, LayoutWrapper
 
     typealias WrappedSequence = DataSequence<Dynamic>
 

@@ -19,11 +19,11 @@ extension ELF32NoteHeader: ELFNoteHeaderProtocol {
     public var nameSize: Int {
         numericCast(layout.n_namesz)
     }
-    
+
     public var descriptionSize: Int {
         numericCast(layout.n_descsz)
     }
-    
+
     public var type: Int {
         numericCast(layout.n_type)
     }

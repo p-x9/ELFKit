@@ -73,7 +73,7 @@ extension SymbolType/*: RawRepresentable*/ {
             case 13: self = .arm_tfunc
                 return
             case 15: self = .arm_16bit
-                return 
+                return
             default:
                 return nil
             }

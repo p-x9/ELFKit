@@ -123,7 +123,6 @@ extension SpecialSectionIndex/*: RawRepresentable*/ {
 
             case (_, .mmix, 0xff00): self = .register
 
-
             case (_, .score, 0xff01): self = .score_text
             case (_, .score, 0xff02): self = .score_data
             case (_, .score, 0xff03): self = .score_scommon

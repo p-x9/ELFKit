@@ -11,7 +11,7 @@ import ELFKitC
 
 public protocol ELFSymbolProtocol {
     var nameOffset: Int { get }
-    
+
     var _commonBinding: SymbolBinding? { get }
     func binding(inELF header: ELFHeader) -> SymbolBinding?
 

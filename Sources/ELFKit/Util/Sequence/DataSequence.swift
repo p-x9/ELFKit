@@ -14,14 +14,6 @@ public struct DataSequence<T>: Sequence {
     let data: Data
     let numberOfElements: Int
 
-    init(
-        data: Data,
-        numberOfElements: Int
-    ) {
-        self.data = data
-        self.numberOfElements = numberOfElements
-    }
-
     public func makeIterator() -> Iterator {
         Iterator(
             data: data,

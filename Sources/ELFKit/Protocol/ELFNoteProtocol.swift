@@ -9,7 +9,7 @@
 import Foundation
 
 public protocol ELFNoteProtocol {
-    associatedtype Header: ELFNoteHeaderProtocol & LayoutWrapper
+    associatedtype Header: ELFNoteHeaderProtocol, LayoutWrapper
 
     var header: Header { get }
     var name: String? { get }

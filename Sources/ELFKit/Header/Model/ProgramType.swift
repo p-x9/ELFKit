@@ -180,7 +180,6 @@ extension ProgramType/*: RawRepresentable*/ {
             case (_, .aarch64, 0x70000001): self = .aarch64_unwind
             case (_, .aarch64, 0x70000002): self = .aarch64_memtag_mte
 
-
             case (_, .arm, 0x70000000): self = .arm_archext
             case (_, .arm, 0x70000001): self = .arm_exidx
 

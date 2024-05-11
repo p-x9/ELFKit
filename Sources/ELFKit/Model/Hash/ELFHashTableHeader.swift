@@ -29,7 +29,7 @@ extension ELF32HashTableHeader: ELFHashTableHeaderProtocol {
     public var numberOfBuckets: Int {
         numericCast(layout.nbuckets)
     }
-    
+
     public var numberOfChains: Int {
         numericCast(layout.nchain)
     }

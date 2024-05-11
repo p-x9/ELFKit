@@ -15,7 +15,7 @@ public protocol ELFSectionHeaderProtocol {
 
     var nameOffset: Int { get }
 
-    var _commonFlags: SectionFlags { get } 
+    var _commonFlags: SectionFlags { get }
     func flags(inELF header: ELFHeader) -> SectionFlags
 
     var address: Int { get }
@@ -32,7 +32,7 @@ public protocol ELFSectionHeaderProtocol {
 
     func _strings(in elf: ELFFile) -> ELFFile.Strings?
     func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
-    func _notes(in elf: ELFFile) ->  _ELFNotes<Note>?
+    func _notes(in elf: ELFFile) -> _ELFNotes<Note>?
     func _dynamics(in elf: ELFFile) -> Dynamics?
 
     func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader?
@@ -75,7 +75,7 @@ extension ELFSectionHeaderProtocol {
 
 // MARK: - Note
 extension ELFSectionHeaderProtocol {
-    public func _notes(in elf: ELFFile) ->  _ELFNotes<Note>? {
+    public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
         guard type(inELF: elf.header) == .note else { return nil }
         let data = elf.fileHandle.readData(
             offset: numericCast(offset),

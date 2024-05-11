@@ -86,7 +86,7 @@ extension ELFGnuHashTableProtocol {
         }
         var ix: UInt32 = numericCast(maxBucket)
         var chain: Hashelt = elf.fileHandle.read(
-            offset: numericCast(chainsOffset) 
+            offset: numericCast(chainsOffset)
             + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
         )
         while (chain & 1) == 0 {

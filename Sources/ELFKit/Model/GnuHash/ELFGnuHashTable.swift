@@ -95,7 +95,7 @@ extension ELF32GnuHashTable {
             let name = current.name(in: elf, isDynamic: true)
             let nhash: UInt32 = elf.fileHandle.read(
                 offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx))
-            if (hash|1) == (nhash|1) && name == symbol {
+            if (hash | 1) == (nhash | 1) && name == symbol {
                 return current
             }
             if (hash & 1) != 0 { break }
@@ -142,7 +142,7 @@ extension ELF64GnuHashTable {
             let name = current.name(in: elf, isDynamic: true)
             let nhash: UInt32 = elf.fileHandle.read(
                 offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx))
-            if (hash|1) == (nhash|1) && name == symbol {
+            if (hash | 1) == (nhash | 1) && name == symbol {
                 return current
             }
             if (hash & 1) != 0 { break }

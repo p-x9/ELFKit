@@ -292,7 +292,6 @@ public enum SectionType: CaseIterable {
     case x86_64_unwind
 }
 
-
 extension SectionType/*: RawRepresentable*/ {
     public typealias RawValue = UInt32
 

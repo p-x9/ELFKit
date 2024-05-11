@@ -62,7 +62,7 @@ extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
     public var nameOffset: Int {
         numericCast(layout.vda_name)
     }
-    
+
     public var nextOffset: Int {
         numericCast(layout.vda_next)
     }
