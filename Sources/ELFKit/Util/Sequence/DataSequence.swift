@@ -11,14 +11,42 @@ import Foundation
 public struct DataSequence<T>: Sequence {
     public typealias Element = T
 
-    let data: Data
-    let numberOfElements: Int
+    private let data: Data
+    private let entrySize: Int
+    private let numberOfElements: Int
+
+    @_spi(Support)
+    public init(
+        data: Data,
+        numberOfElements: Int
+    ) {
+        self.data = data
+        self.entrySize = MemoryLayout<Element>.size
+        self.numberOfElements = numberOfElements
+    }
+
+    @_spi(Support)
+    public init(
+        data: Data,
+        entrySize: Int
+    ) {
+        self.data = data
+        self.entrySize = entrySize
+        self.numberOfElements = data.count / entrySize
+    }
 
     public func makeIterator() -> Iterator {
         Iterator(
             data: data,
+            entrySize: entrySize,
             numberOfElements: numberOfElements
         )
+    }
+}
+
+extension DataSequence {
+    public var size: Int {
+        data.count
     }
 }
 
@@ -27,6 +55,7 @@ extension DataSequence {
         public typealias Element = T
 
         private let data: Data
+        private let entrySize: Int
         private let numberOfElements: Int
 
         private var nextIndex: Int = 0
@@ -34,19 +63,21 @@ extension DataSequence {
 
         init(
             data: Data,
+            entrySize: Int,
             numberOfElements: Int
         ) {
             self.data = data
+            self.entrySize = entrySize
             self.numberOfElements = numberOfElements
         }
 
         public mutating func next() -> Element? {
             guard nextIndex < numberOfElements else { return nil }
-            guard nextOffset < data.count else { return nil }
+            guard nextOffset + entrySize <= data.count else { return nil }
 
             defer {
                 nextIndex += 1
-                nextOffset += MemoryLayout<Element>.size
+                nextOffset += entrySize
             }
 
             return data.withUnsafeBytes {
@@ -70,12 +101,14 @@ extension DataSequence: Collection {
     public subscript(position: Int) -> Element {
         precondition(position >= 0)
         precondition(position < endIndex)
+        precondition(data.count >= (position + 1) * entrySize)
         return data.withUnsafeBytes {
-            guard let baseAddress = $0.baseAddress else { fatalError() }
+            guard let baseAddress = $0.baseAddress else {
+                fatalError("data is empty")
+            }
             return baseAddress
-                .assumingMemoryBound(to: Element.self)
-                .advanced(by: position)
-                .pointee
+                .advanced(by: position * entrySize)
+                .load(as: Element.self)
         }
     }
 }

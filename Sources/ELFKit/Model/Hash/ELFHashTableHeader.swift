@@ -58,7 +58,7 @@ extension ELFHashTableHeaderProtocol where Self: LayoutWrapper {
             numberOfElements: header.numberOfBuckets
         )
 
-        let chainStart: Int = bucketStart + buckets.data.count
+        let chainStart: Int = bucketStart + buckets.size
         let chains: DataSequence<Table.Hashelt> = elf.fileHandle.readDataSequence(
             offset: numericCast(chainStart),
             numberOfElements: header.numberOfChains
