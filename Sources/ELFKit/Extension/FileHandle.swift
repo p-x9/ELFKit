@@ -9,7 +9,8 @@
 import Foundation
 
 extension FileHandle {
-    func readDataSequence<Element>(
+    @_spi(Support)
+    public func readDataSequence<Element>(
         offset: UInt64,
         numberOfElements: Int,
         swapHandler: ((inout Data) -> Void)? = nil
@@ -18,6 +19,10 @@ extension FileHandle {
         let size = Element.layoutSize * numberOfElements
         var data = readData(
             ofLength: size
+        )
+        precondition(
+            Element.layoutSize == MemoryLayout<Element>.size,
+            "Invalid Layout Size"
         )
         precondition(
             data.count >= size,
@@ -30,8 +35,9 @@ extension FileHandle {
         )
     }
 
+    @_spi(Support)
     @_disfavoredOverload
-    func readDataSequence<Element>(
+    public func readDataSequence<Element>(
         offset: UInt64,
         numberOfElements: Int,
         swapHandler: ((inout Data) -> Void)? = nil
@@ -51,16 +57,72 @@ extension FileHandle {
             numberOfElements: numberOfElements
         )
     }
+
+    @_spi(Support)
+    public func readDataSequence<Element>(
+        offset: UInt64,
+        entrySize: Int,
+        numberOfElements: Int,
+        swapHandler: ((inout Data) -> Void)? = nil
+    ) -> DataSequence<Element> where Element: LayoutWrapper {
+        seek(toFileOffset: offset)
+        let size = entrySize * numberOfElements
+        var data = readData(
+            ofLength: size
+        )
+        precondition(
+            Element.layoutSize == MemoryLayout<Element>.size,
+            "Invalid Layout Size"
+        )
+        precondition(
+            data.count >= size,
+            "Invalid Data Size"
+        )
+        if let swapHandler { swapHandler(&data) }
+        return .init(
+            data: data,
+            entrySize: entrySize
+        )
+    }
+
+    @_spi(Support)
+    @_disfavoredOverload
+    public func readDataSequence<Element>(
+        offset: UInt64,
+        entrySize: Int,
+        numberOfElements: Int,
+        swapHandler: ((inout Data) -> Void)? = nil
+    ) -> DataSequence<Element> {
+        seek(toFileOffset: offset)
+        let size = entrySize * numberOfElements
+        var data = readData(
+            ofLength: size
+        )
+        precondition(
+            data.count >= size,
+            "Invalid Data Size"
+        )
+        if let swapHandler { swapHandler(&data) }
+        return .init(
+            data: data,
+            entrySize: entrySize
+        )
+    }
 }
 
 extension FileHandle {
-    func read<Element>(
+    @_spi(Support)
+    public func read<Element>(
         offset: UInt64,
         swapHandler: ((inout Data) -> Void)? = nil
     ) -> Optional<Element> where Element: LayoutWrapper {
         seek(toFileOffset: offset)
         var data = readData(
             ofLength: Element.layoutSize
+        )
+        precondition(
+            Element.layoutSize == MemoryLayout<Element>.size,
+            "Invalid Layout Size"
         )
         precondition(
             data.count >= Element.layoutSize,
@@ -72,7 +134,8 @@ extension FileHandle {
         }
     }
 
-    func read<Element>(
+    @_spi(Support)
+    public func read<Element>(
         offset: UInt64,
         swapHandler: ((inout Data) -> Void)? = nil
     ) -> Optional<Element> {
@@ -90,13 +153,18 @@ extension FileHandle {
         }
     }
 
-    func read<Element>(
+    @_spi(Support)
+    public func read<Element>(
         offset: UInt64,
         swapHandler: ((inout Data) -> Void)? = nil
     ) -> Element where Element: LayoutWrapper {
         seek(toFileOffset: offset)
         var data = readData(
             ofLength: Element.layoutSize
+        )
+        precondition(
+            Element.layoutSize == MemoryLayout<Element>.size,
+            "Invalid Layout Size"
         )
         precondition(
             data.count >= Element.layoutSize,
@@ -108,7 +176,8 @@ extension FileHandle {
         }
     }
 
-    func read<Element>(
+    @_spi(Support)
+    public func read<Element>(
         offset: UInt64,
         swapHandler: ((inout Data) -> Void)? = nil
     ) -> Element {
@@ -128,7 +197,8 @@ extension FileHandle {
 }
 
 extension FileHandle {
-    func readString(
+    @_spi(Support)
+    public func readString(
         offset: UInt64,
         size: Int
     ) -> String? {
@@ -139,7 +209,26 @@ extension FileHandle {
         return String(cString: data)
     }
 
-    func readData(
+    @_spi(Support)
+    public func readString(
+        offset: UInt64,
+        step: UInt64 = 10
+    ) -> String? {
+        var data = Data()
+        var offset = offset
+        while true {
+            let new = readData(offset: offset, size: Int(step))
+            if new.isEmpty { break }
+            data.append(new)
+            if new.contains(0) { break }
+            offset += UInt64(new.count)
+        }
+
+        return String(cString: data)
+    }
+
+    @_spi(Support)
+    public func readData(
         offset: UInt64,
         size: Int
     ) -> Data {
