@@ -26,3 +26,12 @@ public protocol ELFDynamicProtocol {
     var value: Int { get }
     var pointer: Int { get }
 }
+
+extension ELFDynamicProtocol {
+    public func pointer(for elf: ELFImage) -> UnsafeRawPointer? {
+        if Int(bitPattern: elf.ptr) > pointer {
+            return elf.ptr.advanced(by: pointer)
+        }
+        return UnsafeRawPointer(bitPattern: pointer)
+    }
+}

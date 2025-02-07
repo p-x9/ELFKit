@@ -37,18 +37,18 @@ where Element == Dynamic,
 
     func symbolInfos(in elf: ELFImage) -> MemorySequence<Dynamic.SymbolInfo>?
 
-//    func relocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    func relocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
     var flags1: DynamicFlags1 { get }
 
     var numberOfVersionDefs: Int? { get }
-//    func _versionDef(in elf: ELFImage) -> Dynamic.VersionDef?
-//    func versionDefs(in elf: ELFImage) -> [Dynamic.VersionDef]
+    func _versionDef(in elf: ELFImage) -> Dynamic.VersionDef?
+    func versionDefs(in elf: ELFImage) -> [Dynamic.VersionDef]
 
     var numberOfVersionNeeds: Int? { get }
-//    func _versionNeed(in elf: ELFImage) -> Dynamic.VersionNeed?
-//    func versionNeeds(in elf: ELFImage) -> [Dynamic.VersionNeed]
+    func _versionNeed(in elf: ELFImage) -> Dynamic.VersionNeed?
+    func versionNeeds(in elf: ELFImage) -> [Dynamic.VersionNeed]
 
     func versionSyms(in elf: ELFImage) -> MemorySequence<Dynamic.VersionSym>?
 }
@@ -79,7 +79,7 @@ extension ELFImageDynamicsSequence {
         guard let _strtab, let _strsiz else {
             return nil
         }
-        guard let pointer = UnsafeRawPointer(bitPattern: _strtab.pointer) else {
+        guard let pointer = _strtab.pointer(for: elf) else {
             return nil
         }
         let size = _strsiz.value
@@ -131,7 +131,7 @@ extension ELFImageDynamicsSequence {
 extension ELFImageDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
     public func hashTableHeader(in elf: ELFImage) -> Dynamic.HashTableHeader? {
         guard let _hash else { return nil }
-        guard let pointer = UnsafeRawPointer(bitPattern: _hash.pointer) else {
+        guard let pointer = _hash.pointer(for: elf) else {
             return nil
         }
         return pointer.autoBoundPointee()
@@ -142,7 +142,7 @@ extension ELFImageDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper 
         guard let header = hashTableHeader(in: elf) else {
             return nil
         }
-        guard let pointer = UnsafeRawPointer(bitPattern: _hash.pointer) else {
+        guard let pointer = _hash.pointer(for: elf) else {
             return nil
         }
         return header._readContent(
@@ -156,7 +156,7 @@ extension ELFImageDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper 
 extension ELFImageDynamicsSequence {
     public func gnuHashTableHeader(in elf: ELFImage) -> ELFGnuHashTableHeader? {
         guard let gnu_hash = _gnu_hash(inELF: elf.header) else { return nil }
-        guard let pointer = UnsafeRawPointer(bitPattern: gnu_hash.pointer) else {
+        guard let pointer = gnu_hash.pointer(for: elf) else {
             return nil
         }
         return pointer.autoBoundPointee()
@@ -167,7 +167,7 @@ extension ELFImageDynamicsSequence {
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
         }
-        guard let pointer = UnsafeRawPointer(bitPattern: gnu_hash.pointer) else {
+        guard let pointer = gnu_hash.pointer(for: elf) else {
             return nil
         }
         return header._readContent(
@@ -193,7 +193,7 @@ extension ELFImageDynamicsSequence {
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
         }
-        guard let pointer = UnsafeRawPointer(bitPattern: _symtab.pointer) else {
+        guard let pointer = _symtab.pointer(for: elf) else {
             return nil
         }
         return .init(
@@ -231,7 +231,7 @@ extension ELFImageDynamicsSequence {
 extension ELFImageDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
     public func symbolInfos(in elf: ELFImage) -> MemorySequence<Dynamic.SymbolInfo>? {
         guard let _syminfo, let _syminsz else { return nil }
-        guard let pointer = UnsafeRawPointer(bitPattern: _syminfo.pointer) else {
+        guard let pointer = _syminfo.pointer(for: elf) else {
             return nil
         }
         return .init(
@@ -266,16 +266,16 @@ extension ELFImageDynamicsSequence {
         return numericCast(_verdefnum.value)
     }
 
-//    public func versionDefs(in elf: ELFImage) -> [Dynamic.VersionDef] {
-//        var def = _versionDef(in: elf)
-//        var defs: [Dynamic.VersionDef] = []
-//        while def != nil {
-//            guard let _def = def else { break }
-//            defs.append(_def)
-//            def = _def._next(in: elf)
-//        }
-//        return defs
-//    }
+    public func versionDefs(in elf: ELFImage) -> [Dynamic.VersionDef] {
+        var def = _versionDef(in: elf)
+        var defs: [Dynamic.VersionDef] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
 }
 
 // MARK: - Verson Needs
@@ -285,16 +285,16 @@ extension ELFImageDynamicsSequence {
         return numericCast(_verneednum.value)
     }
 
-//    public func versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed] {
-//        var def = _versionNeed(in: elf)
-//        var defs: [Dynamic.VersionNeed] = []
-//        while def != nil {
-//            guard let _def = def else { break }
-//            defs.append(_def)
-//            def = _def._next(in: elf)
-//        }
-//        return defs
-//    }
+    public func versionNeeds(in elf: ELFImage) -> [Dynamic.VersionNeed] {
+        var def = _versionNeed(in: elf)
+        var defs: [Dynamic.VersionNeed] = []
+        while def != nil {
+            guard let _def = def else { break }
+            defs.append(_def)
+            def = _def._next(in: elf)
+        }
+        return defs
+    }
 }
 
 // MARK: - Version Syms
@@ -304,7 +304,7 @@ extension ELFImageDynamicsSequence {
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
         }
-        guard let pointer = UnsafeRawPointer(bitPattern: _versym.pointer) else {
+        guard let pointer = _versym.pointer(for: elf) else {
             return nil
         }
         return .init(

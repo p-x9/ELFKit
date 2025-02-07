@@ -16,4 +16,7 @@ public protocol ELFVersionDefAuxProtocol {
 
     func name(in elf: ELFFile) -> String?
     func _next(in elf: ELFFile) -> Self?
+
+    func name(in elf: ELFImage) -> String?
+    func _next(in elf: ELFImage) -> Self?
 }
