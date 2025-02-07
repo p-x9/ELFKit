@@ -155,6 +155,28 @@ extension ELFImage {
 }
 
 extension ELFImage {
+    public var dynamicSymbols32: MemorySequence<ELF32Symbol>? {
+        guard !is64Bit else { return nil }
+        return dynamics32?.symbols(in: self)
+    }
+
+    public var dynamicSymbols64: MemorySequence<ELF64Symbol>? {
+        guard is64Bit else { return nil}
+        return dynamics64?.symbols(in: self)
+    }
+
+    public var dynamicSymbols: [ELFSymbolProtocol] {
+        if is64Bit, let dynamicSymbols64 {
+            return Array(dynamicSymbols64)
+        } else if let dynamicSymbols32 {
+            return Array(dynamicSymbols32)
+        } else {
+            return []
+        }
+    }
+}
+
+extension ELFImage {
 //    public var stringTable: Strings? {
 //        if let sections64,
 //           let strtab = sections64._strtab(in: self) {
