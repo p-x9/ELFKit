@@ -44,6 +44,58 @@ public struct ELFImage {
     }
 }
 
+#if os(Linux)
+extension ELFImage {
+    public init?(name: String) {
+        var image = Ref<ELFImage?>(targetName: name, value: nil)
+
+        let callback: IteratePhdrCallback = { info, size, _image in
+            guard let info = info?.pointee else { return 0 }
+            guard let path = info.dlpi_name.flatMap({ String(cString: $0) }) else {
+                return 0
+            }
+            let imageName = path
+                .components(separatedBy: "/")
+                .last?
+                .components(separatedBy: ".")
+                .first
+
+            guard let _image else { return 1 }
+            let image = _image.assumingMemoryBound(to: Ref<ELFImage?>.self)
+
+            guard imageName == image.pointee.targetName else { return 0 }
+
+            guard let ptr = UnsafeRawPointer(bitPattern: UInt(info.dlpi_addr)) else {
+                return 1 // stop iterate
+            }
+            guard let elf = try? ELFImage(ptr: ptr) else { return 1 }
+            image.pointee.set(elf)
+
+            return 1
+        }
+
+        dl_iterate_phdr(callback, &image)
+
+        guard let image = image.value else { return nil }
+        self = image
+    }
+}
+
+fileprivate class Ref<T> {
+    let targetName: String
+    private(set) var value: T
+
+    init(targetName: String, value: T) {
+        self.targetName = targetName
+        self.value = value
+    }
+
+    func set(_ value: T) {
+        self.value = value
+    }
+}
+#endif
+
 extension ELFImage {
     public var programs32: MemorySequence<ELF32ProgramHeader>? {
         guard !is64Bit else { return nil }
