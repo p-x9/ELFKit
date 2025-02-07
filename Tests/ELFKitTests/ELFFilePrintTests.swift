@@ -305,7 +305,7 @@ extension ELFFilePrintTests {
         let note = elf.sections
             .compactMap { $0._notes(in: elf) }
             .flatMap { $0 }
-            .compactMap { $0.gnuNoteContent(in: elf) }
+            .compactMap { $0.gnuNoteContent }
             .first(where: { $0.type == .abi_tag })
         guard let note,
               case let .abi_tag(abiTag) = note else {
@@ -318,7 +318,7 @@ extension ELFFilePrintTests {
         let note = elf.sections
             .compactMap { $0._notes(in: elf) }
             .flatMap { $0 }
-            .compactMap { $0.gnuNoteContent(in: elf) }
+            .compactMap { $0.gnuNoteContent}
             .first(where: { $0.type == .build_id })
         guard let note,
               case let .build_id(id) = note else {
@@ -331,7 +331,7 @@ extension ELFFilePrintTests {
         let note = elf.sections
             .compactMap { $0._notes(in: elf) }
             .flatMap { $0 }
-            .compactMap { $0.gnuNoteContent(in: elf) }
+            .compactMap { $0.gnuNoteContent }
             .first(where: { $0.type == .gold_version })
         guard let note,
               case let .gold_version(id) = note else {
