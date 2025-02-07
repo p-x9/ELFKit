@@ -11,7 +11,7 @@ import Foundation
 public protocol ELFProgramHeaderProtocol {
     associatedtype Relocation: ELFRelocationProtocol
     associatedtype Note: ELFNoteProtocol
-    associatedtype Dynamics: ELFFileDynamicsSequence
+    associatedtype Dynamic: ELFDynamicProtocol
 
     var _commonType: ProgramType? { get }
     func type(inELF header: ELFHeader) -> ProgramType?
@@ -27,7 +27,9 @@ public protocol ELFProgramHeaderProtocol {
     var align: Int { get }
 
     func _notes(in elf: ELFFile) -> _ELFNotes<Note>?
-    func _dynamics(in elf: ELFFile) -> Dynamics?
+    func _dynamics(in elf: ELFFile) -> DataSequence<Dynamic>?
+
+    func _dynamics(in elf: ELFImage) -> MemorySequence<Dynamic>?
 }
 
 extension ELFProgramHeaderProtocol {
@@ -51,13 +53,24 @@ extension ELFProgramHeaderProtocol {
     }
 }
 
-extension ELFProgramHeaderProtocol {
-    public func _dynamics(in elf: ELFFile) -> Dynamics? {
+extension ELFProgramHeaderProtocol where Dynamic: LayoutWrapper {
+    public func _dynamics(in elf: ELFFile) -> DataSequence<Dynamic>? {
         guard type(inELF: elf.header) == .dynamic else { return nil }
-        let count = fileSize / Dynamics.Dynamic.layoutSize
-        return .init(
-            elf.fileHandle.readDataSequence(
+        let count = fileSize / Dynamic.layoutSize
+        return elf.fileHandle.readDataSequence(
                 offset: UInt64(offset),
+                numberOfElements: count
+            )
+    }
+
+    public func _dynamics(in elf: ELFImage) -> MemorySequence<Dynamic>? {
+        guard type(inELF: elf.header) == .dynamic else { return nil }
+        let count = fileSize / Dynamic.layoutSize
+        return .init(
+            .init(
+                basePointer: elf.ptr
+                    .advanced(by: virtualAddress)
+                    .assumingMemoryBound(to: Dynamic.self),
                 numberOfElements: count
             )
         )
