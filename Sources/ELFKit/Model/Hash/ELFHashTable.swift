@@ -52,7 +52,6 @@ public struct ELF64HashTable: ELFHashTableProtocol {
 }
 
 extension ELF32HashTable {
-    // ref: https://flapenguin.me/elf-dt-hash
     public func findSymbol(
         named symbol: String,
         in elf: ELFFile
@@ -61,6 +60,68 @@ extension ELF32HashTable {
               let symbols = dynamics.symbols(in: elf) else {
             return nil
         }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            symbols: symbols
+        )
+    }
+
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics32,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            symbols: symbols
+        )
+    }
+}
+
+extension ELF64HashTable {
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFFile
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics64,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            symbols: symbols
+        )
+    }
+
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics64,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            symbols: symbols
+        )
+    }
+}
+
+extension ELFHashTableProtocol {
+    // ref: https://flapenguin.me/elf-dt-hash
+    fileprivate func _findSymbol(
+        named symbol: String,
+        in elf: ELFFile,
+        symbols: DataSequence<Symbol>
+    ) -> Symbol? {
         let hashTable = self
         let header = hashTable.header
 
@@ -80,18 +141,12 @@ extension ELF32HashTable {
         }
         return nil
     }
-}
 
-extension ELF64HashTable {
-    // ref: https://flapenguin.me/elf-dt-hash
-    public func findSymbol(
+    fileprivate func _findSymbol(
         named symbol: String,
-        in elf: ELFFile
+        in elf: ELFImage,
+        symbols: MemorySequence<Symbol>
     ) -> Symbol? {
-        guard let dynamics = elf.dynamics64,
-              let symbols = dynamics.symbols(in: elf) else {
-            return nil
-        }
         let hashTable = self
         let header = hashTable.header
 

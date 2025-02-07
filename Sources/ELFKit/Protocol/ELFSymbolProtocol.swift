@@ -23,6 +23,12 @@ public protocol ELFSymbolProtocol {
 
     var _commonSpecialSection: SpecialSectionIndex? { get }
     func specialSection(inELF header: ELFHeader) -> SpecialSectionIndex?
+
+    func name(in elf: ELFFile, isDynamic: Bool) -> String?
+    func demangledName(in elf: ELFFile, isDynamic: Bool) -> String?
+
+    func name(in elf: ELFImage, isDynamic: Bool) -> String?
+    func demangledName(in elf: ELFImage, isDynamic: Bool) -> String?
 }
 
 extension ELFSymbolProtocol {
@@ -36,10 +42,29 @@ extension ELFSymbolProtocol {
         guard let strings else { return nil }
         return strings.string(at: nameOffset)?.string
     }
+
+    public func name(in elf: ELFImage, isDynamic: Bool) -> String? {
+        var strings: ELFImage.Strings?
+        if isDynamic {
+            strings = elf.dynamicStringTable
+        } else {
+            // FIXME: section is not available
+            // strings = elf.stringTable
+        }
+        guard let strings else { return nil }
+        return strings.string(at: nameOffset)?.string
+    }
 }
 
 extension ELFSymbolProtocol {
     public func demangledName(in elf: ELFFile, isDynamic: Bool) -> String? {
+        guard let name = name(in: elf, isDynamic: isDynamic) else {
+            return nil
+        }
+        return stdlib_demangleName(name)
+    }
+
+    public func demangledName(in elf: ELFImage, isDynamic: Bool) -> String? {
         guard let name = name(in: elf, isDynamic: isDynamic) else {
             return nil
         }

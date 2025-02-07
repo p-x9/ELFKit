@@ -25,6 +25,7 @@ public protocol ELFHashTableProtocol {
     init(header: Header, buckets: [Hashelt], chains: [Hashelt])
 
     func findSymbol(named symbol: String, in elf: ELFFile) -> Symbol?
+    func findSymbol(named symbol: String, in elf: ELFImage) -> Symbol?
 
     static func hash(for name: String) -> Int
 }
@@ -57,6 +58,14 @@ extension ELFHashTableProtocol {
     ) -> (any ELFSymbolProtocol)? {
         findSymbol(named: symbol, in: elf)
     }
+
+    @_disfavoredOverload
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
+    ) -> (any ELFSymbolProtocol)? {
+        findSymbol(named: symbol, in: elf)
+    }
 }
 
 public protocol ELFGnuHashTableProtocol {
@@ -73,13 +82,17 @@ public protocol ELFGnuHashTableProtocol {
 
     init(header: ELFGnuHashTableHeader, bloom: [Bloom], buckets: [Hashelt], chainsOffset: Int)
 
+    func numberOfSymbols(in elf: ELFFile) -> Int?
+    func numberOfSymbols(in elf: ELFImage) -> Int?
+
     func findSymbol(named symbol: String, in elf: ELFFile) -> Symbol?
+    func findSymbol(named symbol: String, in elf: ELFImage) -> Symbol?
 
     static func hash(for name: String) -> Int
 }
 
 extension ELFGnuHashTableProtocol {
-    func numberOfSymbols(in elf: ELFFile) -> Int? {
+    public func numberOfSymbols(in elf: ELFFile) -> Int? {
         // https://flapenguin.me/elf-dt-gnu-hash
         guard let maxBucket = buckets.max() else {
             return nil
@@ -99,7 +112,7 @@ extension ELFGnuHashTableProtocol {
         return numericCast(ix) + 1 // First `STN_UNDEF` symbol
     }
 
-    func numberOfSymbols(in elf: ELFImage) -> Int? {
+    public func numberOfSymbols(in elf: ELFImage) -> Int? {
         // https://flapenguin.me/elf-dt-gnu-hash
         guard let maxBucket = buckets.max() else {
             return nil
@@ -144,6 +157,14 @@ extension ELFGnuHashTableProtocol {
     public func findSymbol(
         named symbol: String,
         in elf: ELFFile
+    ) -> (any ELFSymbolProtocol)? {
+        findSymbol(named: symbol, in: elf)
+    }
+
+    @_disfavoredOverload
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
     ) -> (any ELFSymbolProtocol)? {
         findSymbol(named: symbol, in: elf)
     }
