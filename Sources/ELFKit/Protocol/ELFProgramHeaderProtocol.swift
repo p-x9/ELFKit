@@ -29,6 +29,7 @@ public protocol ELFProgramHeaderProtocol {
     func _notes(in elf: ELFFile) -> _ELFNotes<Note>?
     func _dynamics(in elf: ELFFile) -> DataSequence<Dynamic>?
 
+    func _notes(in elf: ELFImage) -> _ELFNotes<Note>?
     func _dynamics(in elf: ELFImage) -> MemorySequence<Dynamic>?
 }
 
@@ -44,6 +45,27 @@ extension ELFProgramHeaderProtocol {
 
     @_disfavoredOverload
     public func _notes(in elf: ELFFile) -> AnySequence<any ELFNoteProtocol>? {
+        guard let sequence: _ELFNotes<Note> = _notes(in: elf) else {
+            return nil
+        }
+        return AnySequence(sequence.map {
+            $0 as (any ELFNoteProtocol)
+        })
+    }
+}
+
+extension ELFProgramHeaderProtocol {
+    public func _notes(in elf: ELFImage) -> _ELFNotes<Note>? {
+        guard type(inELF: elf.header) == .note else { return nil }
+        let data: Data = .init(
+            bytes: elf.ptr.advanced(by: virtualAddress),
+            count: memorySize
+        )
+        return .init(data: data)
+    }
+
+    @_disfavoredOverload
+    public func _notes(in elf: ELFImage) -> AnySequence<any ELFNoteProtocol>? {
         guard let sequence: _ELFNotes<Note> = _notes(in: elf) else {
             return nil
         }
