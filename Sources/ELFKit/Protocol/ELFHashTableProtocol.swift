@@ -94,7 +94,8 @@ public protocol ELFGnuHashTableProtocol {
 extension ELFGnuHashTableProtocol {
     public func numberOfSymbols(in elf: ELFFile) -> Int? {
         // https://flapenguin.me/elf-dt-gnu-hash
-        guard let maxBucket = buckets.max() else {
+        guard let maxBucket = buckets.max(),
+              0 < maxBucket else {
             return nil
         }
         var ix: UInt32 = numericCast(maxBucket)
@@ -114,7 +115,8 @@ extension ELFGnuHashTableProtocol {
 
     public func numberOfSymbols(in elf: ELFImage) -> Int? {
         // https://flapenguin.me/elf-dt-gnu-hash
-        guard let maxBucket = buckets.max() else {
+        guard let maxBucket = buckets.max(),
+              0 < maxBucket else {
             return nil
         }
         var ix: UInt32 = numericCast(maxBucket)
