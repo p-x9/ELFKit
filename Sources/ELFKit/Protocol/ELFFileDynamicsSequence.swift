@@ -20,21 +20,33 @@ where Element == Dynamic,
 
     init(_ sequence: WrappedSequence)
 
+    func strings(in elf: ELFFile) -> ELFFile.Strings?
+    func neededs(in elf: ELFFile) -> [String]
+    func rpaths(in elf: ELFFile) -> [String]
+    func runpaths(in elf: ELFFile) -> [String]
+    func sharedObjectName(in elf: ELFFile) -> String?
+
     func hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader?
     func hashTable(in elf: ELFFile) -> Dynamic.HashTable?
 
+    func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader?
     func gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable?
 
     func numberOfSymbols(in elf: ELFFile) -> Int?
     func symbols(in elf: ELFFile) -> DataSequence<Dynamic.Symbol>?
 
-    func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
-
     func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>?
 
+    func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+
+    var flags: DynamicFlags { get }
+    var flags1: DynamicFlags1 { get }
+
+    var numberOfVersionDefs: Int? { get }
     func _versionDef(in elf: ELFFile) -> Dynamic.VersionDef?
     func versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef]
 
+    var numberOfVersionNeeds: Int? { get }
     func _versionNeed(in elf: ELFFile) -> Dynamic.VersionNeed?
     func versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed]
 
@@ -141,7 +153,7 @@ extension ELFFileDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
 // MARK: - GNU Hash Table
 extension ELFFileDynamicsSequence {
     public func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
-        guard let gnu_hash = _gnu_hash(in: elf) else { return nil }
+        guard let gnu_hash = _gnu_hash(inELF: elf.header) else { return nil }
         guard let offset = elf.fileOffset(of: gnu_hash.pointer) else {
             return nil
         }
@@ -151,7 +163,7 @@ extension ELFFileDynamicsSequence {
     }
 
     public func gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable? {
-        guard let gnu_hash = _gnu_hash(in: elf) else { return nil }
+        guard let gnu_hash = _gnu_hash(inELF: elf.header) else { return nil }
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
         }

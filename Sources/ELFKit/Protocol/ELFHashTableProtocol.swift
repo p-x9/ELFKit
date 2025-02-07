@@ -98,6 +98,30 @@ extension ELFGnuHashTableProtocol {
         }
         return numericCast(ix) + 1 // First `STN_UNDEF` symbol
     }
+
+    func numberOfSymbols(in elf: ELFImage) -> Int? {
+        // https://flapenguin.me/elf-dt-gnu-hash
+        guard let maxBucket = buckets.max() else {
+            return nil
+        }
+        var ix: UInt32 = numericCast(maxBucket)
+        var chain: Hashelt = elf.ptr
+            .advanced(
+                by: numericCast(chainsOffset)
+                      + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
+            )
+            .autoBoundPointee()
+        while (chain & 1) == 0 {
+            ix += 1
+            chain = elf.ptr
+                .advanced(
+                    by: numericCast(chainsOffset)
+                          + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
+                )
+                .autoBoundPointee()
+        }
+        return numericCast(ix) + 1 // First `STN_UNDEF` symbol
+    }
 }
 
 extension ELFGnuHashTableProtocol {

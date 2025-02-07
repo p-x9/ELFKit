@@ -46,6 +46,12 @@ public struct MemorySequence<T>: Sequence {
 }
 
 extension MemorySequence {
+    public var size: Int {
+        entrySize * numberOfElements
+    }
+}
+
+extension MemorySequence {
     public struct Iterator: IteratorProtocol {
         public typealias Element = T
 

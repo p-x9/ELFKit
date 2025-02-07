@@ -16,8 +16,8 @@ extension Sequence where Element: ELFDynamicProtocol {
     var _strsiz: Element? { first(where: { $0._commonTag == .strsz }) }
 
     var _hash: Element? { first(where: { $0._commonTag == .hash }) }
-    func _gnu_hash(in elf: ELFFile) -> Element? {
-        first(where: { $0.tag(inELF: elf.header) == .gnu_hash })
+    func _gnu_hash(inELF header: ELFHeader) -> Element? {
+        first(where: { $0.tag(inELF: header) == .gnu_hash })
     }
 
     var _symtab: Element? { first(where: { $0._commonTag == .symtab }) }
