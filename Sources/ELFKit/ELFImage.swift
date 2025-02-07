@@ -153,3 +153,68 @@ extension ELFImage {
         }
     }
 }
+
+extension ELFImage {
+//    public var stringTable: Strings? {
+//        if let sections64,
+//           let strtab = sections64._strtab(in: self) {
+//            return strtab._strings(in: self)
+//        } else if let sections32,
+//                  let strtab = sections32._strtab(in: self) {
+//            return strtab._strings(in: self)
+//        }
+//        return nil
+//    }
+
+    public var dynamicStringTable: Strings? {
+//        if let sections64,
+//           let dynstr = sections64._dynstr(in: self) {
+//            return dynstr._strings(in: self)
+//        } else if let sections32,
+//                  let dynstr = sections32._dynstr(in: self) {
+//            return dynstr._strings(in: self)
+//        }
+        if let dynamics64 {
+            return dynamics64.strings(in: self)
+        } else if let dynamics32 {
+            return dynamics32.strings(in: self)
+        }
+        return nil
+    }
+
+//    public var allCStringTables: [Strings] {
+//        sections.compactMap {
+//            $0._strings(in: self)
+//        }
+//    }
+}
+
+extension ELFImage {
+    /// List of runpaths
+    public var rpaths: [String] {
+        if let dynamics64 {
+            let rpaths = dynamics64.rpaths(in: self)
+            let runpaths = dynamics64.runpaths(in: self)
+            return rpaths + runpaths
+        }
+        if let dynamics32 {
+            let rpaths = dynamics32.rpaths(in: self)
+            let runpaths = dynamics32.runpaths(in: self)
+            return rpaths + runpaths
+        }
+        return []
+    }
+}
+
+extension ELFImage {
+    /// List of depended shared objects.
+    public var dependencies: [String] {
+        if let dynamics64 {
+            return dynamics64.neededs(in: self)
+        }
+        if let dynamics32 {
+            return dynamics32.neededs(in: self)
+        }
+        return []
+    }
+}
