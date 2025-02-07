@@ -11,18 +11,8 @@ import Foundation
 public protocol ELFImageDynamicsSequence<Dynamic>: RandomAccessCollection
 where Element == Dynamic,
       Iterator == WrappedSequence.Iterator,
-      Index == Int,
-      HashTable.Header == HashTableHeader {
+      Index == Int {
     associatedtype Dynamic: ELFDynamicProtocol, LayoutWrapper
-    associatedtype HashTableHeader: ELFHashTableHeaderProtocol, LayoutWrapper
-    associatedtype HashTable: ELFHashTableProtocol
-    associatedtype GnuHashTable: ELFGnuHashTableProtocol
-    associatedtype Symbol: ELFSymbolProtocol
-    associatedtype Relocation: ELFRelocationProtocol
-    associatedtype SymbolInfo: ELFSymbolInfoProtocol
-    associatedtype VersionDef: ELFVersionDefProtocol
-    associatedtype VersionNeed: ELFVersionNeedProtocol
-    associatedtype VersionSym: ELFVersionSymProtocol, LayoutWrapper
 
     typealias WrappedSequence = MemorySequence<Dynamic>
 

@@ -11,18 +11,8 @@ import Foundation
 public protocol ELFFileDynamicsSequence<Dynamic>: RandomAccessCollection
 where Element == Dynamic,
       Iterator == WrappedSequence.Iterator,
-      Index == Int,
-      HashTable.Header == HashTableHeader {
+      Index == Int {
     associatedtype Dynamic: ELFDynamicProtocol, LayoutWrapper
-    associatedtype HashTableHeader: ELFHashTableHeaderProtocol, LayoutWrapper
-    associatedtype HashTable: ELFHashTableProtocol
-    associatedtype GnuHashTable: ELFGnuHashTableProtocol
-    associatedtype Symbol: ELFSymbolProtocol
-    associatedtype Relocation: ELFRelocationProtocol
-    associatedtype SymbolInfo: ELFSymbolInfoProtocol
-    associatedtype VersionDef: ELFVersionDefProtocol
-    associatedtype VersionNeed: ELFVersionNeedProtocol
-    associatedtype VersionSym: ELFVersionSymProtocol, LayoutWrapper
 
     typealias WrappedSequence = DataSequence<Dynamic>
 
@@ -30,25 +20,25 @@ where Element == Dynamic,
 
     init(_ sequence: WrappedSequence)
 
-    func hashTableHeader(in elf: ELFFile) -> HashTableHeader?
-    func hashTable(in elf: ELFFile) -> HashTable?
+    func hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader?
+    func hashTable(in elf: ELFFile) -> Dynamic.HashTable?
 
-    func gnuHashTable(in elf: ELFFile) -> GnuHashTable?
+    func gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable?
 
     func numberOfSymbols(in elf: ELFFile) -> Int?
-    func symbols(in elf: ELFFile) -> DataSequence<Symbol>?
+    func symbols(in elf: ELFFile) -> DataSequence<Dynamic.Symbol>?
 
-    func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
+    func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
-    func symbolInfos(in elf: ELFFile) -> DataSequence<SymbolInfo>?
+    func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>?
 
-    func _versionDef(in elf: ELFFile) -> VersionDef?
-    func versionDefs(in elf: ELFFile) -> [VersionDef]
+    func _versionDef(in elf: ELFFile) -> Dynamic.VersionDef?
+    func versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef]
 
-    func _versionNeed(in elf: ELFFile) -> VersionNeed?
-    func versionNeeds(in elf: ELFFile) -> [VersionNeed]
+    func _versionNeed(in elf: ELFFile) -> Dynamic.VersionNeed?
+    func versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed]
 
-    func versionSyms(in elf: ELFFile) -> DataSequence<VersionSym>?
+    func versionSyms(in elf: ELFFile) -> DataSequence<Dynamic.VersionSym>?
 }
 
 extension ELFFileDynamicsSequence {
@@ -122,8 +112,8 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: Hash Table
-extension ELFFileDynamicsSequence {
-    public func hashTableHeader(in elf: ELFFile) -> HashTableHeader? {
+extension ELFFileDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
+    public func hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader? {
         guard let _hash else { return nil }
         guard let offset = elf.fileOffset(of: _hash.pointer) else {
             return nil
@@ -133,7 +123,7 @@ extension ELFFileDynamicsSequence {
         )
     }
 
-    public func hashTable(in elf: ELFFile) -> HashTable? {
+    public func hashTable(in elf: ELFFile) -> Dynamic.HashTable? {
         guard let _hash else { return nil }
         guard let header = hashTableHeader(in: elf) else {
             return nil
@@ -160,7 +150,7 @@ extension ELFFileDynamicsSequence {
         )
     }
 
-    public func gnuHashTable(in elf: ELFFile) -> GnuHashTable? {
+    public func gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable? {
         guard let gnu_hash = _gnu_hash(in: elf) else { return nil }
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
@@ -186,7 +176,7 @@ extension ELFFileDynamicsSequence {
         return nil
     }
 
-    public func symbols(in elf: ELFFile) -> DataSequence<Symbol>? {
+    public func symbols(in elf: ELFFile) -> DataSequence<Dynamic.Symbol>? {
         guard let _symtab else { return nil }
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
@@ -225,15 +215,15 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - SymbolInfos
-extension ELFFileDynamicsSequence where SymbolInfo: LayoutWrapper {
-    public func symbolInfos(in elf: ELFFile) -> DataSequence<SymbolInfo>? {
+extension ELFFileDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
+    public func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>? {
         guard let _syminfo, let _syminsz else { return nil }
         guard let offset = elf.fileOffset(of: _syminfo.pointer) else {
             return nil
         }
         return elf.fileHandle.readDataSequence(
             offset: numericCast(offset),
-            numberOfElements: numericCast(_syminsz.value) / SymbolInfo.layoutSize
+            numberOfElements: numericCast(_syminsz.value) / Dynamic.SymbolInfo.layoutSize
         )
     }
 }
@@ -262,9 +252,9 @@ extension ELFFileDynamicsSequence {
         return numericCast(_verdefnum.value)
     }
 
-    public func versionDefs(in elf: ELFFile) -> [VersionDef] {
+    public func versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef] {
         var def = _versionDef(in: elf)
-        var defs: [VersionDef] = []
+        var defs: [Dynamic.VersionDef] = []
         while def != nil {
             guard let _def = def else { break }
             defs.append(_def)
@@ -281,9 +271,9 @@ extension ELFFileDynamicsSequence {
         return numericCast(_verneednum.value)
     }
 
-    public func versionNeeds(in elf: ELFFile) -> [VersionNeed] {
+    public func versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed] {
         var def = _versionNeed(in: elf)
-        var defs: [VersionNeed] = []
+        var defs: [Dynamic.VersionNeed] = []
         while def != nil {
             guard let _def = def else { break }
             defs.append(_def)
@@ -295,7 +285,7 @@ extension ELFFileDynamicsSequence {
 
 // MARK: - Version Syms
 extension ELFFileDynamicsSequence {
-    public func versionSyms(in elf: ELFFile) -> DataSequence<VersionSym>? {
+    public func versionSyms(in elf: ELFFile) -> DataSequence<Dynamic.VersionSym>? {
         guard let _versym else { return nil }
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil

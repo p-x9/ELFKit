@@ -18,7 +18,7 @@ public struct ELF64SectionHeader: LayoutWrapper {
 extension ELF64SectionHeader: ELFSectionHeaderProtocol {
     public typealias Relocation = ELF64Relocation
     public typealias Note = ELF64Note
-    public typealias Dynamics = ELFFile.Dynamics64
+    public typealias Dynamic = ELF64Dynamic
 
     public var nameOffset: Int { numericCast(layout.sh_name) }
 

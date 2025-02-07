@@ -12,6 +12,15 @@ import ELFKitC
 public struct ELF64Dynamic: LayoutWrapper {
     public typealias Layout = Elf64_Dyn
 
+    public typealias HashTable = ELF64HashTable
+    public typealias GnuHashTable = ELF64GnuHashTable
+    public typealias Symbol = ELF64Symbol
+    public typealias Relocation = ELF64Relocation
+    public typealias SymbolInfo = ELF64SymbolInfo
+    public typealias VersionDef = ELF64VersionDef
+    public typealias VersionNeed = ELF64VersionNeed
+    public typealias VersionSym = ELF64VersionSym
+
     public var layout: Layout
 }
 

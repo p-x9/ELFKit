@@ -9,6 +9,17 @@
 import Foundation
 
 public protocol ELFDynamicProtocol {
+    associatedtype HashTable: ELFHashTableProtocol
+    associatedtype GnuHashTable: ELFGnuHashTableProtocol
+    associatedtype Symbol: ELFSymbolProtocol
+    associatedtype Relocation: ELFRelocationProtocol
+    associatedtype SymbolInfo: ELFSymbolInfoProtocol
+    associatedtype VersionDef: ELFVersionDefProtocol
+    associatedtype VersionNeed: ELFVersionNeedProtocol
+    associatedtype VersionSym: ELFVersionSymProtocol
+
+    typealias HashTableHeader = HashTable.Header
+
     var _commonTag: DynamicTag? { get }
     func tag(inELF header: ELFHeader) -> DynamicTag?
 

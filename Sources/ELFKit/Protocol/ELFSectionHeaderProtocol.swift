@@ -11,7 +11,7 @@ import Foundation
 public protocol ELFSectionHeaderProtocol {
     associatedtype Relocation: ELFRelocationProtocol
     associatedtype Note: ELFNoteProtocol
-    associatedtype Dynamics: ELFFileDynamicsSequence
+    associatedtype Dynamic: ELFDynamicProtocol
 
     var nameOffset: Int { get }
 
@@ -33,21 +33,23 @@ public protocol ELFSectionHeaderProtocol {
     func _strings(in elf: ELFFile) -> ELFFile.Strings?
     func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
     func _notes(in elf: ELFFile) -> _ELFNotes<Note>?
-    func _dynamics(in elf: ELFFile) -> Dynamics?
+    func _dynamics(in elf: ELFFile) -> DataSequence<Dynamic>?
 
-    func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader?
-    func _hashTable(in elf: ELFFile) -> Dynamics.HashTable?
+    func _hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader?
+    func _hashTable(in elf: ELFFile) -> Dynamic.HashTable?
 
     func _gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader?
-    func _gnuHashTable(in elf: ELFFile) -> Dynamics.GnuHashTable?
+    func _gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable?
 
-    func _versionDef(in elf: ELFFile) -> Dynamics.VersionDef?
-    func _versionDefs(in elf: ELFFile) -> [Dynamics.VersionDef]?
+    func _versionDef(in elf: ELFFile) -> Dynamic.VersionDef?
+    func _versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef]?
 
-    func _versionNeed(in elf: ELFFile) -> Dynamics.VersionNeed?
-    func _versionNeeds(in elf: ELFFile) -> [Dynamics.VersionNeed]?
+    func _versionNeed(in elf: ELFFile) -> Dynamic.VersionNeed?
+    func _versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed]?
 
-    func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamics.VersionSym>?
+    func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamic.VersionSym>?
+
+    func _strings(in elf: ELFImage) -> ELFImage.Strings?
 }
 
 extension ELFSectionHeaderProtocol {
@@ -69,6 +71,16 @@ extension ELFSectionHeaderProtocol {
             elf: elf,
             offset: offset,
             size: size
+        )
+    }
+
+    public func _strings(in elf: ELFImage) -> ELFImage.Strings? {
+        guard type(inELF: elf.header) == .strtab else { return nil }
+        return .init(
+            basePointer: elf.ptr
+                .advanced(by: offset)
+                .assumingMemoryBound(to: UInt8.self),
+            tableSize: size
         )
     }
 }
@@ -96,10 +108,10 @@ extension ELFSectionHeaderProtocol {
 }
 
 // MARK: - Dynamics
-extension ELFSectionHeaderProtocol {
-    public func _dynamics(in elf: ELFFile) -> Dynamics? {
+extension ELFSectionHeaderProtocol where Dynamic: LayoutWrapper {
+    public func _dynamics(in elf: ELFFile) -> DataSequence<Dynamic>? {
         guard type(inELF: elf.header) == .dynamic else { return nil }
-        let count = size / Dynamics.Dynamic.layoutSize
+        let count = size / Dynamic.layoutSize
         return .init(
             elf.fileHandle.readDataSequence(
                 offset: UInt64(offset),
@@ -110,15 +122,15 @@ extension ELFSectionHeaderProtocol {
 }
 
 // MARK: - Hash Table
-extension ELFSectionHeaderProtocol {
-    public func _hashTableHeader(in elf: ELFFile) -> Dynamics.HashTableHeader? {
+extension ELFSectionHeaderProtocol where Dynamic.HashTableHeader: LayoutWrapper {
+    public func _hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader? {
         guard type(inELF: elf.header) == .hash else { return nil }
         return elf.fileHandle.read(
             offset: numericCast(offset)
         )
     }
 
-    public func _hashTable(in elf: ELFFile) -> Dynamics.HashTable? {
+    public func _hashTable(in elf: ELFFile) -> Dynamic.HashTable? {
         guard let header = _hashTableHeader(in: elf) else {
             return nil
         }
@@ -142,7 +154,7 @@ extension ELFSectionHeaderProtocol {
         )
     }
 
-    public func _gnuHashTable(in elf: ELFFile) -> Dynamics.GnuHashTable? {
+    public func _gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable? {
         guard let header = _gnuHashTableHeader(in: elf) else {
             return nil
         }
@@ -155,10 +167,10 @@ extension ELFSectionHeaderProtocol {
 
 // MARK: - Verson Defs
 extension ELFSectionHeaderProtocol {
-    public func _versionDefs(in elf: ELFFile) -> [Dynamics.VersionDef]? {
+    public func _versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef]? {
         var def = _versionDef(in: elf)
         if def == nil { return nil }
-        var defs: [Dynamics.VersionDef] = []
+        var defs: [Dynamic.VersionDef] = []
         while def != nil {
             guard let _def = def else { break }
             defs.append(_def)
@@ -170,10 +182,10 @@ extension ELFSectionHeaderProtocol {
 
 // MARK: - Verson Needs
 extension ELFSectionHeaderProtocol {
-    public func _versionNeeds(in elf: ELFFile) -> [Dynamics.VersionNeed]? {
+    public func _versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed]? {
         var def = _versionNeed(in: elf)
         if def == nil { return nil }
-        var defs: [Dynamics.VersionNeed] = []
+        var defs: [Dynamic.VersionNeed] = []
         while def != nil {
             guard let _def = def else { break }
             defs.append(_def)
@@ -184,12 +196,12 @@ extension ELFSectionHeaderProtocol {
 }
 
 // MARK: - Version Syms
-extension ELFSectionHeaderProtocol {
-    public func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamics.VersionSym>? {
+extension ELFSectionHeaderProtocol where Dynamic.VersionSym: LayoutWrapper {
+    public func _versionSyms(in elf: ELFFile) -> DataSequence<Dynamic.VersionSym>? {
         guard [.gnu_versym, .sunw_versym].contains(type(inELF: elf.header)) else {
             return nil
         }
-        let numberOfSymbols = size / Dynamics.VersionSym.layoutSize
+        let numberOfSymbols = size / Dynamic.VersionSym.layoutSize
         return elf.fileHandle.readDataSequence(
             offset: numericCast(offset),
             numberOfElements: numberOfSymbols
