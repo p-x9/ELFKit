@@ -25,7 +25,7 @@ public class ELFFile {
     /// ELF header
     public let header: ELFHeader
 
-    init(url: URL) throws {
+    public init(url: URL) throws {
         self.url = url
         self.fileHandle = try FileHandle(forReadingFrom: url)
 
