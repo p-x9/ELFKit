@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct ELFImage {
+public struct ELFImage: ELFRepresentable {
     /// Address of ELF header start
     public let ptr: UnsafeRawPointer
 
@@ -217,7 +217,7 @@ extension ELFImage {
         return dynamics64?.symbols(in: self)
     }
 
-    public var dynamicSymbols: [ELFSymbolProtocol] {
+    public var dynamicSymbols: [any ELFSymbolProtocol] {
         if is64Bit, let dynamicSymbols64 {
             return Array(dynamicSymbols64)
         } else if let dynamicSymbols32 {

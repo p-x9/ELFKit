@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class ELFFile {
+public final class ELFFile: ELFRepresentable {
     /// URL of the file actually loaded
     public let url: URL
 

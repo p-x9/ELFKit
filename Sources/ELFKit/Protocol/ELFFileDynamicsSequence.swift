@@ -8,12 +8,8 @@
 
 import Foundation
 
-public protocol ELFFileDynamicsSequence<Dynamic>: RandomAccessCollection
-where Element == Dynamic,
-      Iterator == WrappedSequence.Iterator,
-      Index == Int {
-    associatedtype Dynamic: ELFDynamicProtocol, LayoutWrapper
-
+public protocol ELFFileDynamicsSequence<Dynamic>: ELFDynamicsSequence
+where Iterator == WrappedSequence.Iterator {
     typealias WrappedSequence = DataSequence<Dynamic>
 
     var sequence: WrappedSequence { get }
