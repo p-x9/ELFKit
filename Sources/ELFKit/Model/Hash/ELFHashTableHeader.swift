@@ -69,4 +69,34 @@ extension ELFHashTableHeaderProtocol where Self: LayoutWrapper {
             chains: Array(chains)
         )
     }
+
+    func _readContent<Table: ELFHashTableProtocol>(
+        in elf: ELFImage,
+        at offset: Int
+    ) -> Table where Table.Header == Self {
+        var header: Self { self }
+
+        let bucketStart: Int = numericCast(offset) + numericCast(header.layoutSize)
+
+        let buckets: MemorySequence<Table.Hashelt> = .init(
+            basePointer: elf.ptr
+                .advanced(by: bucketStart)
+                .assumingMemoryBound(to: Table.Hashelt.self),
+            numberOfElements: header.numberOfBuckets
+        )
+
+        let chainStart: Int = bucketStart + buckets.size
+        let chains: MemorySequence<Table.Hashelt> = .init(
+            basePointer: elf.ptr
+                .advanced(by: chainStart)
+                .assumingMemoryBound(to: Table.Hashelt.self),
+            numberOfElements: header.numberOfChains
+        )
+
+        return .init(
+            header: header,
+            buckets: Array(buckets),
+            chains: Array(chains)
+        )
+    }
 }

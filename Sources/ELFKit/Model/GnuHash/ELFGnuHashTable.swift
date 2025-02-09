@@ -60,8 +60,6 @@ public struct ELF64GnuHashTable: ELFGnuHashTableProtocol {
 }
 
 extension ELF32GnuHashTable {
-    // ref: https://flapenguin.me/elf-dt-gnu-hash
-    // ref: https://github.com/bminor/glibc/blob/ea73eb5f581ef5931fd67005aa0c526ba43366c9/elf/dl-lookup.c#L340
     public func findSymbol(
         named symbol: String,
         in elf: ELFFile
@@ -70,9 +68,76 @@ extension ELF32GnuHashTable {
               let symbols = dynamics.symbols(in: elf) else {
             return nil
         }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            bits: 32,
+            symbols: symbols
+        )
+    }
+
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics32,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            bits: 32,
+            symbols: symbols
+        )
+    }
+}
+
+extension ELF64GnuHashTable {
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFFile
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics64,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            bits: 64,
+            symbols: symbols
+        )
+    }
+
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
+    ) -> Symbol? {
+        guard let dynamics = elf.dynamics64,
+              let symbols = dynamics.symbols(in: elf) else {
+            return nil
+        }
+        return _findSymbol(
+            named: symbol,
+            in: elf,
+            bits: 64,
+            symbols: symbols
+        )
+    }
+}
+
+fileprivate extension ELFGnuHashTableProtocol {
+    // ref: https://flapenguin.me/elf-dt-gnu-hash
+    // ref: https://github.com/bminor/glibc/blob/ea73eb5f581ef5931fd67005aa0c526ba43366c9/elf/dl-lookup.c#L340
+    func _findSymbol(
+        named symbol: String,
+        in elf: ELFFile,
+        bits: Int,
+        symbols: DataSequence<Symbol>
+    ) -> Symbol? {
         let hashTable = self
         let header = hashTable.header
-        let bits = 32
 
         let hash = Self.hash(for: symbol)
 
@@ -104,22 +169,15 @@ extension ELF32GnuHashTable {
 
         return nil
     }
-}
 
-extension ELF64GnuHashTable {
-    // ref: https://flapenguin.me/elf-dt-gnu-hash
-    // ref: https://github.com/bminor/glibc/blob/ea73eb5f581ef5931fd67005aa0c526ba43366c9/elf/dl-lookup.c#L340
-    public func findSymbol(
+    func _findSymbol(
         named symbol: String,
-        in elf: ELFFile
-    ) -> ELF64Symbol? {
-        guard let dynamics = elf.dynamics64,
-              let symbols = dynamics.symbols(in: elf) else {
-            return nil
-        }
+        in elf: ELFImage,
+        bits: Int,
+        symbols: MemorySequence<Symbol>
+    ) -> Symbol? {
         let hashTable = self
         let header = hashTable.header
-        let bits = 64
 
         let hash = Self.hash(for: symbol)
 
@@ -140,8 +198,11 @@ extension ELF64GnuHashTable {
         while true {
             let current = symbols[Int(symix)]
             let name = current.name(in: elf, isDynamic: true)
-            let nhash: UInt32 = elf.fileHandle.read(
-                offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx))
+            let nhash: UInt32 = elf.ptr
+                .advanced(
+                    by: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx)
+                )
+                .autoBoundPointee()
             if (hash | 1) == (nhash | 1) && name == symbol {
                 return current
             }

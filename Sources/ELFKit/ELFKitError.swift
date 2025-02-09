@@ -10,4 +10,5 @@ import Foundation
 
 public enum ELFKitError: Error {
     case invalidFile
+    case invalidPointer
 }

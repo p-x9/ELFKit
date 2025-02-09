@@ -16,6 +16,8 @@ public protocol ELFNoteProtocol {
     var descriptionData: Data? { get }
 
     init?(data: Data)
+
+    var gnuNoteContent: GnuNoteContent? { get }
 }
 
 extension ELFNoteProtocol {
@@ -33,7 +35,7 @@ extension ELFNoteProtocol {
 }
 
 extension ELFNoteProtocol {
-    public func gnuNoteContent(in elf: ELFFile) -> GnuNoteContent? {
+    public var gnuNoteContent: GnuNoteContent? {
         guard let name, name == "GNU",
               let descriptionData else {
             return nil

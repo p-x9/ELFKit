@@ -18,7 +18,7 @@ public struct ELF32ProgramHeader: LayoutWrapper {
 extension ELF32ProgramHeader: ELFProgramHeaderProtocol {
     public typealias Relocation = ELF32Relocation
     public typealias Note = ELF32Note
-    public typealias Dynamics = ELFFile.Dynamics32
+    public typealias Dynamic = ELF32Dynamic
 
     public var _commonType: ProgramType? {
         .init(

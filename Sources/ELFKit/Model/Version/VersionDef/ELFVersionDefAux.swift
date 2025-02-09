@@ -33,7 +33,9 @@ extension ELF32VersionDefAux: ELFVersionDefAuxProtocol {
     public var nextOffset: Int {
         numericCast(layout.vda_next)
     }
+}
 
+extension ELF32VersionDefAux {
     public func _next(in elf: ELFFile) -> Self? {
         guard nextOffset != 0 else {
             return nil
@@ -58,6 +60,31 @@ extension ELF32VersionDefAux: ELFVersionDefAuxProtocol {
     }
 }
 
+extension ELF32VersionDefAux {
+    public func _next(in elf: ELFImage) -> Self? {
+        guard nextOffset != 0 else {
+            return nil
+        }
+        let offset = self._offset + nextOffset
+        let layout: Layout = elf.ptr
+            .advanced(by: offset)
+            .autoBoundPointee()
+        return .init(
+            layout: layout,
+            _index: _index + 1,
+            _offset: offset
+        )
+    }
+
+    public func name(in elf: ELFImage) -> String? {
+        guard let dynamics = elf.dynamics32,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: nameOffset)?.string
+    }
+}
+
 extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
     public var nameOffset: Int {
         numericCast(layout.vda_name)
@@ -66,7 +93,9 @@ extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
     public var nextOffset: Int {
         numericCast(layout.vda_next)
     }
+}
 
+extension ELF64VersionDefAux {
     public func _next(in elf: ELFFile) -> Self? {
         guard nextOffset != 0 else {
             return nil
@@ -83,6 +112,31 @@ extension ELF64VersionDefAux: ELFVersionDefAuxProtocol {
     }
 
     public func name(in elf: ELFFile) -> String? {
+        guard let dynamics = elf.dynamics64,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: nameOffset)?.string
+    }
+}
+
+extension ELF64VersionDefAux {
+    public func _next(in elf: ELFImage) -> Self? {
+        guard nextOffset != 0 else {
+            return nil
+        }
+        let offset = self._offset + nextOffset
+        let layout: Layout = elf.ptr
+            .advanced(by: offset)
+            .autoBoundPointee()
+        return .init(
+            layout: layout,
+            _index: _index + 1,
+            _offset: offset
+        )
+    }
+
+    public func name(in elf: ELFImage) -> String? {
         guard let dynamics = elf.dynamics64,
               let strings = dynamics.strings(in: elf) else {
             return nil

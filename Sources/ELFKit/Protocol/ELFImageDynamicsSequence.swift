@@ -1,61 +1,61 @@
 //
-//  ELFFileDynamicsSequence.swift
+//  ELFImageDynamicsSequence.swift
+//  ELFKit
 //
-//
-//  Created by p-x9 on 2024/05/03
+//  Created by p-x9 on 2025/02/07
 //  
 //
 
 import Foundation
 
-public protocol ELFFileDynamicsSequence<Dynamic>: ELFDynamicsSequence
+public protocol ELFImageDynamicsSequence<Dynamic>: ELFDynamicsSequence
 where Iterator == WrappedSequence.Iterator {
-    typealias WrappedSequence = DataSequence<Dynamic>
+    typealias WrappedSequence = MemorySequence<Dynamic>
 
     var sequence: WrappedSequence { get }
 
     init(_ sequence: WrappedSequence)
 
-    func strings(in elf: ELFFile) -> ELFFile.Strings?
-    func neededs(in elf: ELFFile) -> [String]
-    func rpaths(in elf: ELFFile) -> [String]
-    func runpaths(in elf: ELFFile) -> [String]
-    func sharedObjectName(in elf: ELFFile) -> String?
+    func strings(in elf: ELFImage) -> ELFImage.Strings?
+    func neededs(in elf: ELFImage) -> [String]
+    func rpaths(in elf: ELFImage) -> [String]
+    func runpaths(in elf: ELFImage) -> [String]
+    func sharedObjectName(in elf: ELFImage) -> String?
 
-    func hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader?
-    func hashTable(in elf: ELFFile) -> Dynamic.HashTable?
+    func hashTableHeader(in elf: ELFImage) -> Dynamic.HashTableHeader?
+    func hashTable(in elf: ELFImage) -> Dynamic.HashTable?
 
-    func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader?
-    func gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable?
+    func gnuHashTableHeader(in elf: ELFImage) -> ELFGnuHashTableHeader?
+    func gnuHashTable(in elf: ELFImage) -> Dynamic.GnuHashTable?
 
-    func numberOfSymbols(in elf: ELFFile) -> Int?
-    func symbols(in elf: ELFFile) -> DataSequence<Dynamic.Symbol>?
+    func numberOfSymbols(in elf: ELFImage) -> Int?
+    func symbols(in elf: ELFImage) -> MemorySequence<Dynamic.Symbol>?
 
-    func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>?
+    func symbolInfos(in elf: ELFImage) -> MemorySequence<Dynamic.SymbolInfo>?
 
-    func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    func relocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
     var flags1: DynamicFlags1 { get }
 
     var numberOfVersionDefs: Int? { get }
-    func _versionDef(in elf: ELFFile) -> Dynamic.VersionDef?
-    func versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef]
+    func _versionDef(in elf: ELFImage) -> Dynamic.VersionDef?
+    func versionDefs(in elf: ELFImage) -> [Dynamic.VersionDef]
 
     var numberOfVersionNeeds: Int? { get }
-    func _versionNeed(in elf: ELFFile) -> Dynamic.VersionNeed?
-    func versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed]
+    func _versionNeed(in elf: ELFImage) -> Dynamic.VersionNeed?
+    func versionNeeds(in elf: ELFImage) -> [Dynamic.VersionNeed]
 
-    func versionSyms(in elf: ELFFile) -> DataSequence<Dynamic.VersionSym>?
+    func versionSyms(in elf: ELFImage) -> MemorySequence<Dynamic.VersionSym>?
 }
 
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     public func makeIterator() -> Iterator {
         sequence.makeIterator()
     }
 }
 
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     public var startIndex: Index { sequence.startIndex }
     public var endIndex: Index { sequence.endIndex }
 
@@ -69,23 +69,27 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - String Table
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     // same as `.dynstr` section
-    public func strings(in elf: ELFFile) -> ELFFile.Strings? {
+    public func strings(in elf: ELFImage) -> ELFImage.Strings? {
         guard let _strtab, let _strsiz else {
             return nil
         }
-        guard let offset = elf.fileOffset(of: _strtab.pointer) else {
+        guard let pointer = _strtab.pointer(for: elf) else {
             return nil
         }
         let size = _strsiz.value
-        return .init(elf: elf, offset: offset, size: size)
+        return .init(
+            basePointer: pointer
+                .assumingMemoryBound(to: UInt8.self),
+            tableSize: size
+        )
     }
 }
 
 // MARK: - Needs
-extension ELFFileDynamicsSequence {
-    public func neededs(in elf: ELFFile) -> [String] {
+extension ELFImageDynamicsSequence {
+    public func neededs(in elf: ELFImage) -> [String] {
         guard let strings = strings(in: elf) else { return [] }
         return _neededs.compactMap {
             strings.string(at: numericCast($0.value))?.string
@@ -94,15 +98,15 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - Run Paths
-extension ELFFileDynamicsSequence {
-    public func rpaths(in elf: ELFFile) -> [String] {
+extension ELFImageDynamicsSequence {
+    public func rpaths(in elf: ELFImage) -> [String] {
         guard let strings = strings(in: elf) else { return [] }
         return _rpath.compactMap {
             strings.string(at: numericCast($0.value))?.string
         }
     }
 
-    public func runpaths(in elf: ELFFile) -> [String] {
+    public func runpaths(in elf: ELFImage) -> [String] {
         guard let strings = strings(in: elf) else { return [] }
         return _runpath.compactMap {
             strings.string(at: numericCast($0.value))?.string
@@ -111,8 +115,8 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - SO Name
-extension ELFFileDynamicsSequence {
-    public func sharedObjectName(in elf: ELFFile) -> String? {
+extension ELFImageDynamicsSequence {
+    public func sharedObjectName(in elf: ELFImage) -> String? {
         guard let _soname else { return nil }
         guard let strings = strings(in: elf) else { return nil }
         return strings.string(at: _soname.value)?.string
@@ -120,62 +124,58 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: Hash Table
-extension ELFFileDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
-    public func hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader? {
+extension ELFImageDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
+    public func hashTableHeader(in elf: ELFImage) -> Dynamic.HashTableHeader? {
         guard let _hash else { return nil }
-        guard let offset = elf.fileOffset(of: _hash.pointer) else {
+        guard let pointer = _hash.pointer(for: elf) else {
             return nil
         }
-        return elf.fileHandle.read(
-            offset: numericCast(offset)
-        )
+        return pointer.autoBoundPointee()
     }
 
-    public func hashTable(in elf: ELFFile) -> Dynamic.HashTable? {
+    public func hashTable(in elf: ELFImage) -> Dynamic.HashTable? {
         guard let _hash else { return nil }
         guard let header = hashTableHeader(in: elf) else {
             return nil
         }
-        guard let offset = elf.fileOffset(of: _hash.pointer) else {
+        guard let pointer = _hash.pointer(for: elf) else {
             return nil
         }
         return header._readContent(
             in: elf,
-            at: numericCast(offset)
+            at: Int(bitPattern: pointer) - Int(bitPattern: elf.ptr)
         )
     }
 }
 
 // MARK: - GNU Hash Table
-extension ELFFileDynamicsSequence {
-    public func gnuHashTableHeader(in elf: ELFFile) -> ELFGnuHashTableHeader? {
+extension ELFImageDynamicsSequence {
+    public func gnuHashTableHeader(in elf: ELFImage) -> ELFGnuHashTableHeader? {
         guard let gnu_hash = _gnu_hash(inELF: elf.header) else { return nil }
-        guard let offset = elf.fileOffset(of: gnu_hash.pointer) else {
+        guard let pointer = gnu_hash.pointer(for: elf) else {
             return nil
         }
-        return elf.fileHandle.read(
-            offset: numericCast(offset)
-        )
+        return pointer.autoBoundPointee()
     }
 
-    public func gnuHashTable(in elf: ELFFile) -> Dynamic.GnuHashTable? {
+    public func gnuHashTable(in elf: ELFImage) -> Dynamic.GnuHashTable? {
         guard let gnu_hash = _gnu_hash(inELF: elf.header) else { return nil }
         guard let header = gnuHashTableHeader(in: elf) else {
             return nil
         }
-        guard let offset = elf.fileOffset(of: gnu_hash.pointer) else {
+        guard let pointer = gnu_hash.pointer(for: elf) else {
             return nil
         }
         return header._readContent(
             in: elf,
-            at: offset
+            at: Int(bitPattern: pointer) - Int(bitPattern: elf.ptr)
         )
     }
 }
 
 // MARK: - Symbols(Dynamic)
-extension ELFFileDynamicsSequence {
-    public func numberOfSymbols(in elf: ELFFile) -> Int? {
+extension ELFImageDynamicsSequence {
+    public func numberOfSymbols(in elf: ELFImage) -> Int? {
         if let hashHeader = hashTableHeader(in: elf) {
             return hashHeader.numberOfChains
         } else if let gnuHashTable = gnuHashTable(in: elf) {
@@ -184,23 +184,24 @@ extension ELFFileDynamicsSequence {
         return nil
     }
 
-    public func symbols(in elf: ELFFile) -> DataSequence<Dynamic.Symbol>? {
+    public func symbols(in elf: ELFImage) -> MemorySequence<Dynamic.Symbol>? {
         guard let _symtab else { return nil }
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
         }
-        guard let offset = elf.fileOffset(of: _symtab.pointer) else {
+        guard let pointer = _symtab.pointer(for: elf) else {
             return nil
         }
-        return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+        return .init(
+            basePointer: pointer
+                .assumingMemoryBound(to: Dynamic.Symbol.self),
             numberOfElements: numberOfSymbols
         )
     }
 }
 
 // MARK: - Relocations
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     internal var relcount: Int? {
         if let _relsz, let _relent {
             return numericCast(_relsz.value / _relent.value)
@@ -223,21 +224,22 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - SymbolInfos
-extension ELFFileDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
-    public func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>? {
+extension ELFImageDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
+    public func symbolInfos(in elf: ELFImage) -> MemorySequence<Dynamic.SymbolInfo>? {
         guard let _syminfo, let _syminsz else { return nil }
-        guard let offset = elf.fileOffset(of: _syminfo.pointer) else {
+        guard let pointer = _syminfo.pointer(for: elf) else {
             return nil
         }
-        return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+        return .init(
+            basePointer: pointer
+                .assumingMemoryBound(to: Dynamic.SymbolInfo.self),
             numberOfElements: numericCast(_syminsz.value) / Dynamic.SymbolInfo.layoutSize
         )
     }
 }
 
 // MARK: - FLAGS / FLAGS_1
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     public var flags: DynamicFlags {
         guard let _flags else {
             return .init(rawValue: 0)
@@ -254,13 +256,13 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - Verson Defs
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     public var numberOfVersionDefs: Int? {
         guard let _verdefnum else { return nil }
         return numericCast(_verdefnum.value)
     }
 
-    public func versionDefs(in elf: ELFFile) -> [Dynamic.VersionDef] {
+    public func versionDefs(in elf: ELFImage) -> [Dynamic.VersionDef] {
         var def = _versionDef(in: elf)
         var defs: [Dynamic.VersionDef] = []
         while def != nil {
@@ -273,13 +275,13 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - Verson Needs
-extension ELFFileDynamicsSequence {
+extension ELFImageDynamicsSequence {
     public var numberOfVersionNeeds: Int? {
         guard let _verneednum else { return nil }
         return numericCast(_verneednum.value)
     }
 
-    public func versionNeeds(in elf: ELFFile) -> [Dynamic.VersionNeed] {
+    public func versionNeeds(in elf: ELFImage) -> [Dynamic.VersionNeed] {
         var def = _versionNeed(in: elf)
         var defs: [Dynamic.VersionNeed] = []
         while def != nil {
@@ -292,17 +294,18 @@ extension ELFFileDynamicsSequence {
 }
 
 // MARK: - Version Syms
-extension ELFFileDynamicsSequence {
-    public func versionSyms(in elf: ELFFile) -> DataSequence<Dynamic.VersionSym>? {
+extension ELFImageDynamicsSequence {
+    public func versionSyms(in elf: ELFImage) -> MemorySequence<Dynamic.VersionSym>? {
         guard let _versym else { return nil }
         guard let numberOfSymbols = numberOfSymbols(in: elf) else {
             return nil
         }
-        guard let offset = elf.fileOffset(of: _versym.pointer) else {
+        guard let pointer = _versym.pointer(for: elf) else {
             return nil
         }
-        return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+        return .init(
+            basePointer: pointer
+                .assumingMemoryBound(to: Dynamic.VersionSym.self),
             numberOfElements: numberOfSymbols
         )
     }

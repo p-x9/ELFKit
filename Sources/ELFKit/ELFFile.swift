@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class ELFFile {
+public final class ELFFile: ELFRepresentable {
     /// URL of the file actually loaded
     public let url: URL
 
@@ -29,9 +29,9 @@ public class ELFFile {
         self.url = url
         self.fileHandle = try FileHandle(forReadingFrom: url)
 
-        let identifier: HeaderIdentifier = fileHandle.read(
-            offset: 0
-        )
+        guard let identifier: HeaderIdentifier = .init(
+            layout: fileHandle.read(offset: 0)
+        ) else { throw ELFKitError.invalidFile }
 
         let header: ELFHeader
         switch identifier.class {
@@ -72,15 +72,6 @@ extension ELFFile {
             offset: numericCast(header.programTableOffset),
             numberOfElements: header.numberOfPrograms
         )
-    }
-
-    public var programs: [any ELFProgramHeaderProtocol] {
-        if let programs64 {
-            return Array(programs64)
-        } else if let programs32 {
-            return Array(programs32)
-        }
-        return []
     }
 }
 
@@ -128,32 +119,28 @@ extension ELFFile {
 extension ELFFile {
     public var dynamics64: Dynamics64? {
         guard is64Bit else { return nil }
-        if let dynamic = sections64?._dynamic {
-            return dynamic._dynamics(in: self)
+        if let dynamic = sections64?._dynamic,
+           let wrapped = dynamic._dynamics(in: self) {
+            return .init(wrapped)
         }
-        if let dynamic = programs64?._dynamic {
-            return dynamic._dynamics(in: self)
+        if let dynamic = programs64?._dynamic,
+           let wrapped = dynamic._dynamics(in: self) {
+            return .init(wrapped)
         }
         return nil
     }
 
     public var dynamics32: Dynamics32? {
         guard !is64Bit else { return nil }
-        if let dynamic = sections32?._dynamic {
-            return dynamic._dynamics(in: self)
+        if let dynamic = sections32?._dynamic,
+           let wrapped = dynamic._dynamics(in: self) {
+            return .init(wrapped)
         }
-        if let dynamic = programs32?._dynamic {
-            return dynamic._dynamics(in: self)
+        if let dynamic = programs32?._dynamic,
+           let wrapped = dynamic._dynamics(in: self) {
+            return .init(wrapped)
         }
         return nil
-    }
-
-    public var dynamics: [any ELFDynamicProtocol]? {
-        if is64Bit {
-            dynamics64?.map { $0 }
-        } else {
-            dynamics32?.map { $0 }
-        }
     }
 }
 
@@ -212,16 +199,6 @@ extension ELFFile {
             offset: numericCast(_dysym.offset),
             numberOfElements: _dysym.size / ELF64Symbol.layoutSize
         )
-    }
-
-    public var dynamicSymbols: [ELFSymbolProtocol] {
-        if is64Bit, let dynamicSymbols64 {
-            return Array(dynamicSymbols64)
-        } else if let dynamicSymbols32 {
-            return Array(dynamicSymbols32)
-        } else {
-            return []
-        }
     }
 }
 

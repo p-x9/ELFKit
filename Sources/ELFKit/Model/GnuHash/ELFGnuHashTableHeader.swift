@@ -40,4 +40,35 @@ extension ELFGnuHashTableHeader {
             chainsOffset: chainsOffset
         )
     }
+
+    func _readContent<Table: ELFGnuHashTableProtocol>(
+        in elf: ELFImage,
+        at offset: Int
+    ) -> Table {
+        var header: Self { self }
+        let bloomsStart: Int = numericCast(offset) + numericCast(header.layoutSize)
+        let blooms: MemorySequence<Table.Bloom> = .init(
+            basePointer: elf.ptr
+                .advanced(by: bloomsStart)
+                .assumingMemoryBound(to: Table.Bloom.self),
+            numberOfElements: numericCast(header.gh_maskwords)
+        )
+
+        let bucketsStart: Int = bloomsStart + blooms.size
+        let buckets: MemorySequence<Table.Hashelt> = .init(
+            basePointer: elf.ptr
+                .advanced(by: bucketsStart)
+                .assumingMemoryBound(to: Table.Hashelt.self),
+            numberOfElements: numericCast(header.gh_nbuckets)
+        )
+
+        let chainsOffset = bucketsStart + buckets.size
+
+        return .init(
+            header: header,
+            bloom: Array(blooms),
+            buckets: Array(buckets),
+            chainsOffset: chainsOffset
+        )
+    }
 }

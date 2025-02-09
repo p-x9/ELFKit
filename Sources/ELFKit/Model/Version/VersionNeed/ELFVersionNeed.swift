@@ -43,7 +43,9 @@ extension ELF32VersionNeed: ELFVersionNeedProtocol {
     public var nextOffset: Int {
         numericCast(layout.vn_next)
     }
+}
 
+extension ELF32VersionNeed {
     public func fileName(in elf: ELFFile) -> String? {
         guard let dynamics = elf.dynamics32,
               let strings = dynamics.strings(in: elf) else {
@@ -85,6 +87,48 @@ extension ELF32VersionNeed: ELFVersionNeedProtocol {
     }
 }
 
+extension ELF32VersionNeed {
+    public func fileName(in elf: ELFImage) -> String? {
+        guard let dynamics = elf.dynamics32,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: fileNameOffset)?.string
+    }
+
+    public func _next(in elf: ELFImage) -> Self? {
+        guard let dynamics = elf.dynamics32,
+              let max = dynamics.numberOfVersionNeeds,
+              _index + 1 < max,
+              nextOffset != 0 else {
+            return nil
+        }
+        let offset = self._offset + nextOffset
+        let layout: Layout = elf.ptr
+            .advanced(by: offset)
+            .autoBoundPointee()
+        return .init(
+            layout: layout,
+            _index: _index + 1,
+            _offset: offset
+        )
+    }
+
+    public func _aux(in elf: ELFImage) -> Aux? {
+        guard numberOfAux > 0 else { return nil }
+
+        let offset = _offset + numericCast(layout.vn_aux)
+        let layout: ELF32VersionNeedAux.Layout = elf.ptr
+            .advanced(by: offset)
+            .autoBoundPointee()
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: offset
+        )
+    }
+}
+
 extension ELF64VersionNeed: ELFVersionNeedProtocol {
     public typealias Aux = ELF64VersionNeedAux
 
@@ -103,7 +147,9 @@ extension ELF64VersionNeed: ELFVersionNeedProtocol {
     public var nextOffset: Int {
         numericCast(layout.vn_next)
     }
+}
 
+extension ELF64VersionNeed {
     public func fileName(in elf: ELFFile) -> String? {
         guard let dynamics = elf.dynamics64,
               let strings = dynamics.strings(in: elf) else {
@@ -139,6 +185,50 @@ extension ELF64VersionNeed: ELFVersionNeedProtocol {
         let layout: ELF64VersionNeedAux.Layout = elf.fileHandle.read(
             offset: numericCast(offset)
         )
+        return .init(
+            layout: layout,
+            _index: 0,
+            _offset: offset
+        )
+    }
+}
+
+extension ELF64VersionNeed {
+    public func fileName(in elf: ELFImage) -> String? {
+        guard let dynamics = elf.dynamics64,
+              let strings = dynamics.strings(in: elf) else {
+            return nil
+        }
+        return strings.string(at: fileNameOffset)?.string
+    }
+
+    public func _next(in elf: ELFImage) -> Self? {
+        guard nextOffset != 0 else {
+            return nil
+        }
+        if let dynamics = elf.dynamics64,
+           let max = dynamics.numberOfVersionNeeds,
+           _index + 1 >= max {
+            return nil
+        }
+        let offset = self._offset + nextOffset
+        let layout: Layout = elf.ptr
+            .advanced(by: offset)
+            .autoBoundPointee()
+        return .init(
+            layout: layout,
+            _index: _index + 1,
+            _offset: offset
+        )
+    }
+
+    public func _aux(in elf: ELFImage) -> Aux? {
+        guard numberOfAux > 0 else { return nil }
+
+        let offset = _offset + numericCast(layout.vn_aux)
+        let layout: ELF64VersionNeedAux.Layout = elf.ptr
+            .advanced(by: offset)
+            .autoBoundPointee()
         return .init(
             layout: layout,
             _index: 0,

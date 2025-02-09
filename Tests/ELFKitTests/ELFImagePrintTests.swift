@@ -1,26 +1,25 @@
 //
-//  ELFFilePrintTests.swift
+//  ELFImagePrintTests.swift
+//  ELFKit
 //
-//
-//  Created by p-x9 on 2024/05/07
-//
+//  Created by p-x9 on 2025/02/08
+//  
 //
 
 import XCTest
 @testable import ELFKit
 
-final class ELFFilePrintTests: XCTestCase {
+#if os(Linux)
 
-    private var elf: ELFFile!
+final class ELFImagePrintTests: XCTestCase {
+    private var elf: ELFImage!
 
     override func setUp() {
-        let path = ""
-        let url = URL(fileURLWithPath: path)
-        self.elf = try! ELFFile(url: url)
+        self.elf = ELFImage(name: "libc")
     }
 }
 
-extension ELFFilePrintTests {
+extension ELFImagePrintTests {
     func testHeader() {
         let header = elf.header
         let identifier = header.identifier!
@@ -33,25 +32,6 @@ extension ELFFilePrintTests {
 
         print("Type:", header.type ?? .none)
         print("Machine:", header.machine ?? .none)
-    }
-
-    func testSections() {
-        for (i, section) in elf.sections.enumerated() {
-            print("----")
-            print(
-                "[\(i)] Name:",
-                section.name(in: elf) ?? "Unknown"
-            )
-            let type = section.type(inELF: elf.header)
-            print(
-                "Type:",
-                type?.description ?? "Unknown"
-            )
-            print("Flags:", section.flags(inELF: elf.header).bits)
-            print("Address:", section.address)
-            print("Offset:", section.offset)
-            print("Size:", section.size)
-        }
     }
 
     func testPrograms() {
@@ -74,33 +54,6 @@ extension ELFFilePrintTests {
             let tag = dynamic.tag(inELF: elf.header)
             print("Tag:", tag?.description ?? "Unknown")
             print("Value/Pointer:", dynamic.value)
-        }
-    }
-
-    func testSymbols() {
-        let symbols = Array(elf.symbols)
-        for (i, symbol) in symbols.enumerated() {
-            autoreleasepool {
-                print("----")
-                print(
-                    "[\(i)] Name:",
-                    symbol.name(in: elf, isDynamic: false) ?? "Unknown"
-                )
-                print(
-                    "Binding:",
-                    symbol.binding(inELF: elf.header)?.description ?? "Unknown"
-                )
-                print(
-                    "Type:",
-                    symbol.type(inELF: elf.header)?.description ?? "Unknown"
-                )
-                print("Visibility:", symbol.visibility!)
-                if let specialSection = symbol.specialSection(inELF: elf.header) {
-                    print("Special:", specialSection)
-                } else if let sectionIndex = symbol.sectionIndex {
-                    print("SectionIndex:", sectionIndex)
-                }
-            }
         }
     }
 
@@ -130,37 +83,28 @@ extension ELFFilePrintTests {
     }
 
     func testRelocations() {
-        let sections = elf.sections64!.filter({
-            [.rel, .rela].contains($0.type(inELF: elf.header))
-        })
+        guard let dynamics = elf.dynamics64 else { return }
+        guard let relocations = dynamics.relocations(in: elf) else { return }
 
         let symbols = Array(elf.dynamicSymbols)
-        for section in sections {
-            guard let relocations = section._relocations(in: elf) else {
-                continue
-            }
-            print("\nSection: \(section.name(in: elf) ?? "Unknown")")
-            for (i, relocation) in relocations.enumerated() {
-                autoreleasepool {
-                    print(" ----")
-                    print(" [\(i)]")
-                    print(" Offset:", String(relocation.offset, radix: 16))
-                    print(" SymbolIndex:", relocation.symbolIndex)
-                    print(
-                        " Symbol:",
-                        symbols[relocation.symbolIndex]
-                            .name(in: elf, isDynamic: true) ?? ""
-                    )
-                    print(" Type:", relocation._type)
-                    print(" Addend:", relocation.addend)
-                }
-            }
+        for (i, relocation) in relocations.enumerated() {
+            print(" ----")
+            print(" [\(i)]")
+            print(" Offset:", String(relocation.offset, radix: 16))
+            print(" SymbolIndex:", relocation.symbolIndex)
+            print(
+                " Symbol:",
+                symbols[relocation.symbolIndex]
+                    .name(in: elf, isDynamic: true) ?? ""
+            )
+            print(" Type:", relocation._type)
+            print(" Addend:", relocation.addend)
         }
     }
 }
 
-// MARK: Dynamics
-extension ELFFilePrintTests {
+// MARK: - Dynamics
+extension ELFImagePrintTests {
     func testNeeds() {
         print("Shared Library:")
         for (i, need) in elf.dependencies.enumerated() {
@@ -177,7 +121,7 @@ extension ELFFilePrintTests {
 }
 
 // MARK: - Dynamics
-extension ELFFilePrintTests {
+extension ELFImagePrintTests {
     func testSOName() {
         guard let dynamics = elf.dynamics64 else { return }
         let soname = dynamics.sharedObjectName(in: elf)
@@ -281,14 +225,14 @@ extension ELFFilePrintTests {
 }
 
 // MARK: - Note
-extension ELFFilePrintTests {
+extension ELFImagePrintTests {
     func testNotes() {
-        let sections = elf.sections64!.filter({
+        let programs = elf.programs64!.filter({
             $0.type(inELF: elf.header) == .note
         })
 
-        for section in sections {
-            guard let notes = section._notes(in: elf) else {
+        for program in programs {
+            guard let notes = program._notes(in: elf) else {
                 continue
             }
             for note in notes {
@@ -302,7 +246,7 @@ extension ELFFilePrintTests {
 
     func testGnuABITag() {
         // https://github.com/crossbridge-community/crossbridge/blob/78312c50dbcb3463e2e05b2763a595d4e6ec51c4/binutils/binutils/readelf.c#L12273
-        let note = elf.sections
+        let note = elf.programs
             .compactMap { $0._notes(in: elf) }
             .flatMap { $0 }
             .compactMap { $0.gnuNoteContent }
@@ -315,7 +259,7 @@ extension ELFFilePrintTests {
     }
 
     func testGnuBuildID() {
-        let note = elf.sections
+        let note = elf.programs
             .compactMap { $0._notes(in: elf) }
             .flatMap { $0 }
             .compactMap { $0.gnuNoteContent}
@@ -328,7 +272,7 @@ extension ELFFilePrintTests {
     }
 
     func testGnuGoldVersion() {
-        let note = elf.sections
+        let note = elf.programs
             .compactMap { $0._notes(in: elf) }
             .flatMap { $0 }
             .compactMap { $0.gnuNoteContent }
@@ -342,7 +286,7 @@ extension ELFFilePrintTests {
 }
 
 // MARK: - Hash
-extension ELFFilePrintTests {
+extension ELFImagePrintTests {
     func testHashTable() {
         guard let dynamics = elf.dynamics64,
               let hashTable = dynamics.hashTable(in: elf) else {
@@ -362,7 +306,7 @@ extension ELFFilePrintTests {
     }
 
     func testFindSymbolWithHashTable() {
-        let symbolName = ""
+        let symbolName = "__libc_scratch_buffer_grow_preserve"
         guard let dynamics = elf.dynamics64,
               let hashTable = dynamics.hashTable(in: elf) else {
             return
@@ -381,7 +325,7 @@ extension ELFFilePrintTests {
     }
 
     func testFindSymbolWithGnuHashTable() {
-        let symbolName = ""
+        let symbolName = "__libc_scratch_buffer_grow_preserve"
         guard let dynamics = elf.dynamics64,
               let hashTable = dynamics.gnuHashTable(in: elf) else {
             return
@@ -399,3 +343,5 @@ extension ELFFilePrintTests {
         }
     }
 }
+
+#endif

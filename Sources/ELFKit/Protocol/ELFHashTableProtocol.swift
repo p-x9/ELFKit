@@ -25,6 +25,7 @@ public protocol ELFHashTableProtocol {
     init(header: Header, buckets: [Hashelt], chains: [Hashelt])
 
     func findSymbol(named symbol: String, in elf: ELFFile) -> Symbol?
+    func findSymbol(named symbol: String, in elf: ELFImage) -> Symbol?
 
     static func hash(for name: String) -> Int
 }
@@ -57,6 +58,14 @@ extension ELFHashTableProtocol {
     ) -> (any ELFSymbolProtocol)? {
         findSymbol(named: symbol, in: elf)
     }
+
+    @_disfavoredOverload
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
+    ) -> (any ELFSymbolProtocol)? {
+        findSymbol(named: symbol, in: elf)
+    }
 }
 
 public protocol ELFGnuHashTableProtocol {
@@ -73,15 +82,20 @@ public protocol ELFGnuHashTableProtocol {
 
     init(header: ELFGnuHashTableHeader, bloom: [Bloom], buckets: [Hashelt], chainsOffset: Int)
 
+    func numberOfSymbols(in elf: ELFFile) -> Int?
+    func numberOfSymbols(in elf: ELFImage) -> Int?
+
     func findSymbol(named symbol: String, in elf: ELFFile) -> Symbol?
+    func findSymbol(named symbol: String, in elf: ELFImage) -> Symbol?
 
     static func hash(for name: String) -> Int
 }
 
 extension ELFGnuHashTableProtocol {
-    func numberOfSymbols(in elf: ELFFile) -> Int? {
+    public func numberOfSymbols(in elf: ELFFile) -> Int? {
         // https://flapenguin.me/elf-dt-gnu-hash
-        guard let maxBucket = buckets.max() else {
+        guard let maxBucket = buckets.max(),
+              0 < maxBucket else {
             return nil
         }
         var ix: UInt32 = numericCast(maxBucket)
@@ -95,6 +109,31 @@ extension ELFGnuHashTableProtocol {
                 offset: numericCast(chainsOffset)
                 + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
             )
+        }
+        return numericCast(ix) + 1 // First `STN_UNDEF` symbol
+    }
+
+    public func numberOfSymbols(in elf: ELFImage) -> Int? {
+        // https://flapenguin.me/elf-dt-gnu-hash
+        guard let maxBucket = buckets.max(),
+              0 < maxBucket else {
+            return nil
+        }
+        var ix: UInt32 = numericCast(maxBucket)
+        var chain: Hashelt = elf.ptr
+            .advanced(
+                by: numericCast(chainsOffset)
+                      + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
+            )
+            .autoBoundPointee()
+        while (chain & 1) == 0 {
+            ix += 1
+            chain = elf.ptr
+                .advanced(
+                    by: numericCast(chainsOffset)
+                          + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
+                )
+                .autoBoundPointee()
         }
         return numericCast(ix) + 1 // First `STN_UNDEF` symbol
     }
@@ -120,6 +159,14 @@ extension ELFGnuHashTableProtocol {
     public func findSymbol(
         named symbol: String,
         in elf: ELFFile
+    ) -> (any ELFSymbolProtocol)? {
+        findSymbol(named: symbol, in: elf)
+    }
+
+    @_disfavoredOverload
+    public func findSymbol(
+        named symbol: String,
+        in elf: ELFImage
     ) -> (any ELFSymbolProtocol)? {
         findSymbol(named: symbol, in: elf)
     }
