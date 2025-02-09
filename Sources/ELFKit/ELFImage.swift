@@ -116,15 +116,6 @@ extension ELFImage {
             numberOfElements: header.numberOfPrograms
         )
     }
-
-    public var programs: [any ELFProgramHeaderProtocol] {
-        if let programs64 {
-            return Array(programs64)
-        } else if let programs32 {
-            return Array(programs32)
-        }
-        return []
-    }
 }
 
 extension ELFImage {
@@ -145,14 +136,6 @@ extension ELFImage {
         }
         return nil
     }
-
-    public var dynamics: [any ELFDynamicProtocol]? {
-        if is64Bit {
-            dynamics64?.map { $0 }
-        } else {
-            dynamics32?.map { $0 }
-        }
-    }
 }
 
 extension ELFImage {
@@ -164,16 +147,6 @@ extension ELFImage {
     public var dynamicSymbols64: MemorySequence<ELF64Symbol>? {
         guard is64Bit else { return nil}
         return dynamics64?.symbols(in: self)
-    }
-
-    public var dynamicSymbols: [any ELFSymbolProtocol] {
-        if is64Bit, let dynamicSymbols64 {
-            return Array(dynamicSymbols64)
-        } else if let dynamicSymbols32 {
-            return Array(dynamicSymbols32)
-        } else {
-            return []
-        }
     }
 }
 

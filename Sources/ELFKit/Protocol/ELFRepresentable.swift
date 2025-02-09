@@ -59,3 +59,32 @@ public protocol ELFRepresentable {
     /// Sequence of dynamic symbol strings.
     var dynamicStringTable: Strings? { get }
 }
+
+extension ELFRepresentable {
+    public var programs: [any ELFProgramHeaderProtocol] {
+        if let programs64 {
+            return Array(programs64)
+        } else if let programs32 {
+            return Array(programs32)
+        }
+        return []
+    }
+
+    public var dynamics: [any ELFDynamicProtocol]? {
+        if is64Bit {
+            dynamics64?.map { $0 }
+        } else {
+            dynamics32?.map { $0 }
+        }
+    }
+
+    public var dynamicSymbols: [any ELFSymbolProtocol] {
+        if is64Bit, let dynamicSymbols64 {
+            return Array(dynamicSymbols64)
+        } else if let dynamicSymbols32 {
+            return Array(dynamicSymbols32)
+        } else {
+            return []
+        }
+    }
+}

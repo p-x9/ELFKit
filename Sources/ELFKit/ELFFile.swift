@@ -73,15 +73,6 @@ extension ELFFile {
             numberOfElements: header.numberOfPrograms
         )
     }
-
-    public var programs: [any ELFProgramHeaderProtocol] {
-        if let programs64 {
-            return Array(programs64)
-        } else if let programs32 {
-            return Array(programs32)
-        }
-        return []
-    }
 }
 
 extension ELFFile {
@@ -151,14 +142,6 @@ extension ELFFile {
         }
         return nil
     }
-
-    public var dynamics: [any ELFDynamicProtocol]? {
-        if is64Bit {
-            dynamics64?.map { $0 }
-        } else {
-            dynamics32?.map { $0 }
-        }
-    }
 }
 
 extension ELFFile {
@@ -216,16 +199,6 @@ extension ELFFile {
             offset: numericCast(_dysym.offset),
             numberOfElements: _dysym.size / ELF64Symbol.layoutSize
         )
-    }
-
-    public var dynamicSymbols: [ELFSymbolProtocol] {
-        if is64Bit, let dynamicSymbols64 {
-            return Array(dynamicSymbols64)
-        } else if let dynamicSymbols32 {
-            return Array(dynamicSymbols32)
-        } else {
-            return []
-        }
     }
 }
 
