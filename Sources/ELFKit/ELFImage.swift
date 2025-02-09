@@ -26,7 +26,9 @@ public struct ELFImage: ELFRepresentable {
     public init(ptr: UnsafeRawPointer) throws {
         self.ptr = .init(ptr)
 
-        let identifier: HeaderIdentifier = ptr.autoBoundPointee()
+        guard let identifier: HeaderIdentifier = .init(
+            layout: ptr.autoBoundPointee()
+        ) else { throw ELFKitError.invalidPointer }
 
         let header: ELFHeader
         switch identifier.class {
@@ -37,7 +39,7 @@ public struct ELFImage: ELFRepresentable {
             let _header: ELF64Header = ptr.autoBoundPointee()
             header = ._64(_header)
         default:
-            throw ELFKitError.invalidFile
+            throw ELFKitError.invalidPointer
         }
 
         self.header = header

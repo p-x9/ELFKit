@@ -29,9 +29,9 @@ public final class ELFFile: ELFRepresentable {
         self.url = url
         self.fileHandle = try FileHandle(forReadingFrom: url)
 
-        let identifier: HeaderIdentifier = fileHandle.read(
-            offset: 0
-        )
+        guard let identifier: HeaderIdentifier = .init(
+            layout: fileHandle.read(offset: 0)
+        ) else { throw ELFKitError.invalidFile }
 
         let header: ELFHeader
         switch identifier.class {
