@@ -13,7 +13,9 @@
 
 #include <link.h>
 
-#if 0
+// need to check for __musl__ or else:
+// ELFKit/Sources/ELFKitC/include/elf_linux.h:17:8: error: redefinition of 'dl_phdr_info'
+#ifndef __musl__
 struct dl_phdr_info {
     ElfW(Addr)        dlpi_addr;
     const char       *dlpi_name;
