@@ -13,12 +13,14 @@
 
 #include <link.h>
 
+#if 0
 struct dl_phdr_info {
     ElfW(Addr)        dlpi_addr;
     const char       *dlpi_name;
     const ElfW(Phdr) *dlpi_phdr;
     ElfW(Half)        dlpi_phnum;
 };
+#endif
 
 extern int dl_iterate_phdr(int (*callback) (struct dl_phdr_info *info, size_t size, void *data), void *data);
 
