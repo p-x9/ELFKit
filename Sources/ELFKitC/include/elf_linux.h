@@ -13,12 +13,16 @@
 
 #include <link.h>
 
+// need to check for __musl__ or else:
+// ELFKit/Sources/ELFKitC/include/elf_linux.h:17:8: error: redefinition of 'dl_phdr_info'
+#ifndef __musl__
 struct dl_phdr_info {
     ElfW(Addr)        dlpi_addr;
     const char       *dlpi_name;
     const ElfW(Phdr) *dlpi_phdr;
     ElfW(Half)        dlpi_phnum;
 };
+#endif
 
 extern int dl_iterate_phdr(int (*callback) (struct dl_phdr_info *info, size_t size, void *data), void *data);
 
