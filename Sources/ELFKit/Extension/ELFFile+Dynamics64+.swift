@@ -48,8 +48,8 @@ extension ELFFile.Dynamics64 {
         guard let offset = elf.fileOffset(of: _verdef.pointer) else {
             return nil
         }
-        let layout: ELF64VersionDef.Layout = elf.fileHandle.read(
-            offset: numericCast(offset)
+        let layout: ELF64VersionDef.Layout = try! elf.fileHandle.read(
+            offset: offset
         )
         return .init(
             layout: layout,
@@ -66,8 +66,8 @@ extension ELFFile.Dynamics64 {
         guard let offset = elf.fileOffset(of: _verneed.pointer) else {
             return nil
         }
-        let layout: ELF64VersionNeed.Layout = elf.fileHandle.read(
-            offset: numericCast(offset)
+        let layout: ELF64VersionNeed.Layout = try! elf.fileHandle.read(
+            offset: offset
         )
         return .init(
             layout: layout,

@@ -126,8 +126,8 @@ extension ELFFileDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
         guard let offset = elf.fileOffset(of: _hash.pointer) else {
             return nil
         }
-        return elf.fileHandle.read(
-            offset: numericCast(offset)
+        return try! elf.fileHandle.read(
+            offset: offset
         )
     }
 
@@ -153,8 +153,8 @@ extension ELFFileDynamicsSequence {
         guard let offset = elf.fileOffset(of: gnu_hash.pointer) else {
             return nil
         }
-        return elf.fileHandle.read(
-            offset: numericCast(offset)
+        return try! elf.fileHandle.read(
+            offset: offset
         )
     }
 

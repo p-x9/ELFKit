@@ -96,8 +96,8 @@ extension ELF64SectionHeader {
         guard [.gnu_verdef, .sunw_verdef].contains(type(inELF: elf.header)) else {
             return nil
         }
-        let layout: ELF64VersionDef.Layout = elf.fileHandle.read(
-            offset: numericCast(offset)
+        let layout: ELF64VersionDef.Layout = try! elf.fileHandle.read(
+            offset: offset
         )
         return .init(
             layout: layout,
@@ -113,8 +113,8 @@ extension ELF64SectionHeader {
         guard [.gnu_verneed, .sunw_verneed].contains(type(inELF: elf.header)) else {
             return nil
         }
-        let layout: ELF64VersionNeed.Layout = elf.fileHandle.read(
-            offset: numericCast(offset)
+        let layout: ELF64VersionNeed.Layout = try! elf.fileHandle.read(
+            offset: offset
         )
         return .init(
             layout: layout,

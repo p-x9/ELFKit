@@ -89,9 +89,9 @@ extension ELFSectionHeaderProtocol {
 extension ELFSectionHeaderProtocol {
     public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
         guard type(inELF: elf.header) == .note else { return nil }
-        let data = elf.fileHandle.readData(
-            offset: numericCast(offset),
-            size: size
+        let data = try! elf.fileHandle.readData(
+            offset: offset,
+            length: size
         )
         return .init(data: data)
     }
@@ -125,8 +125,8 @@ extension ELFSectionHeaderProtocol where Dynamic: LayoutWrapper {
 extension ELFSectionHeaderProtocol where Dynamic.HashTableHeader: LayoutWrapper {
     public func _hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader? {
         guard type(inELF: elf.header) == .hash else { return nil }
-        return elf.fileHandle.read(
-            offset: numericCast(offset)
+        return try! elf.fileHandle.read(
+            offset: offset
         )
     }
 
@@ -149,8 +149,8 @@ extension ELFSectionHeaderProtocol {
               type(inELF: elf.header) == .gnu_hash else {
             return nil
         }
-        return elf.fileHandle.read(
-            offset: numericCast(offset)
+        return try! elf.fileHandle.read(
+            offset: offset
         )
     }
 

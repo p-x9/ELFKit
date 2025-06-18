@@ -36,9 +36,9 @@ public protocol ELFProgramHeaderProtocol {
 extension ELFProgramHeaderProtocol {
     public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
         guard type(inELF: elf.header) == .note else { return nil }
-        let data = elf.fileHandle.readData(
-            offset: numericCast(offset),
-            size: fileSize
+        let data = try! elf.fileHandle.readData(
+            offset: offset,
+            length: fileSize
         )
         return .init(data: data)
     }

@@ -39,9 +39,9 @@ extension ELFFile.UnicodeStrings {
         size: Int,
         isLittleEndian: Bool = false
     ) {
-        let data = elf.fileHandle.readData(
-            offset: numericCast(offset),
-            size: size
+        let data = try! elf.fileHandle.readData(
+            offset: offset,
+            length: size
         )
         self.init(
             data: data,
