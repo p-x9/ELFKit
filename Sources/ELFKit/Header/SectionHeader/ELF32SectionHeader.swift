@@ -101,8 +101,8 @@ extension ELF32SectionHeader {
         guard [.gnu_verdef, .sunw_verdef].contains(type(inELF: elf.header)) else {
             return nil
         }
-        let layout: ELF32VersionDef.Layout = elf.fileHandle.read(
-            offset: numericCast(offset)
+        let layout: ELF32VersionDef.Layout = try! elf.fileHandle.read(
+            offset: offset
         )
         return .init(
             layout: layout,
@@ -118,8 +118,8 @@ extension ELF32SectionHeader {
         guard [.gnu_verneed, .sunw_verneed].contains(type(inELF: elf.header)) else {
             return nil
         }
-        let layout: ELF32VersionNeed.Layout = elf.fileHandle.read(
-            offset: numericCast(offset)
+        let layout: ELF32VersionNeed.Layout = try! elf.fileHandle.read(
+            offset: offset
         )
         return .init(
             layout: layout,

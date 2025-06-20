@@ -7,12 +7,19 @@
 //
 
 import Foundation
+#if compiler(>=6.0) || (compiler(>=5.10) && hasFeature(AccessLevelOnImport))
+internal import FileIO
+#else
+@_implementationOnly import FileIO
+#endif
 
 public final class ELFFile: ELFRepresentable {
+    typealias File = MemoryMappedFile
+
     /// URL of the file actually loaded
     public let url: URL
 
-    let fileHandle: FileHandle
+    let fileHandle: File
 
     /// A boolean value that indicates whether ELF is a 64-bit architecture.
     public var is64Bit: Bool { header.identifier.class == ._64 }
@@ -27,21 +34,24 @@ public final class ELFFile: ELFRepresentable {
 
     public init(url: URL) throws {
         self.url = url
-        self.fileHandle = try FileHandle(forReadingFrom: url)
+        self.fileHandle = try File.open(
+            url: url,
+            isWritable: false
+        )
 
         guard let identifier: HeaderIdentifier = .init(
-            layout: fileHandle.read(offset: 0)
+            layout: try fileHandle.read(offset: 0)
         ) else { throw ELFKitError.invalidFile }
 
         let header: ELFHeader
         switch identifier.class {
         case ._32:
-            let _header: ELF32Header = fileHandle.read(
+            let _header: ELF32Header = try fileHandle.read(
                 offset: 0
             )
             header = ._32(_header)
         case ._64:
-            let _header: ELF64Header = fileHandle.read(
+            let _header: ELF64Header = try fileHandle.read(
                 offset: 0
             )
             header = ._64(_header)
@@ -50,10 +60,6 @@ public final class ELFFile: ELFRepresentable {
         }
 
         self.header = header
-    }
-
-    deinit {
-        fileHandle.closeFile()
     }
 }
 

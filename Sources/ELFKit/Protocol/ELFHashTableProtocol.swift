@@ -99,15 +99,15 @@ extension ELFGnuHashTableProtocol {
             return nil
         }
         var ix: UInt32 = numericCast(maxBucket)
-        var chain: Hashelt = elf.fileHandle.read(
-            offset: numericCast(chainsOffset)
-            + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
+        var chain: Hashelt = try! elf.fileHandle.read(
+            offset: chainsOffset
+            + numericCast(ix - header.gh_symndx) * MemoryLayout<Hashelt>.size
         )
         while (chain & 1) == 0 {
             ix += 1
-            chain = elf.fileHandle.read(
-                offset: numericCast(chainsOffset)
-                + numericCast(ix - header.gh_symndx) * numericCast(MemoryLayout<Hashelt>.size)
+            chain = try! elf.fileHandle.read(
+                offset: chainsOffset
+                + numericCast(ix - header.gh_symndx) * MemoryLayout<Hashelt>.size
             )
         }
         return numericCast(ix) + 1 // First `STN_UNDEF` symbol

@@ -158,8 +158,8 @@ fileprivate extension ELFGnuHashTableProtocol {
         while true {
             let current = symbols[Int(symix)]
             let name = current.name(in: elf, isDynamic: true)
-            let nhash: UInt32 = elf.fileHandle.read(
-                offset: numericCast( hashTable.chainsOffset) + numericCast(MemoryLayout<Hashelt>.size) * numericCast(UInt32(symix) - header.gh_symndx))
+            let nhash: UInt32 = try! elf.fileHandle.read(
+                offset: hashTable.chainsOffset + MemoryLayout<Hashelt>.size * numericCast(UInt32(symix) - header.gh_symndx))
             if (hash | 1) == (nhash | 1) && name == symbol {
                 return current
             }
