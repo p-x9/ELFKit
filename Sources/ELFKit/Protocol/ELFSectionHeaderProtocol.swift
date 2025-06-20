@@ -70,7 +70,8 @@ extension ELFSectionHeaderProtocol {
         return .init(
             elf: elf,
             offset: offset,
-            size: size
+            size: size,
+            isSwapped: false
         )
     }
 

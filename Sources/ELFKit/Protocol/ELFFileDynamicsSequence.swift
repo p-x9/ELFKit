@@ -79,7 +79,7 @@ extension ELFFileDynamicsSequence {
             return nil
         }
         let size = _strsiz.value
-        return .init(elf: elf, offset: offset, size: size)
+        return .init(elf: elf, offset: offset, size: size, isSwapped: false)
     }
 }
 
