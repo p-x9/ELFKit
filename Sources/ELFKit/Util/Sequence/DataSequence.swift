@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct DataSequence<T>: Sequence {
+public struct DataSequence<T>: Sequence, Sendable {
     public typealias Element = T
 
     private let data: Data

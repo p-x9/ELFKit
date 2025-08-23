@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public struct ELF64Note {
+public struct ELF64Note: Sendable {
     public let data: Data
     public let header: ELF64NoteHeader
 

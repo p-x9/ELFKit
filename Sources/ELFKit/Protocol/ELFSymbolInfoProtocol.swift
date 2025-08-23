@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ELFSymbolInfoProtocol {
+public protocol ELFSymbolInfoProtocol: Sendable {
     var dynamicEntryIndex: Int? { get }
     var specialBound: SymbolInfoSpecialBound? { get }
     var flags: SymbolInfoFlags { get }

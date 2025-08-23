@@ -8,8 +8,8 @@
 
 import Foundation
 
-public protocol BitFlags: OptionSet {
-    associatedtype Bit: CaseIterable, RawRepresentable, CustomStringConvertible where Bit.RawValue == RawValue
+public protocol BitFlags: OptionSet, Sendable {
+    associatedtype Bit: Sendable, CaseIterable, RawRepresentable, CustomStringConvertible where Bit.RawValue == RawValue
 
     associatedtype Element = Self
 

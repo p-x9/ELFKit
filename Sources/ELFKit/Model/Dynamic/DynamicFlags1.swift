@@ -147,7 +147,7 @@ extension DynamicFlags1 {
 }
 
 extension DynamicFlags1 {
-    public enum Bit: UInt32, CaseIterable {
+    public enum Bit: UInt32, Sendable, CaseIterable {
         /// DF_1_NOW
         case now = 1
         /// DF_1_GLOBAL

@@ -8,12 +8,12 @@
 
 import Foundation
 
-public protocol ELFHashTableHeaderProtocol {
+public protocol ELFHashTableHeaderProtocol: Sendable {
     var numberOfBuckets: Int { get }
     var numberOfChains: Int { get }
 }
 
-public protocol ELFHashTableProtocol {
+public protocol ELFHashTableProtocol: Sendable {
     associatedtype Header: ELFHashTableHeaderProtocol
     associatedtype Hashelt: FixedWidthInteger
     associatedtype Symbol: ELFSymbolProtocol
@@ -68,7 +68,7 @@ extension ELFHashTableProtocol {
     }
 }
 
-public protocol ELFGnuHashTableProtocol {
+public protocol ELFGnuHashTableProtocol: Sendable {
     associatedtype Hashelt: FixedWidthInteger
     associatedtype Bloom: FixedWidthInteger
     associatedtype Symbol: ELFSymbolProtocol

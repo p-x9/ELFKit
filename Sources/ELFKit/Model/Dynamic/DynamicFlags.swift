@@ -43,7 +43,7 @@ extension DynamicFlags {
 }
 
 extension DynamicFlags {
-    public enum Bit: UInt32, CaseIterable {
+    public enum Bit: UInt32, Sendable, CaseIterable {
         /// DF_ORIGIN
         case origin = 1
         /// DF_SYMBOLIC

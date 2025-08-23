@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public struct ELF32VersionDefAux: LayoutWrapper {
+public struct ELF32VersionDefAux: LayoutWrapper, Sendable {
     public typealias Layout = Elf32_Verdaux
 
     public var layout: Layout
@@ -17,7 +17,7 @@ public struct ELF32VersionDefAux: LayoutWrapper {
     public let _offset: Int
 }
 
-public struct ELF64VersionDefAux: LayoutWrapper {
+public struct ELF64VersionDefAux: LayoutWrapper, Sendable {
     public typealias Layout = Elf64_Verdaux
 
     public var layout: Layout

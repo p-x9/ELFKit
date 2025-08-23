@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum ELFClass: UInt8 {
+public enum ELFClass: UInt8, Sendable {
     /// ELFCLASSNONE
     case none = 0
     /// ELFCLASS32

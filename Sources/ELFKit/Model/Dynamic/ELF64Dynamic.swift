@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public struct ELF64Dynamic: LayoutWrapper {
+public struct ELF64Dynamic: LayoutWrapper, Sendable {
     public typealias Layout = Elf64_Dyn
 
     public typealias HashTable = ELF64HashTable

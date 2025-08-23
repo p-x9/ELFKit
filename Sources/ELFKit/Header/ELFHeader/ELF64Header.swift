@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public struct ELF64Header: LayoutWrapper {
+public struct ELF64Header: LayoutWrapper, Sendable {
     public var layout: Elf64_Ehdr
 }
 

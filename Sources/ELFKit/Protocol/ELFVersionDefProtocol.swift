@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ELFVersionDefProtocol {
+public protocol ELFVersionDefProtocol: Sendable {
     associatedtype Aux: ELFVersionDefAuxProtocol
 
     var _offset: Int { get }

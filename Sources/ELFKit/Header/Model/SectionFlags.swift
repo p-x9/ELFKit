@@ -58,7 +58,7 @@ extension SectionFlags {
 }
 
 extension SectionFlags {
-    public enum Bit: CaseIterable {
+    public enum Bit: Sendable, CaseIterable {
         /// SHF_WRITE
         case write
         /// SHF_ALLOC

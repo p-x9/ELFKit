@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SectionType: CaseIterable {
+public enum SectionType: Sendable, CaseIterable {
     /// SHT_NULL
     case null
     /// SHT_PROGBITS

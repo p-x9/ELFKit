@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SpecialSectionIndex: CaseIterable {
+public enum SpecialSectionIndex: Sendable, CaseIterable {
     /// SHN_UNDEF
     case undef
     /// SHN_ABS

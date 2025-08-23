@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum GnuNoteType: UInt32, CaseIterable {
+public enum GnuNoteType: UInt32, Sendable, CaseIterable {
     /// NT_GNU_ABI_TAG
     case abi_tag = 1
     /// NT_GNU_HWCAP

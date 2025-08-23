@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum ELF32Relocation {
+public enum ELF32Relocation: Sendable {
     case general(ELF32RelocationInfo)
     case addend(ELF32RelocationAddendInfo)
 }

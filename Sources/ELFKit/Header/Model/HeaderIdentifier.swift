@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public struct HeaderIdentifier: LayoutWrapper {
+public struct HeaderIdentifier: LayoutWrapper, Sendable {
     public typealias Layout = (UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8, UInt8)
 
     public var layout: Layout

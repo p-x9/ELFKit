@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public protocol ELFNoteHeaderProtocol {
+public protocol ELFNoteHeaderProtocol: Sendable {
     var nameSize: Int { get }
     var descriptionSize: Int { get }
     var type: Int { get }

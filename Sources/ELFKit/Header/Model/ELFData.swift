@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum ELFData: UInt8 {
+public enum ELFData: UInt8, Sendable {
     /// ELFDATANONE
     case none = 0
     /// ELFDATA2LSB

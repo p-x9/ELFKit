@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct StringTableEntry: Codable, Equatable {
+public struct StringTableEntry: Sendable, Codable, Equatable {
     public let string: String
     ///  Offset from the beginning of the string table
     public let offset: Int

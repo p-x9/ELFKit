@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct Version {
+public struct Version: Sendable {
     public let major: Int
     public let minor: Int
     public let patch: Int
