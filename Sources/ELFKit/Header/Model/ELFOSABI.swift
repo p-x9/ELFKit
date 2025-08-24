@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum ELFOSABI: CaseIterable {
+public enum ELFOSABI: Sendable, CaseIterable {
     /// ELFOSABI_NONE
     case none
     /// ELFOSABI_HPUX

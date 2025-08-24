@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SymbolBinding: CaseIterable {
+public enum SymbolBinding: Sendable, CaseIterable {
     /// STB_LOCAL
     case local
     /// STB_GLOBAL

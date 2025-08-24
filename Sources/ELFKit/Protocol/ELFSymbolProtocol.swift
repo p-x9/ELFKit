@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public protocol ELFSymbolProtocol {
+public protocol ELFSymbolProtocol: Sendable {
     var nameOffset: Int { get }
 
     var _commonBinding: SymbolBinding? { get }

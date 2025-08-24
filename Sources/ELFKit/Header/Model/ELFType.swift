@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum ELFType: UInt16, CaseIterable {
+public enum ELFType: UInt16, Sendable, CaseIterable {
     /// ET_NONE
     case none = 0
     /// ET_REL

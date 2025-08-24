@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct GnuHardwareCapabilities {
+public struct GnuHardwareCapabilities: Sendable {
     public let numberOfEntries: Int
     public let mask: UInt32
     public let entries: [String]

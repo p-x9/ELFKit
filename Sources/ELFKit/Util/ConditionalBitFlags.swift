@@ -8,10 +8,10 @@
 
 import Foundation
 
-public protocol ConditionalBitFlags: SetAlgebra {
+public protocol ConditionalBitFlags: Sendable, SetAlgebra {
     associatedtype RawValue: FixedWidthInteger
     associatedtype Element = Bit
-    associatedtype Bit: Hashable, CaseIterable, RawRepresentable, CustomStringConvertible where Bit.RawValue == RawValue
+    associatedtype Bit: Sendable, Hashable, CaseIterable, RawRepresentable, CustomStringConvertible where Bit.RawValue == RawValue
     associatedtype ArrayLiteralElement = Element
     var rawValue: RawValue { get set }
     var _bits: Set<Bit> { get set }

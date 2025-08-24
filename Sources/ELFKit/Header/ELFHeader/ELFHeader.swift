@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum ELFHeader {
+public enum ELFHeader: Sendable {
     case _32(ELF32Header)
     case _64(ELF64Header)
 }

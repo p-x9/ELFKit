@@ -11,7 +11,7 @@ import Foundation
 public typealias ELF32Notes = _ELFNotes<ELF32Note>
 public typealias ELF64Notes = _ELFNotes<ELF64Note>
 
-public struct _ELFNotes<Note: ELFNoteProtocol>: Sequence {
+public struct _ELFNotes<Note: ELFNoteProtocol>: Sequence, Sendable {
     let data: Data
 
     public func makeIterator() -> Iterator {

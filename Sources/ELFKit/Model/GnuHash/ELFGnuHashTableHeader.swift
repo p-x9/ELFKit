@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct ELFGnuHashTableHeader: LayoutWrapper {
+public struct ELFGnuHashTableHeader: LayoutWrapper, Sendable {
     public typealias Layout = Elf_GNU_Hash_Header
     public var layout: Layout
 }

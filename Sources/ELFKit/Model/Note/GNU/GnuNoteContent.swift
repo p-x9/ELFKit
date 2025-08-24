@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum GnuNoteContent {
+public enum GnuNoteContent: Sendable {
     /// NT_GNU_ABI_TAG
     case abi_tag(GnuABITag)
     /// NT_GNU_HWCAP

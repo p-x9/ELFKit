@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum DynamicTag: CaseIterable {
+public enum DynamicTag: Sendable, CaseIterable {
     /// DT_NULL
     case null
     /// DT_NEEDED

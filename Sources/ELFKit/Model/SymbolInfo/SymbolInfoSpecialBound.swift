@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SymbolInfoSpecialBound: UInt16, CaseIterable {
+public enum SymbolInfoSpecialBound: UInt16, Sendable, CaseIterable {
     /// SYMINFO_BT_SELF
     case `self` = 0xffff
     /// SYMINFO_BT_PARENT

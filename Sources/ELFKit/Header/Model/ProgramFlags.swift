@@ -58,7 +58,7 @@ extension ProgramFlags {
 }
 
 extension ProgramFlags {
-    public enum Bit: CaseIterable {
+    public enum Bit: Sendable, CaseIterable {
         /// PF_X
         case x
         /// PF_W

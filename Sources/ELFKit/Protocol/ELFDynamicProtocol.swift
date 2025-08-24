@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ELFDynamicProtocol {
+public protocol ELFDynamicProtocol: Sendable {
     associatedtype HashTable: ELFHashTableProtocol
     associatedtype GnuHashTable: ELFGnuHashTableProtocol
     associatedtype Symbol: ELFSymbolProtocol

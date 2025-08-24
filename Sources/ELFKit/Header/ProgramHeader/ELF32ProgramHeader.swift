@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public struct ELF32ProgramHeader: LayoutWrapper {
+public struct ELF32ProgramHeader: LayoutWrapper, Sendable {
     public typealias Layout = Elf32_Phdr
 
     public var layout: Layout

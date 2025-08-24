@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ELFRelocationProtocol {
+public protocol ELFRelocationProtocol: Sendable {
     var offset: Int { get }
     var symbolIndex: Int { get }
     var _type: Int { get }

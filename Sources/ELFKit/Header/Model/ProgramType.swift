@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum ProgramType: CaseIterable {
+public enum ProgramType: Sendable, CaseIterable {
     /// PT_NULL
     case null
     /// PT_LOAD

@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SymbolVisibility: UInt8, CaseIterable {
+public enum SymbolVisibility: UInt8, Sendable, CaseIterable {
     /// STV_DEFAULT
     case `default` = 0
     /// STV_INTERNAL

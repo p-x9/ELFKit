@@ -8,8 +8,8 @@
 
 import Foundation
 
-public struct GnuABITag: LayoutWrapper {
-    public struct Layout {
+public struct GnuABITag: LayoutWrapper, Sendable {
+    public struct Layout: Sendable {
         let os: UInt32
         let major, minor, patch: UInt32
     }
@@ -57,7 +57,7 @@ extension GnuABITag {
 }
 
 extension GnuABITag {
-    public enum OS: UInt32, CaseIterable {
+    public enum OS: UInt32, Sendable, CaseIterable {
         /// GNU_ABI_TAG_LINUX
         case linux = 0
         /// GNU_ABI_TAG_HURD

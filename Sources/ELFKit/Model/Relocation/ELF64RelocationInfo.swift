@@ -9,13 +9,13 @@
 import Foundation
 import ELFKitC
 
-public struct ELF64RelocationInfo: LayoutWrapper {
+public struct ELF64RelocationInfo: LayoutWrapper, Sendable {
     public typealias Layout = Elf64_Rel
 
     public var layout: Layout
 }
 
-public struct ELF64RelocationAddendInfo: LayoutWrapper {
+public struct ELF64RelocationAddendInfo: LayoutWrapper, Sendable {
     public typealias Layout = Elf64_Rela
 
     public var layout: Layout

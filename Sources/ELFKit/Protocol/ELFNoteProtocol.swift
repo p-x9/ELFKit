@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ELFNoteProtocol {
+public protocol ELFNoteProtocol: Sendable {
     associatedtype Header: ELFNoteHeaderProtocol, LayoutWrapper
 
     var header: Header { get }

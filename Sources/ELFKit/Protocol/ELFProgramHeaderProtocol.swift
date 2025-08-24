@@ -8,7 +8,7 @@
 
 import Foundation
 
-public protocol ELFProgramHeaderProtocol {
+public protocol ELFProgramHeaderProtocol: Sendable {
     associatedtype Relocation: ELFRelocationProtocol
     associatedtype Note: ELFNoteProtocol
     associatedtype Dynamic: ELFDynamicProtocol

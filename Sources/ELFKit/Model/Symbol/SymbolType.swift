@@ -9,7 +9,7 @@
 import Foundation
 import ELFKitC
 
-public enum SymbolType: CaseIterable {
+public enum SymbolType: Sendable, CaseIterable {
     /// STT_NOTYPE
     case notype
     /// STT_OBJECT

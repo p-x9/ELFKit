@@ -9,16 +9,16 @@
 import Foundation
 import ELFKitC
 
-public struct ELF32HashTableHeader: LayoutWrapper {
-    public struct Layout {
+public struct ELF32HashTableHeader: LayoutWrapper, Sendable {
+    public struct Layout: Sendable {
         public let nbuckets: Elf32_Hashelt
         public let nchain: Elf32_Hashelt
     }
     public var layout: Layout
 }
 
-public struct ELF64HashTableHeader: LayoutWrapper {
-    public struct Layout {
+public struct ELF64HashTableHeader: LayoutWrapper, Sendable {
+    public struct Layout: Sendable {
         public let nbuckets: Elf64_Hashelt
         public let nchain: Elf64_Hashelt
     }

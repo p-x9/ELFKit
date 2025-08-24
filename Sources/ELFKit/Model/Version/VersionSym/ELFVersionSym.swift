@@ -9,13 +9,13 @@
 import Foundation
 import ELFKitC
 
-public struct ELF32VersionSym: LayoutWrapper {
+public struct ELF32VersionSym: LayoutWrapper, Sendable {
     public typealias Layout = Elf32_Versym
 
     public var layout: Layout
 }
 
-public struct ELF64VersionSym: LayoutWrapper {
+public struct ELF64VersionSym: LayoutWrapper, Sendable {
     public typealias Layout = Elf64_Versym
 
     public var layout: Layout
