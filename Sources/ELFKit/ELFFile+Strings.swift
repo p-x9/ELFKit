@@ -13,10 +13,6 @@ internal import FileIO
 @_implementationOnly import FileIO
 #endif
 
-public protocol StringTable<Encoding>: Sequence<StringTableEntry> {
-    associatedtype Encoding: _UnicodeEncoding
-}
-
 extension ELFFile {
     public typealias Strings = UnicodeStrings<UTF8>
 
