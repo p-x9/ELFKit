@@ -30,7 +30,7 @@ Reading from a file can be as follows.
 
 ```swift
 let path = "Path to MachO file"
-let url = URL(string: path)
+let url = URL(fileURLWithPath: path)
 
 let elf = try ELFFile(url: url)
 ```
