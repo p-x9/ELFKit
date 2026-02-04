@@ -81,6 +81,7 @@ extension ELFSectionHeaderProtocol {
             basePointer: elf.ptr
                 .advanced(by: offset)
                 .assumingMemoryBound(to: UInt8.self),
+            offset: offset,
             tableSize: size
         )
     }
