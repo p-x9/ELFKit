@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/p-x9/swift-binary-parse-support.git",
       "state" : {
-        "revision" : "b430c63f500f1f26105df7d2425b80ae7ed97729",
-        "version" : "0.2.0"
+        "revision" : "5fb96b503672ea4752eded6b4e301fd87214b03b",
+        "version" : "0.2.1"
       }
     },
     {
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/p-x9/swift-fileio-extra.git",
       "state" : {
-        "revision" : "fd15445710e300aa9f70f9b00bc60118398c4a7c",
-        "version" : "0.2.0"
+        "revision" : "8d83506dd4dff737807d90dbf2264096ed98c7a7",
+        "version" : "0.2.2"
       }
     }
   ],
