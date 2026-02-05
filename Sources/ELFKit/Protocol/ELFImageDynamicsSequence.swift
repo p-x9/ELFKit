@@ -82,6 +82,7 @@ extension ELFImageDynamicsSequence {
         return .init(
             basePointer: pointer
                 .assumingMemoryBound(to: UInt8.self),
+            offset: Int(bitPattern: pointer) - Int(bitPattern: elf.ptr),
             tableSize: size
         )
     }

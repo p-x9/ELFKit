@@ -7,3 +7,6 @@
 //
 
 @_exported import ELFKitC
+
+@_exported
+@_spi(Core) import BinaryParseSupport
