@@ -41,6 +41,51 @@ extension ELFImage.Dynamics32 {
         }
         return nil
     }
+
+    public func pltRelocations(in elf: ELFImage) -> AnyRandomAccessCollection<ELF32Relocation>? {
+        guard let _jmprel, let _pltrelsz, let _pltrel else {
+            return nil
+        }
+        guard let pointer = _jmprel.pointer(for: elf) else {
+            return nil
+        }
+        guard let pltrelType = DynamicTag(
+            rawValue: numericCast(_pltrel.value),
+            osabi: .none,
+            machine: .none
+        ) else {
+            return nil
+        }
+
+        switch pltrelType {
+        case .rel:
+            let entrySize = _relent?.value ?? ELF32RelocationInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: MemorySequence<ELF32RelocationInfo> = .init(
+                basePointer: pointer
+                    .assumingMemoryBound(to: ELF32RelocationInfo.self),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+
+        case .rela:
+            let entrySize = _relaent?.value ?? ELF32RelocationAddendInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: MemorySequence<ELF32RelocationAddendInfo> = .init(
+                basePointer: pointer
+                    .assumingMemoryBound(to: ELF32RelocationAddendInfo.self),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+
+        default:
+            return nil
+        }
+    }
 }
 
 // MARK: - Version Defs
