@@ -225,6 +225,84 @@ extension ELFImageDynamicsSequence {
     }
 }
 
+extension ELFImageDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutConvertible {
+    public func relocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>? {
+        if let _rel, let relcount {
+            guard let pointer = _rel.pointer(for: elf) else {
+                return nil
+            }
+            let sequence: MemorySequence<Dynamic.Relocation.RelInfo> = .init(
+                basePointer: pointer
+                    .assumingMemoryBound(to: Dynamic.Relocation.RelInfo.self),
+                numberOfElements: relcount
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        }
+
+        if let _rela, let relacount {
+            guard let pointer = _rela.pointer(for: elf) else {
+                return nil
+            }
+            let sequence: MemorySequence<Dynamic.Relocation.RelaInfo> = .init(
+                basePointer: pointer
+                    .assumingMemoryBound(to: Dynamic.Relocation.RelaInfo.self),
+                numberOfElements: relacount
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        }
+        return nil
+    }
+
+    public func pltRelocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>? {
+        guard let _jmprel, let _pltrelsz, let _pltrel else {
+            return nil
+        }
+        guard let pointer = _jmprel.pointer(for: elf) else {
+            return nil
+        }
+        guard let pltrelType = DynamicTag(
+            rawValue: numericCast(_pltrel.value),
+            osabi: .none,
+            machine: .none
+        ) else {
+            return nil
+        }
+
+        switch pltrelType {
+        case .rel:
+            let entrySize = _relent?.value ?? Dynamic.Relocation.RelInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: MemorySequence<Dynamic.Relocation.RelInfo> = .init(
+                basePointer: pointer
+                    .assumingMemoryBound(to: Dynamic.Relocation.RelInfo.self),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+
+        case .rela:
+            let entrySize = _relaent?.value ?? Dynamic.Relocation.RelaInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: MemorySequence<Dynamic.Relocation.RelaInfo> = .init(
+                basePointer: pointer
+                    .assumingMemoryBound(to: Dynamic.Relocation.RelaInfo.self),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+
+        default:
+            return nil
+        }
+    }
+}
+
 // MARK: - SymbolInfos
 extension ELFImageDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
     public func symbolInfos(in elf: ELFImage) -> MemorySequence<Dynamic.SymbolInfo>? {

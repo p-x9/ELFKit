@@ -123,6 +123,33 @@ extension ELFSectionHeaderProtocol where Dynamic: LayoutWrapper {
     }
 }
 
+extension ELFSectionHeaderProtocol where Relocation: ELFRelocationLayoutConvertible {
+    public func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>? {
+        switch type(inELF: elf.header) {
+        case .rel:
+            let count = size / Relocation.RelInfo.layoutSize
+            let sequence: DataSequence<Relocation.RelInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        case .rela:
+            let count = size / Relocation.RelaInfo.layoutSize
+            let sequence: DataSequence<Relocation.RelaInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: count
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        default:
+            return nil
+        }
+    }
+}
+
 // MARK: - Hash Table
 extension ELFSectionHeaderProtocol where Dynamic.HashTableHeader: LayoutWrapper {
     public func _hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader? {

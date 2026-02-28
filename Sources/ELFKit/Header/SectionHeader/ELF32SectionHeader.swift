@@ -62,39 +62,6 @@ extension ELF32SectionHeader: ELFSectionHeaderProtocol {
     public var entrySize: Int { numericCast(layout.sh_entsize) }
 }
 
-extension ELF32SectionHeader {
-    public func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>? {
-        switch type(inELF: elf.header) {
-        case .rel:
-            let count = size / ELF32RelocationInfo.layoutSize
-            let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
-                numberOfElements: count
-            )
-            return AnyRandomAccessCollection(
-                sequence
-                    .map {
-                        .general($0)
-                    }
-            )
-        case .rela:
-            let count = size / ELF32RelocationAddendInfo.layoutSize
-            let sequence: DataSequence<ELF32RelocationAddendInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
-                numberOfElements: count
-            )
-            return AnyRandomAccessCollection(
-                sequence
-                    .map {
-                        .addend($0)
-                    }
-            )
-        default:
-            return nil
-        }
-    }
-}
-
 // MARK: - Version Defs
 extension ELF32SectionHeader {
     public func _versionDef(in elf: ELFFile) -> ELF32VersionDef? {

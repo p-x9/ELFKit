@@ -14,3 +14,11 @@ public protocol ELFRelocationProtocol: Sendable {
     var _type: Int { get }
     var addend: Int { get }
 }
+
+public protocol ELFRelocationLayoutConvertible: ELFRelocationProtocol {
+    associatedtype RelInfo: LayoutWrapper
+    associatedtype RelaInfo: LayoutWrapper
+
+    static func general(_ info: RelInfo) -> Self
+    static func addend(_ info: RelaInfo) -> Self
+}
