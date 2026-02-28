@@ -34,6 +34,7 @@ where Iterator == WrappedSequence.Iterator {
     func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>?
 
     func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    func pltRelocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
     var flags1: DynamicFlags1 { get }

@@ -39,6 +39,49 @@ extension ELFFile.Dynamics32 {
         }
         return nil
     }
+
+    public func pltRelocations(in elf: ELFFile) -> AnyRandomAccessCollection<ELF32Relocation>? {
+        guard let _jmprel, let _pltrelsz, let _pltrel else {
+            return nil
+        }
+        guard let offset = elf.fileOffset(of: _jmprel.pointer) else {
+            return nil
+        }
+        guard let pltrelType = DynamicTag(
+            rawValue: numericCast(_pltrel.value),
+            osabi: .none,
+            machine: .none
+        ) else {
+            return nil
+        }
+
+        switch pltrelType {
+        case .rel:
+            let entrySize = _relent?.value ?? ELF32RelocationInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: DataSequence<ELF32RelocationInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+
+        case .rela:
+            let entrySize = _relaent?.value ?? ELF32RelocationAddendInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: DataSequence<ELF32RelocationAddendInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+
+        default:
+            return nil
+        }
+    }
 }
 
 // MARK: - Version Defs

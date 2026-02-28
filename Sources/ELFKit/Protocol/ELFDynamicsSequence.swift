@@ -102,6 +102,7 @@ where Element == Dynamic,
     func symbolInfos(in elf: ELF) -> SymbolInfos?
 
     func relocations(in elf: ELF) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    func pltRelocations(in elf: ELF) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
     var flags1: DynamicFlags1 { get }
