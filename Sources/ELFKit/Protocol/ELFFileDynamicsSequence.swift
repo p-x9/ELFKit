@@ -223,6 +223,80 @@ extension ELFFileDynamicsSequence {
     }
 }
 
+extension ELFFileDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutConvertible {
+    public func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>? {
+        if let _rel, let relcount {
+            guard let offset = elf.fileOffset(of: _rel.pointer) else {
+                return nil
+            }
+            let sequence: DataSequence<Dynamic.Relocation.RelInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: relcount
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+        }
+
+        if let _rela, let relacount {
+            guard let offset = elf.fileOffset(of: _rela.pointer) else {
+                return nil
+            }
+            let sequence: DataSequence<Dynamic.Relocation.RelaInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: relacount
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+        }
+        return nil
+    }
+
+    public func pltRelocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>? {
+        guard let _jmprel, let _pltrelsz, let _pltrel else {
+            return nil
+        }
+        guard let offset = elf.fileOffset(of: _jmprel.pointer) else {
+            return nil
+        }
+        guard let pltrelType = DynamicTag(
+            rawValue: numericCast(_pltrel.value),
+            osabi: .none,
+            machine: .none
+        ) else {
+            return nil
+        }
+
+        switch pltrelType {
+        case .rel:
+            let entrySize = _relent?.value ?? Dynamic.Relocation.RelInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: DataSequence<Dynamic.Relocation.RelInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .general($0) }
+            )
+
+        case .rela:
+            let entrySize = _relaent?.value ?? Dynamic.Relocation.RelaInfo.layoutSize
+            guard entrySize > 0 else { return nil }
+            let sequence: DataSequence<Dynamic.Relocation.RelaInfo> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: _pltrelsz.value / entrySize
+            )
+            return AnyRandomAccessCollection(
+                sequence.map { .addend($0) }
+            )
+
+        default:
+            return nil
+        }
+    }
+}
+
 // MARK: - SymbolInfos
 extension ELFFileDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
     public func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>? {

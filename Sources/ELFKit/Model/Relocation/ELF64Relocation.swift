@@ -43,3 +43,8 @@ extension ELF64Relocation: ELFRelocationProtocol {
         }
     }
 }
+
+extension ELF64Relocation: ELFRelocationLayoutConvertible {
+    public typealias RelInfo = ELF64RelocationInfo
+    public typealias RelaInfo = ELF64RelocationAddendInfo
+}
