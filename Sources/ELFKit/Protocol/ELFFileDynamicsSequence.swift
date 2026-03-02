@@ -33,7 +33,9 @@ where Iterator == WrappedSequence.Iterator {
 
     func symbolInfos(in elf: ELFFile) -> DataSequence<Dynamic.SymbolInfo>?
 
+    func relrEntries(in elf: ELFFile) -> [ELFRelrEntry]?
     func relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    func relrRelocations(in elf: ELFFile) -> [ELFRelrRelocation]?
     func pltRelocations(in elf: ELFFile) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
@@ -294,6 +296,60 @@ extension ELFFileDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutC
         default:
             return nil
         }
+    }
+}
+
+extension ELFFileDynamicsSequence where Dynamic == ELF32Dynamic {
+    public func relrEntries(in elf: ELFFile) -> [ELFRelrEntry]? {
+        guard let _relr, let _relrsz else { return nil }
+
+        let entrySize = _relrent?.value ?? MemoryLayout<UInt32>.size
+        guard entrySize == MemoryLayout<UInt32>.size else { return nil }
+        guard _relrsz.value % entrySize == 0 else { return nil }
+        guard let offset = elf.fileOffset(of: _relr.pointer) else {
+            return nil
+        }
+
+        let sequence: DataSequence<UInt32> = elf.fileHandle.readDataSequence(
+            offset: numericCast(offset),
+            numberOfElements: _relrsz.value / entrySize
+        )
+        return _ELFRelrRelocationDecoder.entries(sequence)
+    }
+
+    public func relrRelocations(in elf: ELFFile) -> [ELFRelrRelocation]? {
+        guard let entries = relrEntries(in: elf) else { return nil }
+        return _ELFRelrRelocationDecoder.decode(
+            entries,
+            wordSize: MemoryLayout<UInt32>.size
+        )
+    }
+}
+
+extension ELFFileDynamicsSequence where Dynamic == ELF64Dynamic {
+    public func relrEntries(in elf: ELFFile) -> [ELFRelrEntry]? {
+        guard let _relr, let _relrsz else { return nil }
+
+        let entrySize = _relrent?.value ?? MemoryLayout<UInt64>.size
+        guard entrySize == MemoryLayout<UInt64>.size else { return nil }
+        guard _relrsz.value % entrySize == 0 else { return nil }
+        guard let offset = elf.fileOffset(of: _relr.pointer) else {
+            return nil
+        }
+
+        let sequence: DataSequence<UInt64> = elf.fileHandle.readDataSequence(
+            offset: numericCast(offset),
+            numberOfElements: _relrsz.value / entrySize
+        )
+        return _ELFRelrRelocationDecoder.entries(sequence)
+    }
+
+    public func relrRelocations(in elf: ELFFile) -> [ELFRelrRelocation]? {
+        guard let entries = relrEntries(in: elf) else { return nil }
+        return _ELFRelrRelocationDecoder.decode(
+            entries,
+            wordSize: MemoryLayout<UInt64>.size
+        )
     }
 }
 

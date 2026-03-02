@@ -33,7 +33,9 @@ where Iterator == WrappedSequence.Iterator {
 
     func symbolInfos(in elf: ELFImage) -> MemorySequence<Dynamic.SymbolInfo>?
 
+    func relrEntries(in elf: ELFImage) -> [ELFRelrEntry]?
     func relocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    func relrRelocations(in elf: ELFImage) -> [ELFRelrRelocation]?
     func pltRelocations(in elf: ELFImage) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
@@ -300,6 +302,60 @@ extension ELFImageDynamicsSequence where Dynamic.Relocation: ELFRelocationLayout
         default:
             return nil
         }
+    }
+}
+
+extension ELFImageDynamicsSequence where Dynamic == ELF32Dynamic {
+    public func relrEntries(in elf: ELFImage) -> [ELFRelrEntry]? {
+        guard let _relr, let _relrsz else { return nil }
+
+        let entrySize = _relrent?.value ?? MemoryLayout<UInt32>.size
+        guard entrySize == MemoryLayout<UInt32>.size else { return nil }
+        guard _relrsz.value % entrySize == 0 else { return nil }
+        guard let pointer = _relr.pointer(for: elf) else {
+            return nil
+        }
+
+        let sequence: MemorySequence<UInt32> = .init(
+            basePointer: pointer.assumingMemoryBound(to: UInt32.self),
+            numberOfElements: _relrsz.value / entrySize
+        )
+        return _ELFRelrRelocationDecoder.entries(sequence)
+    }
+
+    public func relrRelocations(in elf: ELFImage) -> [ELFRelrRelocation]? {
+        guard let entries = relrEntries(in: elf) else { return nil }
+        return _ELFRelrRelocationDecoder.decode(
+            entries,
+            wordSize: MemoryLayout<UInt32>.size
+        )
+    }
+}
+
+extension ELFImageDynamicsSequence where Dynamic == ELF64Dynamic {
+    public func relrEntries(in elf: ELFImage) -> [ELFRelrEntry]? {
+        guard let _relr, let _relrsz else { return nil }
+
+        let entrySize = _relrent?.value ?? MemoryLayout<UInt64>.size
+        guard entrySize == MemoryLayout<UInt64>.size else { return nil }
+        guard _relrsz.value % entrySize == 0 else { return nil }
+        guard let pointer = _relr.pointer(for: elf) else {
+            return nil
+        }
+
+        let sequence: MemorySequence<UInt64> = .init(
+            basePointer: pointer.assumingMemoryBound(to: UInt64.self),
+            numberOfElements: _relrsz.value / entrySize
+        )
+        return _ELFRelrRelocationDecoder.entries(sequence)
+    }
+
+    public func relrRelocations(in elf: ELFImage) -> [ELFRelrRelocation]? {
+        guard let entries = relrEntries(in: elf) else { return nil }
+        return _ELFRelrRelocationDecoder.decode(
+            entries,
+            wordSize: MemoryLayout<UInt64>.size
+        )
     }
 }
 

@@ -101,7 +101,11 @@ where Element == Dynamic,
 
     func symbolInfos(in elf: ELF) -> SymbolInfos?
 
+    /// Raw packed RELR entries retrieved from `DT_RELR`.
+    func relrEntries(in elf: ELF) -> [ELFRelrEntry]?
     func relocations(in elf: ELF) -> AnyRandomAccessCollection<Dynamic.Relocation>?
+    /// Expanded relative relocations decoded from `DT_RELR`.
+    func relrRelocations(in elf: ELF) -> [ELFRelrRelocation]?
     func pltRelocations(in elf: ELF) -> AnyRandomAccessCollection<Dynamic.Relocation>?
 
     var flags: DynamicFlags { get }
