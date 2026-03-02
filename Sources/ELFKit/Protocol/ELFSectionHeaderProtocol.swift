@@ -31,8 +31,13 @@ public protocol ELFSectionHeaderProtocol: Sendable {
     func name(in elf: ELFFile) -> String?
 
     func _strings(in elf: ELFFile) -> ELFFile.Strings?
+
     func _relocations(in elf: ELFFile) -> AnyRandomAccessCollection<Relocation>?
+    func _relrEntries(in elf: ELFFile) -> [ELFRelrEntry]?
+    func _relrRelocations(in elf: ELFFile) -> [ELFRelrRelocation]?
+
     func _notes(in elf: ELFFile) -> _ELFNotes<Note>?
+
     func _dynamics(in elf: ELFFile) -> DataSequence<Dynamic>?
 
     func _hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader?
@@ -147,6 +152,41 @@ extension ELFSectionHeaderProtocol where Relocation: ELFRelocationLayoutConverti
         default:
             return nil
         }
+    }
+}
+
+extension ELFSectionHeaderProtocol {
+    public func _relrEntries(in elf: ELFFile) -> [ELFRelrEntry]? {
+        guard type(inELF: elf.header) == .relr else { return nil }
+
+        let wordSize = elf.is64Bit ? MemoryLayout<UInt64>.size : MemoryLayout<UInt32>.size
+        let relrEntrySize = entrySize > 0 ? entrySize : wordSize
+
+        guard relrEntrySize == wordSize else { return nil }
+        guard size % relrEntrySize == 0 else { return nil }
+
+        if elf.is64Bit {
+            let sequence: DataSequence<UInt64> = elf.fileHandle.readDataSequence(
+                offset: numericCast(offset),
+                numberOfElements: size / relrEntrySize
+            )
+            return _ELFRelrRelocationDecoder.entries(sequence)
+        }
+
+        let sequence: DataSequence<UInt32> = elf.fileHandle.readDataSequence(
+            offset: numericCast(offset),
+            numberOfElements: size / relrEntrySize
+        )
+        return _ELFRelrRelocationDecoder.entries(sequence)
+    }
+
+    public func _relrRelocations(in elf: ELFFile) -> [ELFRelrRelocation]? {
+        guard let entries = _relrEntries(in: elf) else { return nil }
+        let wordSize = elf.is64Bit ? MemoryLayout<UInt64>.size : MemoryLayout<UInt32>.size
+        return _ELFRelrRelocationDecoder.decode(
+            entries,
+            wordSize: wordSize
+        )
     }
 }
 

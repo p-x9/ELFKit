@@ -31,6 +31,9 @@ extension Sequence where Element: ELFDynamicProtocol {
     var _relsz: Element? { first(where: { $0._commonTag == .relsz }) }
     var _relcount: Element? { first(where: { $0._commonTag == .relcount }) }
     var _relent: Element? { first(where: { $0._commonTag == .relent }) }
+    var _relr: Element? { first(where: { $0._commonTag == .relr }) }
+    var _relrsz: Element? { first(where: { $0._commonTag == .relrsz }) }
+    var _relrent: Element? { first(where: { $0._commonTag == .relrent }) }
     var _jmprel: Element? { first(where: { $0._commonTag == .jmprel }) }
     var _pltrel: Element? { first(where: { $0._commonTag == .pltrel }) }
     var _pltrelsz: Element? { first(where: { $0._commonTag == .pltrelsz }) }
