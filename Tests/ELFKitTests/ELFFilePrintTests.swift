@@ -196,6 +196,30 @@ extension ELFFilePrintTests {
         )
     }
 
+    func testRelrRelocations() {
+        let relocations: [ELFRelrRelocation]?
+        if let dynamics = elf.dynamics64 {
+            relocations = dynamics.relrRelocations(in: elf)
+        } else if let dynamics = elf.dynamics32 {
+            relocations = dynamics.relrRelocations(in: elf)
+        } else {
+            relocations = nil
+        }
+
+        guard let relocations else { return }
+
+        print("DT_RELR:")
+        for (i, relocation) in relocations.enumerated() {
+            print(" ----")
+            print(" [\(i)]")
+            print(" Offset:", String(relocation.offset, radix: 16))
+            print(
+                " Addend:",
+                String(relocation.addend(in: elf) ?? 0, radix: 16)
+            )
+        }
+    }
+
     func testVersionDef() {
         guard let dynamics = elf.dynamics64 else { return }
         let versionDefs = dynamics.versionDefs(in: elf)
