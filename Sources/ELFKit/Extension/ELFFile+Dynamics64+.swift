@@ -17,7 +17,7 @@ extension ELFFile.Dynamics64 {
             return nil
         }
         let layout: ELF64VersionDef.Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,
@@ -35,7 +35,7 @@ extension ELFFile.Dynamics64 {
             return nil
         }
         let layout: ELF64VersionNeed.Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,

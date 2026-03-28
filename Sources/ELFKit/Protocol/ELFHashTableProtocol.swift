@@ -102,12 +102,14 @@ extension ELFGnuHashTableProtocol {
         var chain: Hashelt = try! elf.fileHandle.read(
             offset: chainsOffset
             + numericCast(ix - header.gh_symndx) * MemoryLayout<Hashelt>.size
+            + elf.headerStartOffset
         )
         while (chain & 1) == 0 {
             ix += 1
             chain = try! elf.fileHandle.read(
                 offset: chainsOffset
                 + numericCast(ix - header.gh_symndx) * MemoryLayout<Hashelt>.size
+                + elf.headerStartOffset
             )
         }
         return numericCast(ix) + 1 // First `STN_UNDEF` symbol

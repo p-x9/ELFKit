@@ -82,7 +82,12 @@ extension ELFFileDynamicsSequence {
             return nil
         }
         let size = _strsiz.value
-        return .init(elf: elf, offset: offset, size: size, isSwapped: false)
+        return .init(
+            elf: elf,
+            offset: offset + elf.headerStartOffset,
+            size: size,
+            isSwapped: false
+        )
     }
 }
 
@@ -130,7 +135,7 @@ extension ELFFileDynamicsSequence where Dynamic.HashTableHeader: LayoutWrapper {
             return nil
         }
         return try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
     }
 
@@ -157,7 +162,7 @@ extension ELFFileDynamicsSequence {
             return nil
         }
         return try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
     }
 
@@ -196,7 +201,7 @@ extension ELFFileDynamicsSequence {
             return nil
         }
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: numberOfSymbols
         )
     }
@@ -232,7 +237,7 @@ extension ELFFileDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutC
                 return nil
             }
             let sequence: DataSequence<Dynamic.Relocation.RelInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: relcount
             )
             return AnyRandomAccessCollection(
@@ -245,7 +250,7 @@ extension ELFFileDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutC
                 return nil
             }
             let sequence: DataSequence<Dynamic.Relocation.RelaInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: relacount
             )
             return AnyRandomAccessCollection(
@@ -275,7 +280,7 @@ extension ELFFileDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutC
             let entrySize = _relent?.value ?? Dynamic.Relocation.RelInfo.layoutSize
             guard entrySize > 0 else { return nil }
             let sequence: DataSequence<Dynamic.Relocation.RelInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: _pltrelsz.value / entrySize
             )
             return AnyRandomAccessCollection(
@@ -286,7 +291,7 @@ extension ELFFileDynamicsSequence where Dynamic.Relocation: ELFRelocationLayoutC
             let entrySize = _relaent?.value ?? Dynamic.Relocation.RelaInfo.layoutSize
             guard entrySize > 0 else { return nil }
             let sequence: DataSequence<Dynamic.Relocation.RelaInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: _pltrelsz.value / entrySize
             )
             return AnyRandomAccessCollection(
@@ -311,7 +316,7 @@ extension ELFFileDynamicsSequence where Dynamic == ELF32Dynamic {
         }
 
         let sequence: DataSequence<UInt32> = elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: _relrsz.value / entrySize
         )
         return _ELFRelrRelocationDecoder.entries(sequence)
@@ -338,7 +343,7 @@ extension ELFFileDynamicsSequence where Dynamic == ELF64Dynamic {
         }
 
         let sequence: DataSequence<UInt64> = elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: _relrsz.value / entrySize
         )
         return _ELFRelrRelocationDecoder.entries(sequence)
@@ -361,7 +366,7 @@ extension ELFFileDynamicsSequence where Dynamic.SymbolInfo: LayoutWrapper {
             return nil
         }
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: numericCast(_syminsz.value) / Dynamic.SymbolInfo.layoutSize
         )
     }
@@ -433,7 +438,7 @@ extension ELFFileDynamicsSequence {
             return nil
         }
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: numberOfSymbols
         )
     }

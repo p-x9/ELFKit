@@ -74,7 +74,7 @@ extension ELFSectionHeaderProtocol {
         guard type(inELF: elf.header) == .strtab else { return nil }
         return .init(
             elf: elf,
-            offset: offset,
+            offset: offset + elf.headerStartOffset,
             size: size,
             isSwapped: false
         )
@@ -97,7 +97,7 @@ extension ELFSectionHeaderProtocol {
     public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
         guard type(inELF: elf.header) == .note else { return nil }
         let data = try! elf.fileHandle.readData(
-            offset: offset,
+            offset: offset + elf.headerStartOffset,
             length: size
         )
         return .init(data: data)
@@ -121,7 +121,7 @@ extension ELFSectionHeaderProtocol where Dynamic: LayoutWrapper {
         let count = size / Dynamic.layoutSize
         return .init(
             elf.fileHandle.readDataSequence(
-                offset: UInt64(offset),
+                offset: UInt64(offset + elf.headerStartOffset),
                 numberOfElements: count
             )
         )
@@ -134,7 +134,7 @@ extension ELFSectionHeaderProtocol where Relocation: ELFRelocationLayoutConverti
         case .rel:
             let count = size / Relocation.RelInfo.layoutSize
             let sequence: DataSequence<Relocation.RelInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: count
             )
             return AnyRandomAccessCollection(
@@ -143,7 +143,7 @@ extension ELFSectionHeaderProtocol where Relocation: ELFRelocationLayoutConverti
         case .rela:
             let count = size / Relocation.RelaInfo.layoutSize
             let sequence: DataSequence<Relocation.RelaInfo> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: count
             )
             return AnyRandomAccessCollection(
@@ -167,14 +167,14 @@ extension ELFSectionHeaderProtocol {
 
         if elf.is64Bit {
             let sequence: DataSequence<UInt64> = elf.fileHandle.readDataSequence(
-                offset: numericCast(offset),
+                offset: numericCast(offset + elf.headerStartOffset),
                 numberOfElements: size / relrEntrySize
             )
             return _ELFRelrRelocationDecoder.entries(sequence)
         }
 
         let sequence: DataSequence<UInt32> = elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: size / relrEntrySize
         )
         return _ELFRelrRelocationDecoder.entries(sequence)
@@ -195,7 +195,7 @@ extension ELFSectionHeaderProtocol where Dynamic.HashTableHeader: LayoutWrapper 
     public func _hashTableHeader(in elf: ELFFile) -> Dynamic.HashTableHeader? {
         guard type(inELF: elf.header) == .hash else { return nil }
         return try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
     }
 
@@ -219,7 +219,7 @@ extension ELFSectionHeaderProtocol {
             return nil
         }
         return try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
     }
 
@@ -272,7 +272,7 @@ extension ELFSectionHeaderProtocol where Dynamic.VersionSym: LayoutWrapper {
         }
         let numberOfSymbols = size / Dynamic.VersionSym.layoutSize
         return elf.fileHandle.readDataSequence(
-            offset: numericCast(offset),
+            offset: numericCast(offset + elf.headerStartOffset),
             numberOfElements: numberOfSymbols
         )
     }

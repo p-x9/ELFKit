@@ -21,13 +21,13 @@ extension ELFGnuHashTableHeader {
         var header: Self { self }
         let bloomsStart: Int = numericCast(offset) + numericCast(header.layoutSize)
         let blooms: DataSequence<Table.Bloom> = elf.fileHandle.readDataSequence(
-            offset: numericCast(bloomsStart),
+            offset: numericCast(bloomsStart + elf.headerStartOffset),
             numberOfElements: numericCast(header.gh_maskwords)
         )
 
         let bucketsStart: Int = bloomsStart + blooms.size
         let buckets: DataSequence<Table.Hashelt> = elf.fileHandle.readDataSequence(
-            offset: numericCast(bucketsStart),
+            offset: numericCast(bucketsStart + elf.headerStartOffset),
             numberOfElements: numericCast(header.gh_nbuckets)
         )
 
