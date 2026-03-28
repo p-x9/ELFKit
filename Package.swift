@@ -9,6 +9,10 @@ let package = Package(
             name: "ELFKit",
             targets: ["ELFKit"]
         ),
+        .library(
+            name: "ELFArchiveKit",
+            targets: ["ELFArchiveKit"]
+        ),
     ],
     dependencies: [
         .package(
