@@ -85,7 +85,6 @@ extension ELFFile {
            let name = dynamics64.sharedObjectName(in: self) {
             return name
         }
-        dynamics
         return url.path
     }
 }
