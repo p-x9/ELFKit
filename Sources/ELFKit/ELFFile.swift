@@ -19,6 +19,8 @@ public final class ELFFile: ELFRepresentable {
     /// URL of the file actually loaded
     public let url: URL
 
+    private let _name: String?
+
     let fileHandle: File
 
     /// A boolean value that indicates whether ELF is a 64-bit architecture.
@@ -32,27 +34,35 @@ public final class ELFFile: ELFRepresentable {
     /// ELF header
     public let header: ELFHeader
 
-    public init(url: URL) throws {
+    /// File offset at which the elf header begins.
+    public let headerStartOffset: Int
+
+    public init(
+        url: URL,
+        headerStartOffset: Int = 0,
+        name: String? = nil
+    ) throws {
         self.url = url
+        self._name = name
         self.fileHandle = try File.open(
             url: url,
             isWritable: false
         )
 
         guard let identifier: HeaderIdentifier = .init(
-            layout: try fileHandle.read(offset: 0)
+            layout: try fileHandle.read(offset: headerStartOffset)
         ) else { throw ELFKitError.invalidFile }
 
         let header: ELFHeader
         switch identifier.class {
         case ._32:
             let _header: ELF32Header = try fileHandle.read(
-                offset: 0
+                offset: headerStartOffset
             )
             header = ._32(_header)
         case ._64:
             let _header: ELF64Header = try fileHandle.read(
-                offset: 0
+                offset: headerStartOffset
             )
             header = ._64(_header)
         default:
@@ -60,6 +70,22 @@ public final class ELFFile: ELFRepresentable {
         }
 
         self.header = header
+        self.headerStartOffset = headerStartOffset
+    }
+}
+
+extension ELFFile {
+    public var name: String {
+        if let _name { return _name }
+        if let dynamics32,
+           let name = dynamics32.sharedObjectName(in: self) {
+            return name
+        }
+        if let dynamics64,
+           let name = dynamics64.sharedObjectName(in: self) {
+            return name
+        }
+        return url.path
     }
 }
 
@@ -67,7 +93,7 @@ extension ELFFile {
     public var programs32: DataSequence<ELF32ProgramHeader>? {
         guard !is64Bit else { return nil }
         return fileHandle.readDataSequence(
-            offset: numericCast(header.programTableOffset),
+            offset: numericCast(header.programTableOffset + headerStartOffset),
             numberOfElements: header.numberOfPrograms
         )
     }
@@ -75,7 +101,7 @@ extension ELFFile {
     public var programs64: DataSequence<ELF64ProgramHeader>? {
         guard is64Bit else { return nil }
         return fileHandle.readDataSequence(
-            offset: numericCast(header.programTableOffset),
+            offset: numericCast(header.programTableOffset + headerStartOffset),
             numberOfElements: header.numberOfPrograms
         )
     }
@@ -85,7 +111,7 @@ extension ELFFile {
     public var sections32: DataSequence<ELF32SectionHeader>? {
         guard !is64Bit else { return nil }
         return fileHandle.readDataSequence(
-            offset: numericCast(header.sectionTableOffset),
+            offset: numericCast(header.sectionTableOffset + headerStartOffset),
             numberOfElements: header.numberOfSections
         )
     }
@@ -93,7 +119,7 @@ extension ELFFile {
     public var sections64: DataSequence<ELF64SectionHeader>? {
         guard is64Bit else { return nil }
         return fileHandle.readDataSequence(
-            offset: numericCast(header.sectionTableOffset),
+            offset: numericCast(header.sectionTableOffset + headerStartOffset),
             numberOfElements: header.numberOfSections
         )
     }
@@ -157,7 +183,7 @@ extension ELFFile {
             return nil
         }
         return fileHandle.readDataSequence(
-            offset: numericCast(_symtab.offset),
+            offset: numericCast(_symtab.offset + headerStartOffset),
             numberOfElements: _symtab.size / ELF32Symbol.layoutSize
         )
     }
@@ -168,7 +194,7 @@ extension ELFFile {
             return nil
         }
         return fileHandle.readDataSequence(
-            offset: numericCast(_symtab.offset),
+            offset: numericCast(_symtab.offset + headerStartOffset),
             numberOfElements: _symtab.size / ELF64Symbol.layoutSize
         )
     }
@@ -191,7 +217,7 @@ extension ELFFile {
             return dynamics32?.symbols(in: self)
         }
         return fileHandle.readDataSequence(
-            offset: numericCast(_dysym.offset),
+            offset: numericCast(_dysym.offset + headerStartOffset),
             numberOfElements: _dysym.size / ELF32Symbol.layoutSize
         )
     }
@@ -202,7 +228,7 @@ extension ELFFile {
             return dynamics64?.symbols(in: self)
         }
         return fileHandle.readDataSequence(
-            offset: numericCast(_dysym.offset),
+            offset: numericCast(_dysym.offset + headerStartOffset),
             numberOfElements: _dysym.size / ELF64Symbol.layoutSize
         )
     }

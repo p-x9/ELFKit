@@ -1,6 +1,15 @@
 {
   "pins" : [
     {
+      "identity" : "objectarchivekit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/p-x9/ObjectArchiveKit.git",
+      "state" : {
+        "revision" : "5fbe7bc2391296aefabbb282359764ebe4ed6532",
+        "version" : "0.4.0"
+      }
+    },
+    {
       "identity" : "swift-binary-parse-support",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/p-x9/swift-binary-parse-support.git",

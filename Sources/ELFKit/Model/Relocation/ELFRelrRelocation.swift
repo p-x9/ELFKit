@@ -45,12 +45,16 @@ extension ELFFile {
         }
 
         if is64Bit {
-            guard let value: UInt64 = try? fileHandle.read(offset: offset) else {
+            guard let value: UInt64 = try? fileHandle.read(
+                offset: offset + headerStartOffset
+            ) else {
                 return nil
             }
             return numericCast(value)
         } else {
-            guard let value: UInt32 = try? fileHandle.read(offset: offset) else {
+            guard let value: UInt32 = try? fileHandle.read(
+                offset: offset + headerStartOffset
+            ) else {
                 return nil
             }
             return numericCast(value)

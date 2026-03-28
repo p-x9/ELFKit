@@ -66,7 +66,7 @@ extension ELF32VersionDef {
         }
         let offset = self._offset + nextOffset
         let layout: Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,
@@ -80,7 +80,7 @@ extension ELF32VersionDef {
 
         let offset = _offset + numericCast(layout.vd_aux)
         let layout: Aux.Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,
@@ -164,7 +164,7 @@ extension ELF64VersionDef {
         }
         let offset = self._offset + nextOffset
         let layout: Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,
@@ -178,7 +178,7 @@ extension ELF64VersionDef {
 
         let offset = _offset + numericCast(layout.vd_aux)
         let layout: Aux.Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,

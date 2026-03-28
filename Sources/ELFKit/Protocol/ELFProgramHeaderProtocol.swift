@@ -37,7 +37,7 @@ extension ELFProgramHeaderProtocol {
     public func _notes(in elf: ELFFile) -> _ELFNotes<Note>? {
         guard type(inELF: elf.header) == .note else { return nil }
         let data = try! elf.fileHandle.readData(
-            offset: offset,
+            offset: offset + elf.headerStartOffset,
             length: fileSize
         )
         return .init(data: data)
@@ -80,7 +80,7 @@ extension ELFProgramHeaderProtocol where Dynamic: LayoutWrapper {
         guard type(inELF: elf.header) == .dynamic else { return nil }
         let count = fileSize / Dynamic.layoutSize
         return elf.fileHandle.readDataSequence(
-                offset: UInt64(offset),
+                offset: UInt64(offset + elf.headerStartOffset),
                 numberOfElements: count
             )
     }

@@ -69,7 +69,7 @@ extension ELF32SectionHeader {
             return nil
         }
         let layout: ELF32VersionDef.Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,
@@ -86,7 +86,7 @@ extension ELF32SectionHeader {
             return nil
         }
         let layout: ELF32VersionNeed.Layout = try! elf.fileHandle.read(
-            offset: offset
+            offset: offset + elf.headerStartOffset
         )
         return .init(
             layout: layout,
