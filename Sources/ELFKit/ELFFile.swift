@@ -19,6 +19,8 @@ public final class ELFFile: ELFRepresentable {
     /// URL of the file actually loaded
     public let url: URL
 
+    private let _name: String?
+
     let fileHandle: File
 
     /// A boolean value that indicates whether ELF is a 64-bit architecture.
@@ -37,9 +39,11 @@ public final class ELFFile: ELFRepresentable {
 
     public init(
         url: URL,
-        headerStartOffset: Int = 0
+        headerStartOffset: Int = 0,
+        name: String? = nil
     ) throws {
         self.url = url
+        self._name = name
         self.fileHandle = try File.open(
             url: url,
             isWritable: false
@@ -67,6 +71,22 @@ public final class ELFFile: ELFRepresentable {
 
         self.header = header
         self.headerStartOffset = headerStartOffset
+    }
+}
+
+extension ELFFile {
+    public var name: String {
+        if let _name { return _name }
+        if let dynamics32,
+           let name = dynamics32.sharedObjectName(in: self) {
+            return name
+        }
+        if let dynamics64,
+           let name = dynamics64.sharedObjectName(in: self) {
+            return name
+        }
+        dynamics
+        return url.path
     }
 }
 

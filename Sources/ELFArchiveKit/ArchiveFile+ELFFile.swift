@@ -23,7 +23,8 @@ extension ArchiveFile {
             }
             return try? ELFFile(
                 url: url,
-                headerStartOffset: dataOffset + headerStartOffset
+                headerStartOffset: dataOffset + headerStartOffset,
+                name: member.name(in: self)
             )
         }
     }
