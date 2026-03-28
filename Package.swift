@@ -23,6 +23,10 @@ let package = Package(
             url: "https://github.com/p-x9/swift-fileio-extra.git",
             from: "0.2.2"
         ),
+        .package(
+            url: "https://github.com/p-x9/ObjectArchiveKit.git",
+            from: "0.3.0"
+        ),
     ],
     targets: [
         .target(
@@ -35,11 +39,18 @@ let package = Package(
             ]
         ),
         .target(
+            name: "ELFArchiveKit",
+            dependencies: [
+                "ELFKit",
+                .product(name: "ObjectArchiveKit", package: "ObjectArchiveKit"),
+            ]
+        ),
+        .target(
             name: "ELFKitC"
         ),
         .testTarget(
             name: "ELFKitTests",
-            dependencies: ["ELFKit"]
+            dependencies: ["ELFKit", "ELFArchiveKit"]
         ),
     ]
 )
